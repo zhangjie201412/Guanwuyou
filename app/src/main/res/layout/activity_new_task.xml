@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20px"
+                android:src="@mipmap/ic_back" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="新建任务单"
+                android:textColor="#ffffff"
+                android:textSize="24px" />
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:id="@+id/layout_system_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tb_top"
+        android:layout_marginTop="@dimen/pile_detail_margin_top_first"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="系统编号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_system_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_system_number"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="桩号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_number"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="桩类型"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/sp_pile_type"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:entries="@array/array_pile_type"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_coordinatex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_type"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="X坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_coordinatex"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:enabled="false"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_coordinatey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_coordinatex"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="Y坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_coordinatey"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:enabled="false"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_diameter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_coordinatey"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="桩径(mm)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_pile_diameter"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:hint="请输入"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textColorHint="#b0b3c1"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_length"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_diameter"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="桩长(M)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_pile_length"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:hint="请输入"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textColorHint="#b0b3c1"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_con_grade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_length"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="砼标号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/sp_con_grade"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:entries="@array/array_con_grade_id"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_empty_pile_length"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_con_grade"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="空桩长度(M)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_empty_pile_length"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:hint="请输入"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textColorHint="#b0b3c1"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pilling_machine_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_empty_pile_length"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="打桩机械"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/sp_pilling_machine_id"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_design_of_concrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pilling_machine_id"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_1"
+            android:text="砼设计方量"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <EditText
+            android:id="@+id/et_design_of_concrete"
+            android:layout_width="350px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/new_task_margin_left_2"
+            android:background="@drawable/edittext_bg"
+            android:hint="请输入"
+            android:inputType="number"
+            android:textColor="#818181"
+            android:textColorHint="#b0b3c1"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bt_sure"
+        android:layout_width="400px"
+        android:layout_height="45px"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30px"
+        android:background="@drawable/shape_button"
+        android:text="确定"
+        android:textColor="#ffffff"
+        android:textSize="24px" />
+</RelativeLayout>

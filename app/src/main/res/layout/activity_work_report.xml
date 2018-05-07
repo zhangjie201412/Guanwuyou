@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20px"
+                android:src="@mipmap/ic_back" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="工作报告"
+                android:textColor="#ffffff"
+                android:textSize="24px" />
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="项目名称"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_project_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="苏州乐园项目"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="打桩机械"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_filling_machine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="打桩机"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="系统编号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_system_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="0037"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="灌注开始时间"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_filling_start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="2018-01-01"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="桩号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="#1001"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="灌注完成时间"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_filling_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="2018-03-03"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="桩类型"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="工程桩"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="混凝土标定值"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_con_cal_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="46"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="X坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_coordinatex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="100"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="泥浆标定值"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_slurry_cal_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="200"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="Y坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_coordinatey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="100"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="砼设计方量"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_con_grade_design"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="0.3*0.4*100"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="桩径(mm)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_diameter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="10"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="砼实际使用方量"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_con_grade_actual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="4*5*100"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="桩长(M)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="80"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="桩头差异等级"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_diff_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="等级三"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="砼标号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_con_grade_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="200"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="情况汇报人"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_reporter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="张三"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142px"
+            android:text="空桩长度(M)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_empty_pile_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="342px"
+            android:text="20"
+            android:textColor="#818181"
+            android:textSize="22px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="702px"
+            android:text="汇报时间"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_report_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="902px"
+            android:text="2018-04-04"
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+</LinearLayout>

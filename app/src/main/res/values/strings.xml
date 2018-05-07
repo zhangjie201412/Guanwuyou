@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Guanwuyou</string>
+
+    <string-array name="array_pile_type">
+        <item>施工桩</item>
+    </string-array>
+    <string-array name="array_con_grade_id">
+        <item>100</item>
+        <item>200</item>
+        <item>300</item>
+        <item>400</item>
+    </string-array>
+</resources>

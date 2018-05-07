@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#64a9a7a7"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40px"
+        android:textColor="#ffffff"
+        android:textSize="22px" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48px"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/dialog_button1"
+            android:layout_width="160px"
+            android:layout_height="45px"
+            android:layout_marginBottom="40px"
+            android:layout_marginLeft="70px"
+            android:layout_marginRight="20px"
+            android:layout_weight="1"
+            android:background="#a3a3a3"
+            android:text="是"
+            android:textColor="#ffffff"
+            android:textSize="22px" />
+
+        <Button
+            android:id="@+id/dialog_button2"
+            android:layout_width="160px"
+            android:layout_height="45px"
+            android:layout_marginBottom="40px"
+            android:layout_marginLeft="20px"
+            android:layout_marginRight="70px"
+            android:layout_weight="1"
+            android:background="#a3a3a3"
+            android:text="否"
+            android:textColor="#ffffff"
+            android:textSize="22px" />
+    </LinearLayout>
+
+</LinearLayout>

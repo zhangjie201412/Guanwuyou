@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.1, maximum-scale=1.0,target-densitydpi=device-dpi" />-->
+    <meta name="viewport" content="initial-scale=0.5, minimum-scale=0.1, maximum-scale=1.5, user-scalable=yes" />
+    <script type="text/javascript" src="jQuery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="md5.min.js"></script>
+    <title>桩位图forApp</title>
+    <style type="text/css">
+        *{margin: 0;padding: 0;border: 0;outline: 0;vertical-align: baseline;background: transparent;}
+        .pileMap_base{width: 100%;height: 100%;float: left;overflow:auto;position: absolute;}
+        .pileMap_base>.pileMap_map{position: relative;min-width: 100%;min-height: 100%;background-image: url("images/wangge.png");}
+        .pileMap_base>.pileMap_map>span{font-size: 14px;height: 14px;line-height: 14px;position: absolute;z-index: 1;}
+        .pileMap_base>.pileMap_map>span.focus,
+        //.pileMap_base>.pileMap_map>span.select{text-decoration: underline;background-color: black;z-index: 3;padding: 0 2px;}
+        .pileMap_base>.pileMap_map>span.select{z-index: 3;padding: 0 2px;}
+        .pileMap_base>.pileMap_map>div{width: 15px;height: 15px;position: absolute;z-index: 2;cursor: pointer;}
+        .pileMap_base>.pileMap_map>div.sgz{background-image: url("images/orange.png")}
+        .pileMap_base>.pileMap_map>div.sgz.focus,
+        .pileMap_base>.pileMap_map>div.sgz.select{background-image: url("images/orange_chk.png")}
+        .pileMap_base>.pileMap_map>div.wsg{background-image: url("images/red.png")}
+        .pileMap_base>.pileMap_map>div.wsg.focus,
+        .pileMap_base>.pileMap_map>div.wsg.select{background-image: url("images/red_chk.png")}
+        .pileMap_base>.pileMap_map>div.jcwc{background-image: url("images/green.png")}
+        .pileMap_base>.pileMap_map>div.jcwc.focus,
+        .pileMap_base>.pileMap_map>div.jcwc.select{background-image: url("images/green_chk.png")}
+        .pileMap_base>.pileMap_map>div.fjcwc{background-image: url("images/yellow.png")}
+        .pileMap_base>.pileMap_map>div.fjcwc.focus,
+        .pileMap_base>.pileMap_map>div.fjcwc.select{background-image: url("images/yellow_chk.png")}
+        .pileMap_base>.pileMap_map>div.focus,
+        .pileMap_base>.pileMap_map>div.select{width: 24px;height: 24px;margin-left: -4px;margin-top: -4px;  }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+        });
+
+            //全局变量
+            var zoomSize = 0.4;//初始1:1比例
+            var margin = 50;//这个必须大于等于节点大小的一半
+
+            //生成桩位图接口
+            function pielDataToMap(jsonStr) {
+                //window.AndroidWebView.showInfoFromJs(11);
+                var json=JSON.parse(jsonStr);
+                if ($.isEmptyObject(json))return;
+                var rs = json.data;
+                if (rs.pileMap.length == 0) {//项目没有桩时
+                    return;
+                }
+                $(".pileMap_map").data("datas", rs);//存起来，缩放有用
+                createMap();
+                return 1;
+            }
+
+            function createMap() {
+                var data = $(".pileMap_map").data("datas");
+                $(".pileMap_map").empty().attr("style","");
+                var rangeX=0;
+                var rangeY=0;
+                var width=0;
+                var height=0;
+                //计算偏移量（移动到第四象限(0,0)的）
+                rangeX = 0-data.coRange.minCoordinatex;//水平偏移 +右-左
+                rangeY = 0-data.coRange.maxCoordinatey;//垂直偏移 +上-下
+                //加上边距后的偏移量(向右，向下移margini像素)
+                rangeX = (rangeX*zoomSize)+margin;
+                rangeY = (rangeY*zoomSize)-margin;
+                //计算原始宽度(不含margin)
+                width = data.coRange.maxCoordinatex-data.coRange.minCoordinatex;
+                height= data.coRange.maxCoordinatey-data.coRange.minCoordinatey;
+                //加上margin宽度
+                width = width*zoomSize+margin*2;
+                height= height*zoomSize+margin*2;
+                $(".pileMap_map").css({width:width,height:height});
+                $.each(data.pileMap,function (i,c) {
+                    createPile($(".pileMap_map"),c,rangeX,rangeY);
+                });
+                //if(defSysNo)focusPile(defSysNo);
+                //移到中心点
+                 $(".pileMap_base").animate({scrollTop:width/2,scrollLeft:height/2},"1000","swing");
+            }
+
+            //生成单根桩，放到tar里//新做法
+            function createPile(tar,data,rangeX,rangeY) {
+                var X,Y;
+                X=parseFloat(data.coordinatex)*zoomSize+parseFloat(rangeX);
+                Y=Math.abs(parseFloat(data.coordinatey)*zoomSize+parseFloat(rangeY));//y轴取反
+                var classStr = hex_md5(data.systemNumber);//由于编号有特殊符号，故改为md5
+                var point = $("<div></div>").appendTo(tar).addClass("p_"+classStr);
+                point.css({left:(X+"px"),top:(Y+"px")}).data("datas",data);
+                var number = $("<span></span>").appendTo(tar).text(data.systemNumber).addClass("p_"+classStr);
+                number.css({left:(X-(number.width()/2)+6),top:((Y-18)+"px")});
+                //切换图例颜色
+                point.hover(function(){point.addClass("focus");number.addClass("focus")},function(){point.removeClass("focus");number.removeClass("focus")});
+                switch (data.constructionState){
+                    case "0"://施工中
+                        number.css("color","#FC9C1F");
+                        point.addClass("sgz");
+                        break;
+                    case "1"://未施工
+                        number.css("color","#ED6663");
+                        point.addClass("wsg");
+                        break;
+                    case "2"://检测完成
+                        number.css("color","#0FD2AE");
+                        point.addClass("jcwc");
+                        break;
+                    case "3"://非检测完成
+                        number.css("color","#FDD100");
+                        point.addClass("fjcwc");
+                        break;
+                }
+                //点击获取焦点
+                point.click(function () {
+                    //focusPile(data.systemNumber);
+                    //只标记定位，不移动
+                    var classStr = hex_md5(data.systemNumber);//由于编号有特殊符号，故改为md5
+                    if($(".p_"+classStr).hasClass("select")){
+
+                    }else{
+                      $(".p_"+classStr).removeClass("select");
+                      $(".p_"+classStr).removeClass("focus");
+                    }
+                    window.AndroidWebView.jumpToPileDetail(JSON.stringify(data));
+
+                });
+            }
+
+            function clearMap() {
+                $(".pileMap_map").empty().attr("style","");
+            }
+            function focusPile(systemNumber) {
+                var classStr = hex_md5(systemNumber);//由于编号有特殊符号，故改为md5
+                $(".pileMap_map").find(".select").removeClass("select");
+                $(".pileMap_map").find(".focus").removeClass("focus");
+                $(".p_"+classStr).addClass("select");
+                //偏移画布,将结果放到中间
+                var tar = $("div.p_"+classStr);
+                //取桩位置，相对画布的
+                var left = parseFloat(tar.position().left);
+                var top = parseFloat(tar.position().top);
+                //取画布大小
+                var map_l = parseFloat($(".pileMap_map").width());
+                var map_t = parseFloat($(".pileMap_map").height());
+                //取可见区大小
+                var base_l = parseFloat($(".pileMap_base").width());
+                var base_t = parseFloat($(".pileMap_base").height());
+                //处理水平方向
+                var scrollTop,scrollLeft;
+                if(map_l<base_l){
+                    //画布宽度比可见区小，不用调
+                }else if(left<=(base_l/2)){//如果left在中点都不到的位置，直接移到最左边
+                    scrollLeft = 0;
+                }else if((map_l-left)<(base_l/2)){//如果距离最右边不到半个可见区，移到最右
+                    scrollLeft = map_l-base_l;
+                }else{//其它情况正常调整
+                    scrollLeft = left-base_l/2;
+                }
+                //处理垂直方向
+                if(map_t<base_t){
+                    //画布高度比可见区小，不用调
+                }else if(top<=(base_t/2)){//如果top在中点都不到的位置，直接移到最上边
+                    scrollTop = 0;
+                }else if((map_t-top)<(base_t/2)){//如果距离最底边不到半个可见区，移到最下
+                    scrollTop = map_t-base_t;
+                }else{//其它情况正常调整
+                    scrollTop = top-base_t/2;
+                }
+                var androidScale=window.AndroidWebView.getScale();
+                $(".pileMap_base").animate({scrollTop:scrollTop,scrollLeft:scrollLeft},"3000","swing");
+                return 1;
+            }
+    </script>
+</head>
+<body>
+<div class="pileMap_base">
+    <div class="pileMap_map">
+
+    </div>
+</div>
+</body>
+</html>

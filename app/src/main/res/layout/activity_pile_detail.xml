@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20px"
+                android:src="@mipmap/ic_back" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="桩详情"
+                android:textColor="#ffffff"
+                android:textSize="24px" />
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_below="@id/tb_top"
+        android:id="@+id/layout_system_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pile_detail_margin_top_first"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="系统编号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_system_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_system_number"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="桩号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_number"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="桩类型"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/layout_coordinatex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_type"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="X坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_coordinatex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_coordinatey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_coordinatex"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="Y坐标"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_coordinatey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_construction_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_coordinatey"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="施工状态"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_construction_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_diameter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_construction_state"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="桩径(mm)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_diameter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_pile_length"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_diameter"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="桩长(M)"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_pile_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_con_grade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_pile_length"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="标号"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_con_grade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_fill_end_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_con_grade"
+        android:layout_marginTop="@dimen/pile_detail_margin_top"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="478px"
+            android:text="灌注时间"
+            android:textColor="#151515"
+            android:textSize="24px" />
+
+        <TextView
+            android:id="@+id/tv_fill_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="678px"
+            android:text=""
+            android:textColor="#818181"
+            android:textSize="22px" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bt_new_task"
+        android:layout_width="400px"
+        android:layout_height="45px"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30px"
+        android:background="@drawable/shape_button"
+        android:textColor="#ffffff"
+        android:textSize="24px" />
+</RelativeLayout>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:hjm="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.hjm.bottomtabbar.BottomTabBar
+        android:id="@+id/bottom_tab_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        hjm:tab_selected_color="#b489e7"
+        hjm:tab_unselected_color="#908f8f"></com.hjm.bottomtabbar.BottomTabBar>
+
+    <!--<ImageView-->
+        <!--android:id="@+id/iv_menu"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="100px"-->
+        <!--android:layout_marginLeft="50px"-->
+        <!--android:src="@mipmap/ic_menu" />-->
+
+</RelativeLayout>

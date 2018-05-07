@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="pile_detail_margin_top_first">30px</dimen>
+    <dimen name="pile_detail_margin_top">15px</dimen>
+    <dimen name="new_task_margin_left_1">380px</dimen>
+    <dimen name="new_task_margin_left_2">550px</dimen>
+
+</resources>
+

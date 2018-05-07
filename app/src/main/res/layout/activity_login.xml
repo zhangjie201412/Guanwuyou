@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#edebf4">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="88px"
+            android:src="@mipmap/ic_logo" />
+
+        <TextView
+            android:id="@+id/tv_username_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="284px"
+            android:text="用户名 Username"
+            android:textColor="#4e585c"
+            android:textSize="22px" />
+
+        <EditText
+            android:id="@+id/et_username"
+            android:layout_width="400px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_username_title"
+            android:layout_marginTop="22px"
+            android:hint="请输入您的用户名"
+            android:textColorHint="#b0b3c1" />
+
+        <TextView
+            android:id="@+id/tv_password_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_username"
+            android:layout_marginTop="24px"
+            android:text="密码 Password"
+            android:textColor="#4e585c"
+            android:textSize="22px" />
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="400px"
+            android:inputType="numberPassword"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_password_title"
+            android:layout_marginTop="22px"
+            android:hint="请输入您的用户名密码"
+            android:textColorHint="#b0b3c1" />
+
+        <Button
+            android:id="@+id/bt_login"
+            android:layout_width="400px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_password"
+            android:layout_marginTop="58px"
+            android:background="@drawable/shape_button"
+            android:text="登录"
+            android:textColor="#ffffff"
+            android:textSize="24px" />
+
+        <CheckBox
+            android:id="@+id/cb_keep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bt_login"
+            android:layout_marginTop="20px"
+            android:text="记住账号密码"
+            android:textColor="#4e585c"
+            android:textSize="18px" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:padding="30px"
+        android:text="©江苏中海昇物联科技有限公司 版本号: V1.0.0"
+        android:textColor="#979797" />
+
+
+</RelativeLayout>

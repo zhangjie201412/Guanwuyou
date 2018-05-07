@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20px"
+                android:src="@mipmap/ic_back" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="桩列表"
+                android:textColor="#ffffff"
+                android:textSize="24px" />
+
+            <ImageView
+                android:id="@+id/iv_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="30px"
+                android:src="@mipmap/ic_switch" />
+
+            <ImageView
+                android:src="@mipmap/ic_advance_search"
+                android:id="@+id/iv_advance"
+                android:layout_toLeftOf="@id/iv_switch"
+                android:layout_marginLeft="20px"
+                android:layout_marginRight="30px"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.SearchView
+                android:id="@+id/sv_search"
+                android:layout_marginBottom="10px"
+                android:layout_toLeftOf="@id/iv_advance"
+                android:layout_marginTop="10px"
+                android:layout_width="400px"
+                android:layout_height="wrap_content"></android.support.v7.widget.SearchView>
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/lv_pile"
+        android:layout_marginBottom="20px"
+        android:layout_marginLeft="48px"
+        android:layout_marginRight="50px"
+        android:layout_marginTop="34px"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+
+</LinearLayout>

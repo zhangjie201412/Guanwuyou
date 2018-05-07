@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/sp_year"
+        android:layout_width="150px"
+        android:layout_height="36px"
+        android:layout_marginLeft="10px"
+        android:layout_marginTop="14px"></android.support.v7.widget.AppCompatSpinner>
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart_bar"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sp_year"></com.github.mikephil.charting.charts.BarChart>
+
+</RelativeLayout>
