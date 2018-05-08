@@ -262,8 +262,8 @@ public class SerialPackage {
 
             List<String> dataList = new ArrayList<>();
             dataList.add("" + (year - 2000));
-            dataList.add("" + month + 1);
-            dataList.add("" + day + 1);
+            dataList.add("" + (month + 1));
+            dataList.add("" + day );
             dataList.add("" + hour);
             dataList.add("" + min);
             dataList.add("" + second);
