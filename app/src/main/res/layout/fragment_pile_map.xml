@@ -29,7 +29,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10px"
                 android:layout_toRightOf="@id/iv_location"
-                android:text="苏州乐园桩基项目"
+                android:text="--"
                 android:textColor="#ffffff"
                 android:textSize="18px" />
 

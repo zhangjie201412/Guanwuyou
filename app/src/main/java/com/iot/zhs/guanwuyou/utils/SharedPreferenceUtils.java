@@ -25,6 +25,7 @@ public class SharedPreferenceUtils {
     public static final String KEY_LOGIN_COMPANY_NAME = "key_login_company_name";
     public static final String KEY_LOGIN_MASTER_DEVICE_SN = "key_login_master_device_sn";
     public static final String KEY_LOGIN_PROJECT_ID = "key_login_project_id";
+    public static final String KEY_LOGIN_PROJECT_NAME = "key_login_project_name";
     public static final String KEY_LOGIN_USER_ID = "key_login_user_id";
     public static final String KEY_LOGIN_USER_NAME = "key_login_user_name";
     public static final String KEY_LATEST_RAW = "key_latest_raw";
@@ -94,6 +95,11 @@ public class SharedPreferenceUtils {
     public String getKeyLoginProjectId() {
         return mSp.getString(KEY_LOGIN_PROJECT_ID, "");
     }
+
+    public String getKeyLoginProjectName() {
+        return mSp.getString(KEY_LOGIN_PROJECT_NAME, "");
+    }
+
 
     public String getKeyLoginUserId() {
         return mSp.getString(KEY_LOGIN_USER_ID, "");
@@ -234,6 +240,11 @@ public class SharedPreferenceUtils {
 
     public void setKeyLoginProjectId(String val) {
         mEditor.putString(KEY_LOGIN_PROJECT_ID, val);
+        mEditor.commit();
+    }
+
+    public void setKeyLoginProjectName(String val) {
+        mEditor.putString(KEY_LOGIN_PROJECT_NAME, val);
         mEditor.commit();
     }
 

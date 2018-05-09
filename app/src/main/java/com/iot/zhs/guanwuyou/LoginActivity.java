@@ -195,6 +195,7 @@ public class LoginActivity extends AppCompatActivity {
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);
                     MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(userModel.masterDeviceSN);
                     MyApplication.getInstance().getSpUtils().setKeyLoginProjectId(userModel.projectId);
+                    MyApplication.getInstance().getSpUtils().setKeyLoginProjectName(userModel.projectName);
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserId(userModel.userId);
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
 

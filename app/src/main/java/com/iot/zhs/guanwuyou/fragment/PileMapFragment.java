@@ -66,6 +66,7 @@ public class PileMapFragment extends Fragment {
     private ImageView mZoomRestoreImageView;
     private ImageView mZoomInImageView;
     private ImageView mZoomOutImageView;
+    private TextView mProjectNameTv;
 
     private PileMapInfo mPileMapInfo;
     private MyApplication mApplication;
@@ -104,6 +105,8 @@ public class PileMapFragment extends Fragment {
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
         mPileInfoList = new ArrayList<>();
+        mProjectNameTv=view.findViewById(R.id.tv_project_title);
+        mProjectNameTv.setText(mSpUtils.getKeyLoginProjectName());
         mPileMapWebView = view.findViewById(R.id.wv_pile_map);
         mSwitchImageView = view.findViewById(R.id.iv_switch);
         mSwitchImageView.setOnClickListener(new View.OnClickListener() {
