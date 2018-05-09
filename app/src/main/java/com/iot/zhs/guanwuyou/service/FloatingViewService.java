@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -37,16 +38,27 @@ import java.util.List;
 public class FloatingViewService extends Service {
     private static final String TAG = "ZHS#Float";
     private LinearLayout mLayout;
+    private LinearLayout mPopLayout;
+
     private ImageView mFloatingImageView;
     private WindowManager.LayoutParams mWindowManagerParams;
+    private WindowManager.LayoutParams mPopWindowManagerParams;
+
     private LayoutInflater mInflater;
     private WindowManager mWindowManager;
-    private boolean mIsShowing = false;
 
+    private boolean isShow=false;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        initFloating();
+        return new MyBinder();
+    }
+
+    public class MyBinder extends Binder {
+        public FloatingViewService getFloatingViewService(){
+            return FloatingViewService.this;
+        }
     }
 
     @Override
@@ -94,8 +106,77 @@ public class FloatingViewService extends Service {
         mFloatingImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startService(new Intent(FloatingViewService.this, PopupWindowService.class));
+                if(isShow){
+                    if(mPopLayout!=null) {
+                        mWindowManager.removeViewImmediate(mPopLayout);
+                    }
+                }else{
+                    initPopupwindow();
+                }
+                isShow=!isShow;
             }
         });
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mWindowManager!=null){
+            mWindowManager.removeViewImmediate(mLayout);
+        }
+    }
+
+    private void initPopupwindow(){
+        mPopWindowManagerParams = getParams(mPopWindowManagerParams);//设置好悬浮窗的参数
+        // 悬浮窗默认显示以左上角为起始坐标
+        mPopWindowManagerParams.gravity = Gravity.LEFT| Gravity.TOP;
+        //悬浮窗的开始位置，因为设置的是从左上角开始，所以屏幕左上角是x=0;y=0
+        mPopWindowManagerParams.x = 40;
+        mPopWindowManagerParams.y = 150;
+        mPopWindowManagerParams.width = 600;
+        mPopWindowManagerParams.height = 450;
+        //得到容器，通过这个inflater来获得悬浮窗控件
+        mInflater = LayoutInflater.from(getApplication());
+        // 获取浮动窗口视图所在布局
+        mPopLayout = (LinearLayout) mInflater.inflate(R.layout.dialog_device_list, null);
+
+        List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
+        SlaveDevice masterDevice = new SlaveDevice();
+        masterDevice.setSerialNumber(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
+        masterDevice.setSlaveOrMaster(0);
+        masterDevice.setOnline(1);
+        masterDevice.setAlarm(0);
+        masterDevice.setComm(1);
+        masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery());
+
+        slaveDeviceList.add(0, masterDevice);
+        for (SlaveDevice device : slaveDeviceList) {
+            Log.d(TAG, "### serialNumber: " + device.getSerialNumber());
+            Log.d(TAG, "### online: " + device.getOnline());
+            Log.d(TAG, "### alarm: " + device.getAlarm());
+            Log.d(TAG, "### comm: " + device.getComm());
+            Log.d(TAG, "### battery: " + device.getBattery());
+            Log.d(TAG, "### ----------------------------------");
+        }
+
+        ListView listView = mPopLayout.findViewById(R.id.lv_popup);
+        DeviceListAdapter adapter = new DeviceListAdapter(FloatingViewService.this, slaveDeviceList);
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        mWindowManager.addView(mPopLayout, mPopWindowManagerParams);
+    }
+
+    public void  dismissPop(){
+        if(isShow){
+            if(mPopLayout!=null) {
+                mWindowManager.removeViewImmediate(mPopLayout);
+            }
+        }
+    }
+
+
+
+
+
 }

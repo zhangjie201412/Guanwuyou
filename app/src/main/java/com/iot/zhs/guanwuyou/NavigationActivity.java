@@ -46,9 +46,13 @@ public class NavigationActivity extends AppCompatActivity {
     private NotificationDialog mNotificationDialog;
 
     private Intent mIntent;
+    private FloatingViewService floatingViewService;
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
+        if(floatingViewService!=null){
+            floatingViewService.dismissPop();
+        }
         mNotificationDialog.setMessage("是否确认退出?");
         mNotificationDialog.show(getSupportFragmentManager(), "Notification");
     }
@@ -123,6 +127,10 @@ public class NavigationActivity extends AppCompatActivity {
                     public void onButtonClick(int id) {
                         //响应左边的button
                         if (id == 1) {
+                            if(mIntent!=null) {
+                                unbindService(mServiceConnection);
+                                stopService(mIntent);
+                            }
                             NavigationActivity.this.finish();
                         } else if(id == 2) {
                             mNotificationDialog.dismiss();
@@ -130,12 +138,26 @@ public class NavigationActivity extends AppCompatActivity {
                     }
                 });
         mIntent = new Intent(NavigationActivity.this, FloatingViewService.class);
-        startService(mIntent);
+       // startService(mIntent);
+        bindService(mIntent, mServiceConnection,
+                Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(mIntent);
     }
+
+    ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            floatingViewService = ((FloatingViewService.MyBinder) service).getFloatingViewService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+    };
+
 }
