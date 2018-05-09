@@ -76,7 +76,8 @@
             android:layout_marginBottom="20px"
             android:layout_marginLeft="48px"
             android:layout_marginRight="50px"
-            android:layout_marginTop="34px"></ListView>
+            android:layout_marginTop="34px"
+            android:scrollbars="none"></ListView>
     </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
 </LinearLayout>

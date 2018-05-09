@@ -93,20 +93,6 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
     private Toast mToast;
 
 
-    private Handler mUiHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == CMD_START) {
-                mProgressDialog.show();
-            } else if (msg.what == CMD_END) {
-                mProgressDialog.dismiss();
-            } else if (msg.what == CMD_UPDATE) {
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    };
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,6 +181,14 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
             }
         });
 
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        curPage = 1;
+        mPileInfoList.clear();
         doSelectPileOfAppInfo();
     }
 
