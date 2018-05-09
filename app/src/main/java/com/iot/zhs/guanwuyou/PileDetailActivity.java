@@ -126,7 +126,7 @@ public class PileDetailActivity extends AppCompatActivity {
         mPileId = getIntent().getStringExtra("pileId");
         mProjectId = getIntent().getStringExtra("projectId");
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
-        showToast("Pile ID: " + mPileId);
+      //  showToast("Pile ID: " + mPileId);
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
 //        doViewPileInfo(mSpUtils.getKeyLoginToken(),
@@ -189,7 +189,7 @@ public class PileDetailActivity extends AppCompatActivity {
                 if ((constructionState == 2) || (constructionState == 3)) {
                     mNewTaskButton.setText("查看工作报告");
                     mButtonEvent = BUTTON_EVENT_REPORT;
-                } else if (constructionState == 0) {
+                } else if (constructionState == 0||constructionState == 1) {
                     mNewTaskButton.setText("继续");
                     mButtonEvent = BUTTON_EVENT_CONTINUE;
                 }

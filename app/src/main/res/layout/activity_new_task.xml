@@ -222,7 +222,7 @@
             android:layout_marginLeft="@dimen/new_task_margin_left_2"
             android:background="@drawable/edittext_bg"
             android:hint="请输入"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="#818181"
             android:textColorHint="#b0b3c1"
             android:textSize="22px" />
@@ -279,7 +279,7 @@
             android:layout_marginLeft="@dimen/new_task_margin_left_2"
             android:background="@drawable/edittext_bg"
             android:hint="请输入"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="#818181"
             android:textColorHint="#b0b3c1"
             android:textSize="22px" />

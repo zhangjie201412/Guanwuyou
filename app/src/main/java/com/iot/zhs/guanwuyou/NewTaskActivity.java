@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.SaveAccountReportData;
 import com.iot.zhs.guanwuyou.comm.http.SaveAccountReportInfo;
+import com.iot.zhs.guanwuyou.utils.EditInputFilter;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -108,8 +110,12 @@ public class NewTaskActivity extends AppCompatActivity {
         mCoordinateyEditText = findViewById(R.id.et_coordinatey);
         mPileDiameteEditText = findViewById(R.id.et_pile_diameter);
         mPileLengthEditText = findViewById(R.id.et_pile_length);
+        InputFilter[] filters0 = {new EditInputFilter(2)};//限制空桩长为2位小数
+        mPileLengthEditText.setFilters(filters0);
         mConGradeNumberSpinner = findViewById(R.id.sp_con_grade);
         mEmptyPileLengthEditText = findViewById(R.id.et_empty_pile_length);
+        InputFilter[] filters1 = {new EditInputFilter(2)};//限制空桩长为2位小数
+        mEmptyPileLengthEditText.setFilters(filters1);
         mPillingMachineIdSpinner = findViewById(R.id.sp_pilling_machine_id);
         mDesignOfConcreteEditText = findViewById(R.id.et_design_of_concrete);
         mBackImageView = findViewById(R.id.iv_back);

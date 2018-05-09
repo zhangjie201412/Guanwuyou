@@ -121,7 +121,7 @@ public class FillingActivity extends AppCompatActivity {
         mFinalCheckData = new ArrayList<>();
         mFinalCheckData.clear();
         List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
-        for(SlaveDevice device : slaveDeviceList) {
+        for (SlaveDevice device : slaveDeviceList) {
             mFinalCheckData.add("" + device.getLatestData());
         }
         mNotificationDialog = new NotificationDialog();
@@ -146,7 +146,7 @@ public class FillingActivity extends AppCompatActivity {
         mAnimationRunning = true;
         mAnimationThread.start();
         mActivedByPileMap = getIntent().getBooleanExtra("ACTIVITY_BY_PILE_MAP", false);
-        if(mActivedByPileMap) {
+        if (mActivedByPileMap) {
             if (mSpUtils.getKeySlaveAlarm()) {
                 doEndPourInfo(mSpUtils.getKeyLoginToken(),
                         mSpUtils.getKeyLoginUserId(),
@@ -183,7 +183,7 @@ public class FillingActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             int what = msg.what;
-            if(!mAnimationRunning)
+            if (!mAnimationRunning)
                 return;
             switch (what) {
                 case STAGE0_ON:
@@ -220,12 +220,12 @@ public class FillingActivity extends AppCompatActivity {
                         Thread.sleep(1000);
                         mHandler.sendEmptyMessage(STAGE0_ON);
                         Thread.sleep(1000);
-                    } else if(mAnimationStage == 1) {
+                    } else if (mAnimationStage == 1) {
                         mHandler.sendEmptyMessage(STAGE1_OFF);
                         Thread.sleep(1000);
                         mHandler.sendEmptyMessage(STAGE1_ON);
                         Thread.sleep(1000);
-                    } else if(mAnimationStage == 2) {
+                    } else if (mAnimationStage == 2) {
                         mHandler.sendEmptyMessage(STAGE2_OFF);
                         Thread.sleep(1000);
                         mHandler.sendEmptyMessage(STAGE2_ON);
@@ -350,14 +350,13 @@ public class FillingActivity extends AppCompatActivity {
             Gson gson = new Gson();
             EndPourData data = gson.fromJson(response, EndPourData.class);
             Log.d(TAG, "code: " + data.code);
-            if(data.code == Utils.MSG_CODE_OK) {
-                Log.d(TAG, "diffGrade: " + data.data.diffGrade);
-                if (data.code.equals(Utils.MSG_CODE_OK)) {
-                    mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
-                            + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
-                    mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
-                }
+            Log.d(TAG, "diffGrade: " + data.data.diffGrade);
+            if (data.code.equals(Utils.MSG_CODE_OK)) {
+                mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
+                        + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
+                mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
             }
+
             showToast(data.message);
         }
     }
@@ -405,10 +404,10 @@ public class FillingActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
-        if(event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
-            if(event.message.equals("prealarm")) {
+        if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
+            if (event.message.equals("prealarm")) {
                 mAnimationStage = 1;
-            } else if(event.message.equals("alarm")) {
+            } else if (event.message.equals("alarm")) {
                 mAnimationStage = 2;
             }
         }
