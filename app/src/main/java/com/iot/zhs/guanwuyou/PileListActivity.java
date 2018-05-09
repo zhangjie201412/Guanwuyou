@@ -31,6 +31,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.SelectPileOfAppInfo;
@@ -50,6 +51,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -58,11 +61,13 @@ import okhttp3.Response;
  * Created by H151136 on 1/23/2018.
  */
 
-public class PileListActivity extends AppCompatActivity {
+public class PileListActivity extends AppCompatActivity implements BGARefreshLayout.BGARefreshLayoutDelegate {
 
     private static final String TAG = "ZHS.IOT";
     private Toolbar mToolbar;
     private SearchView mSearchView;
+    private TextView mSerarchTextView;
+    private BGARefreshLayout bgaRefreshLayout;
 
     private WaitProgressDialog mProgressDialog;
     private MyApplication mApplication;
@@ -82,6 +87,11 @@ public class PileListActivity extends AppCompatActivity {
     private static final int CMD_START = 0x01;
     private static final int CMD_END = 0x02;
     private static final int CMD_UPDATE = 0x03;
+
+    private int curPage = 1;
+    private int totalPageNum;
+    private Toast mToast;
+
 
     private Handler mUiHandler = new Handler() {
         @Override
@@ -103,12 +113,16 @@ public class PileListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pile_list);
         mToolbar = findViewById(R.id.tb_top);
         setSupportActionBar(mToolbar);
+        mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 
         mSearchView = findViewById(R.id.sv_search);
         mListView = findViewById(R.id.lv_pile);
         mBackImageView = findViewById(R.id.iv_back);
         mSwitchImageView = findViewById(R.id.iv_switch);
         mAdvanceImageView = findViewById(R.id.iv_advance);
+        bgaRefreshLayout = findViewById(R.id.refreshLayout);
+        bgaRefreshLayout.setDelegate(this);
+        bgaRefreshLayout.setRefreshViewHolder(new BGANormalRefreshViewHolder(PileListActivity.this, true));
 
         mBackImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,8 +158,8 @@ public class PileListActivity extends AppCompatActivity {
                 spanText.length(),
                 Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         mSearchView.setQueryHint(spanText);
-        TextView textView = mSearchView.findViewById(R.id.search_src_text);
-        textView.setTextColor(Color.WHITE);// 设置输入字的显示
+        mSerarchTextView  = mSearchView.findViewById(R.id.search_src_text);
+        mSerarchTextView.setTextColor(Color.WHITE);// 设置输入字的显示
         mProgressDialog = new WaitProgressDialog(this);
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
@@ -153,7 +167,6 @@ public class PileListActivity extends AppCompatActivity {
         mAdapter = new PileInfoAdapter(this, mPileInfoList);
         mListView.setAdapter(mAdapter);
 
-        new DoPileInfoThread().start();
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -169,20 +182,41 @@ public class PileListActivity extends AppCompatActivity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                curPage = 1;
+                mPileInfoList.clear();
+                doSelectPileOfAppInfo();
+
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!TextUtils.isEmpty(newText)){
-                    Log.d(TAG, "filter: " + newText);
-                    mListView.setFilterText(newText);
-                }else{
-                    mListView.clearTextFilter();
-                }
                 return false;
             }
         });
+
+        doSelectPileOfAppInfo();
+    }
+
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+        curPage = 1;
+        mPileInfoList.clear();
+        doSelectPileOfAppInfo();
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        curPage++;
+        if (curPage <= totalPageNum) {
+            doSelectPileOfAppInfo();
+
+        } else {
+            bgaRefreshLayout.endLoadingMore();
+            showToast("无更多数据");
+            return false;
+        }
+        return true;
     }
 
     private class DoSelectPileOfAppInfoCallback extends StringCallback {
@@ -191,83 +225,55 @@ public class PileListActivity extends AppCompatActivity {
         public void onBefore(Request request, int id) {
             super.onBefore(request, id);
             Log.d(TAG, "onBefore");
-            mIsLast = false;
         }
 
         @Override
         public void onAfter(int id) {
             super.onAfter(id);
             Log.d(TAG, "onAfter");
-            mIsLast = false;
         }
 
         @Override
         public void onError(Call call, Exception e, int id) {
             e.printStackTrace();
-            mIsLast = true;
+            mProgressDialog.dismiss();
+            bgaRefreshLayout.endLoadingMore();
+            bgaRefreshLayout.endRefreshing();
         }
 
         @Override
         public void onResponse(String response, int id) {
-            mLock.lock();
-            try {
-                Log.d(TAG, response);
-                Gson gson = new Gson();
-                SelectPileOfAppInfo info = gson.fromJson(response, SelectPileOfAppInfo.class);
-
-                if (info.data.page.list.size() == 0) {
-                    mIsLast = true;
-                } else {
-                    for(int i = 0; i <info.data.page.list.size(); i++) {
-                        mPileInfoList.add(info.data.page.list.get(i));
-                    }
-                    mUiHandler.sendEmptyMessage(CMD_UPDATE);
-                }
-                mCond.signal();
-            } finally {
-                mLock.unlock();
+            Log.d(TAG, response);
+            Gson gson = new Gson();
+            SelectPileOfAppInfo info = gson.fromJson(response, SelectPileOfAppInfo.class);
+            if (info.data.page.list.size() != 0) {
+                mPileInfoList.addAll(info.data.page.list);
             }
+            totalPageNum=info.data.page.allPage;
+            mProgressDialog.dismiss();
+            bgaRefreshLayout.endLoadingMore();
+            bgaRefreshLayout.endRefreshing();
         }
     }
 
-    private class DoPileInfoThread extends Thread {
-        @Override
-        public void run() {
-            Looper.prepare();
-            int page = 1;
-            mUiHandler.sendEmptyMessage(CMD_START);
-            while (true) {
-                try {
-                    mLock.lock();
-                    JSONObject object = new JSONObject();
-                    try {
-                        object.put("projectId", mSpUtils.getKeyLoginProjectId());
-                        doSelectPileOfAppInfo(mSpUtils.getKeyLoginToken(), mSpUtils.getKeyLoginUserId(),
-                                object, page++);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    mCond.await();
-                    if (mIsLast) {
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    mLock.unlock();
-                }
-            }
-            mUiHandler.sendEmptyMessage(CMD_END);
-            Looper.loop();
-        }
-    }
 
-    private void doSelectPileOfAppInfo(String token, String userName, JSONObject json, int pageNo) {
-        Log.d(TAG, "json: " + json.toString());
+    private void doSelectPileOfAppInfo() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("projectId", mSpUtils.getKeyLoginProjectId());
+            json.put("pileNumber",mSerarchTextView.getText().toString().trim());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String token = mSpUtils.getKeyLoginToken();
+        String userName = mSpUtils.getKeyLoginUserId();
+
         String url = Utils.SERVER_ADDR + "/pile/doSelectPileOfAppInfo/cc/" + token + "/" + userName;
+        mProgressDialog.show();
         OkHttpUtils.post().url(url)
                 .addParams("jsonStr", json.toString())
-                .addParams("pageNo", "" + pageNo)
+                .addParams("pageNo", "" + curPage)
                 .addParams("pageSize", "20")
                 .build()
                 .connTimeOut(Utils.HTTP_TIMEOUT)
@@ -275,6 +281,9 @@ public class PileListActivity extends AppCompatActivity {
                 .writeTimeOut(Utils.HTTP_TIMEOUT)
                 .execute(new DoSelectPileOfAppInfoCallback());
     }
+
+
+
 
     private class PileInfoAdapter extends BaseAdapter implements Filterable {
         private LayoutInflater mInflater;
@@ -337,9 +346,9 @@ public class PileListActivity extends AppCompatActivity {
             holder.pileLength.setText("桩长: " + mDatas.get(i).pileLength + "mm");
             holder.pileDiameter.setText("桩径: " + mDatas.get(i).pileDiameter + "mm");
 
-            if(mDatas.get(i).conGrade == null)
+            if (mDatas.get(i).conGrade == null)
                 mDatas.get(i).conGrade = "";
-            if(mDatas.get(i).pileTypeName == null)
+            if (mDatas.get(i).pileTypeName == null)
                 mDatas.get(i).pileTypeName = "";
             holder.concrete.setText("砼标号: " + mDatas.get(i).conGrade);
             holder.pileType.setText("桩类型: " + mDatas.get(i).pileTypeName);
@@ -349,7 +358,7 @@ public class PileListActivity extends AppCompatActivity {
 
         @Override
         public Filter getFilter() {
-            if(mFilter == null) {
+            if (mFilter == null) {
                 mFilter = new MyFilter();
             }
 
@@ -372,12 +381,12 @@ public class PileListActivity extends AppCompatActivity {
             protected FilterResults performFiltering(CharSequence charSequence) {
                 FilterResults results = new FilterResults();
                 List<SelectPileOfAppInfo.Data.Page.PileInfo> list;
-                if(TextUtils.isEmpty(charSequence)) {
+                if (TextUtils.isEmpty(charSequence)) {
                     list = mDataBak;
                 } else {
                     list = new ArrayList<>();
-                    for(SelectPileOfAppInfo.Data.Page.PileInfo info: mDataBak) {
-                        if(info.pileNumber.contains(charSequence) ||
+                    for (SelectPileOfAppInfo.Data.Page.PileInfo info : mDataBak) {
+                        if (info.pileNumber.contains(charSequence) ||
                                 info.systemNumber.contains(charSequence)) {
                             list.add(info);
                         }
@@ -392,13 +401,18 @@ public class PileListActivity extends AppCompatActivity {
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mDatas = (List<SelectPileOfAppInfo.Data.Page.PileInfo>)filterResults.values;
-                if (filterResults.count>0){
+                mDatas = (List<SelectPileOfAppInfo.Data.Page.PileInfo>) filterResults.values;
+                if (filterResults.count > 0) {
                     notifyDataSetChanged();//通知数据发生了改变
-                }else {
+                } else {
                     notifyDataSetInvalidated();//通知数据失效
                 }
             }
         }
+    }
+
+    private void showToast(String msg) {
+        mToast.setText(msg);
+        mToast.show();
     }
 }

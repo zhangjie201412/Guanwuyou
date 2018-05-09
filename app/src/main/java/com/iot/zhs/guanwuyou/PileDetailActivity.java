@@ -106,7 +106,7 @@ public class PileDetailActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (mButtonEvent == BUTTON_EVENT_CONTINUE) {
                     //get no finish status
-                    if (mNoFinishState == 0) {
+                    if (mNoFinishState == 0||mNoFinishState ==-1) {
                         //跳转到标定界面
                         Intent intent = new Intent(PileDetailActivity.this, CalibrationActivity.class);
                         intent.putExtra("pileId", mNoFinishPileId);

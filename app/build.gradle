@@ -39,4 +39,6 @@ dependencies {
     compile 'com.hjm:BottomTabBar:1.0.0'
     compile 'com.android.support:cardview-v7:26.+'
     compile 'com.android.support:recyclerview-v7:26.+'
+    compile 'cn.bingoogolapple:bga-refreshlayout:1.1.7@aar'
+
 }

@@ -213,6 +213,9 @@ public class PileMapFragment extends Fragment {
         if (mNotificationDialog.isAdded()) {
             mNotificationDialog.dismiss();
         }
+        mNoFinishPileNumber="";
+        mNoFinishState=-1;
+        mNoFinishPileId="";
         mProgressDialog.show();
         doQueryPileMap(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(),
