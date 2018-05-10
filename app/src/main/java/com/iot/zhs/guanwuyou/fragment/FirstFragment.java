@@ -1,5 +1,6 @@
 package com.iot.zhs.guanwuyou.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,28 +9,36 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.chart.DiffGradeAxisValueFormatter;
 import com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo;
+import com.iot.zhs.guanwuyou.utils.MyAxisValueFormatter;
+import com.iot.zhs.guanwuyou.utils.MyPercentFormatter;
+import com.iot.zhs.guanwuyou.utils.MyValueFormatter;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -54,7 +63,8 @@ public class FirstFragment extends Fragment {
 
     private PieChart mPieChart;
     private BarChart mBarChart;
-    private DiffGradeAxisValueFormatter mFormatter;
+    private TextView mBarXNameTv;
+    private int visibleXMax = 6;
 
     @Nullable
     @Override
@@ -64,19 +74,33 @@ public class FirstFragment extends Fragment {
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
 
+        mBarXNameTv=view.findViewById(R.id.bar_x_name_tv);
+
         mPieChart = view.findViewById(R.id.chart_pie);
-        mPieChart.setUsePercentValues(true);
-        mPieChart.getDescription().setEnabled(false);
-        mPieChart.setDrawHoleEnabled(false);
-        mPieChart.setTransparentCircleColor(Color.WHITE);
-        mPieChart.setTransparentCircleAlpha(110);
+        mPieChart.setUsePercentValues(true);//设置value是否用显示百分数,默认为false
+        mPieChart.getDescription().setEnabled(false);//是否设置设置描述
+        mPieChart.setExtraOffsets(0, 0, 0, 0);//设置饼状图距离上下左右的偏移量
+        mPieChart.setDrawSliceText(false);//设置隐藏饼图上文字，只显示百分比
+        mPieChart.setDragDecelerationFrictionCoef(0.95f);//设置阻尼系数,范围在[0,1]之间,越小饼状图转动越困难
+        mPieChart.setNoDataText("暂无数据");
+        mPieChart.setNoDataTextColor(Color.parseColor("#4e585c"));
 
-//        mPieChart.setHoleRadius(58f);
-//        mPieChart.setTransparentCircleRadius(61f);
+        mPieChart.setDrawHoleEnabled(false);//是否绘制饼状图中间的圆
+        mPieChart.setTransparentCircleColor(Color.WHITE);//设置圆环的颜色
+        mPieChart.setTransparentCircleAlpha(110);//设置圆环的透明度[0,255]
+        mPieChart.setTransparentCircleRadius(55f);//设置圆环的半径值
 
-        mPieChart.setDrawCenterText(false);
-
+        mPieChart.setRotationEnabled(false);///设置饼状图是否可以旋转(默认为true)
+        mPieChart.setRotationAngle(0);//设置饼状图旋转的角度
         mPieChart.setRotationAngle(0);
+
+        mPieChart.setHighlightPerTapEnabled(true);//设置旋转的时候点中的tab是否高亮(默认为true)
+        mPieChart.animateY(1400, Easing.EasingOption.EaseInOutQuad);//设置动画
+        mPieChart.getLegend().setEnabled(true);//图例显示;
+
+        mPieChart.setEntryLabelColor(Color.WHITE);//设置绘制Label的颜色
+        mPieChart.setEntryLabelTextSize(18f);//设置绘制Label的字体大小
+
         // enable rotation of the chart by touch
         mPieChart.setRotationEnabled(true);
         mPieChart.setHighlightPerTapEnabled(true);
@@ -85,57 +109,66 @@ public class FirstFragment extends Fragment {
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
         l.setDrawInside(true);
-        l.setXEntrySpace(7f);
-        l.setYEntrySpace(0f);
+        l.setXEntrySpace(5f);
+        l.setYEntrySpace(5f);
+        l.setTextSize(14f);
+        l.setTextColor(Color.parseColor("#696969"));
         l.setYOffset(0f);
 
+        /*------------------柱状图----------------------*/
         mBarChart = view.findViewById(R.id.chart_bar);
         mBarChart.getDescription().setEnabled(false);
-        mBarChart.setMaxVisibleValueCount(60);
-        mBarChart.setDrawGridBackground(false);
         mBarChart.setPinchZoom(false);
-        mBarChart.setBackgroundColor(Color.WHITE);
+        mBarChart.setDoubleTapToZoomEnabled(false);
+        mBarChart.setDrawGridBackground(false);
+        mBarChart.setDrawBarShadow(false);
+        mBarChart.setDrawValueAboveBar(true);//数值位于柱状图上
+        //mBarChart.setHighlightFullBarEnabled(false);
+        //mBarChart.setHighlightPerDragEnabled(false);
+        //mBarChart.setHighlightPerTapEnabled(false);
+        mBarChart.setTouchEnabled(true);
+        mBarChart.setExtraOffsets(0, 0, 0, 0);//设置饼状图距离上下左右的偏移量
+        mBarChart.setNoDataText("暂无数据");
+        mBarChart.setNoDataTextColor(Color.parseColor("#4e585c"));
+        mBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener(){
 
-//        IAxisValueFormatter xAxisFormatter = new MonthAxisValueFormatter(mBarChart);
-        mFormatter = new DiffGradeAxisValueFormatter();
-        XAxis xAxis = mBarChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setTextSize(18);
-        xAxis.setTextColor(Color.parseColor("#696969"));
-        xAxis.setLabelCount(12);
-//        xAxis.setValueFormatter(xAxisFormatter);
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index= (int) e.getX();
 
+               /* Intent intent=new Intent(context, PileListActivity.class);
+                intent.putExtra("projectId",project.getId());
+                intent.putExtra("projectName",project.getShowName());
+                intent.putExtra("diffGrade",pileDiffGradeModelList.get(index).getDiffGrade());//差异等级
+                startActivity(intent);*/
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+
+        // y轴
         YAxis leftAxis = mBarChart.getAxisLeft();
-        leftAxis.setLabelCount(3, false);
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setTextSize(18);
+        leftAxis.setValueFormatter(new MyAxisValueFormatter());//y周的标注
+        leftAxis.setAxisMinimum(0); //setStartAtZero(true) 从0开始
         leftAxis.setTextColor(Color.parseColor("#696969"));
-        leftAxis.setSpaceTop(15f);
-        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-
-        YAxis rightAxis = mBarChart.getAxisLeft();
-        rightAxis.setLabelCount(3, false);
-        rightAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        rightAxis.setTextSize(18);
-        rightAxis.setTextColor(Color.parseColor("#696969"));
-        rightAxis.setSpaceTop(15f);
-        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        leftAxis.setTextSize(14f);
+        leftAxis.setDrawGridLines(true);
+        // leftAxis.setLabelCount(5, true); // force 6 labels
+        mBarChart.getAxisRight().setEnabled(false);//右侧y轴没有
+        mBarChart.getLegend().setEnabled(true);
 
         Legend ll = mBarChart.getLegend();
         ll.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         ll.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         ll.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        ll.setDrawInside(false);
-        ll.setForm(Legend.LegendForm.SQUARE);
-        ll.setFormSize(9f);
+        ll.setDrawInside(true);
+        ll.setForm(Legend.LegendForm.NONE);
         ll.setTextSize(18);
-        ll.setXEntrySpace(4f);
+        ll.setXEntrySpace(0f);
         ll.setTextColor(Color.parseColor("#696969"));
-
-//        setBarData(12, 50);
-//        setData(12, 50);
 
         doSelectProgressAndDiffGradeInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(),
@@ -144,46 +177,76 @@ public class FirstFragment extends Fragment {
     }
 
 
-    private void setBarData(List<com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.Data.DiffGrade> diffs) {
-        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
-
-        List<String> xvalues = new ArrayList<>();
-
-        for(int i = 0; i < diffs.size(); i++) {
-            yVals1.add(new BarEntry(i, Float.valueOf(diffs.get(i).pileSumNum)));
-            xvalues.add(diffs.get(i).diffGrade);
-        }
-        mFormatter.setXValues(xvalues);
-        mBarChart.getXAxis().setValueFormatter(mFormatter);
-
-        BarDataSet set1;
-
-        if (mBarChart.getData() != null &&
-                mBarChart.getData().getDataSetCount() > 0) {
-            set1 = (BarDataSet) mBarChart.getData().getDataSetByIndex(0);
-            set1.setValues(yVals1);
-            mBarChart.getData().notifyDataChanged();
-            mBarChart.notifyDataSetChanged();
+    private void setBarData(final List<com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.Data.DiffGrade> diffs) {
+        if (Utils.listIsEmpty(diffs)) {
+            mBarChart.setData(null);
+            mBarXNameTv.setVisibility(View.GONE);
         } else {
-            set1 = new BarDataSet(yVals1, "检测完成数量");
-            set1.setDrawIcons(false);
+            mBarXNameTv.setVisibility(View.VISIBLE);
+            //x轴
+            XAxis xLabels = mBarChart.getXAxis();
+            xLabels.setGranularity(1f);
+            xLabels.setPosition(XAxis.XAxisPosition.BOTTOM);//x轴的位置
+            xLabels.setTextColor(Color.parseColor("#696969"));
+            xLabels.setTextSize(14f);
+            xLabels.setDrawGridLines(false);
+            if (diffs.size() <= visibleXMax) {
+                xLabels.setLabelCount(diffs.size());//设置x轴显示的标签个数
+            }
+            xLabels.setValueFormatter(new IAxisValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    int i = (int) value;
+                    //  LogUtil.i("aa","回调value="+value+",i="+i);
+                    String result = "";
+                    if (!Utils.listIsEmpty(diffs)) {
+                        result = diffs.get(i).diffGrade;
+                    }
+                    return result;
+                }
+            });
 
-            ArrayList<Integer> colors = new ArrayList<Integer>();
+            //x轴数据
+            ArrayList<String> xVals = new ArrayList<String>();
+            for (int i = 0; i < diffs.size(); i++) {
+                xVals.add(i, diffs.get(i).diffGrade);
+            }
 
-            colors.add(Color.parseColor("#b143f1"));
-            set1.setColors(colors);
+            //y轴数据
+            ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+            for (int i = 0; i < diffs.size(); i++) {
+                com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.Data.DiffGrade DiffGrade = diffs.get(i);
+                float val1 = Utils.stringToFloat(DiffGrade.pileSumNum);//非检测完成桩数
+                yVals1.add(new BarEntry(i, new float[]{val1}));
+            }
 
-            ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
-            dataSets.add(set1);
+            BarDataSet set1;
+            if (mBarChart.getData() != null &&
+                    mBarChart.getData().getDataSetCount() > 0) {
+                set1 = (BarDataSet) mBarChart.getData().getDataSetByIndex(0);
+                set1.setValues(yVals1);
+                mBarChart.getData().notifyDataChanged();
+                mBarChart.notifyDataSetChanged();
+            } else {
+                set1 = new BarDataSet(yVals1, "检测完成数量");
+                set1.setColors(Color.parseColor("#B143FE"));//橘色  黄色
+                set1.setStackLabels(new String[]{"检测完成数量"});//图例名称
 
-            BarData data = new BarData(dataSets);
-            data.setValueTextSize(18.0f);
-            data.setValueTextColor(Color.parseColor("#a0a9ff"));
-            data.setBarWidth(0.34f);
+                ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+                dataSets.add(set1);
 
-            mBarChart.setData(data);
-            mBarChart.invalidate();
+                //图上显示的数据
+                BarData data = new BarData(dataSets);
+                data.setValueFormatter(new MyValueFormatter());
+                data.setValueTextColor(Color.parseColor("#A0A9FF"));
+                data.setValueTextSize(18f);
+                data.setBarWidth(0.3f);
+                mBarChart.setData(data);
+            }
+            mBarChart.setVisibleXRangeMaximum(visibleXMax);
+            mBarChart.setFitBars(true);
         }
+        mBarChart.invalidate();
     }
 
     @Override
@@ -204,16 +267,11 @@ public class FirstFragment extends Fragment {
             Gson gson = new Gson();
             com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo info = gson.fromJson(response, com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.class);
             //draw the chart
-            float calFinish = Float.valueOf(info.data.pileProgress.calFinish);
-            float constructing = Float.valueOf(info.data.pileProgress.constructing);
-            float otherFinish = Float.valueOf(info.data.pileProgress.otherFinish);
-            float unconstruct = Float.valueOf(info.data.pileProgress.unconstruct);
-            float total = calFinish + constructing + otherFinish + unconstruct;
-            setData(calFinish * 100f / total,
-                    constructing * 100f / total,
-                    otherFinish * 100f / total,
-                    unconstruct * 100f / total);
-            mPieChart.animateY(800, Easing.EasingOption.EaseInOutQuad);
+            int calFinish = Utils.stringToInt(info.data.pileProgress.calFinish);
+            int constructing = Utils.stringToInt(info.data.pileProgress.constructing);
+            int otherFinish = Utils.stringToInt(info.data.pileProgress.otherFinish);
+            int unconstruct =Utils.stringToInt(info.data.pileProgress.unconstruct);
+            setData(calFinish , constructing , otherFinish , unconstruct );
             setBarData(info.data.diffGradeList);
         }
     }
@@ -228,40 +286,41 @@ public class FirstFragment extends Fragment {
                 );
     }
 
-    private void setData(float calFinish, float constructing, float otherFinish, float unconstruct) {
-        ArrayList<PieEntry> entries = new ArrayList<>();
+    private void setData(int calFinish, int constructing, int otherFinish, int unconstruct) {
+        if (calFinish == 0 && constructing == 0 && otherFinish == 0 && unconstruct == 0) {
+            mPieChart.setData(null);
+        }else {
+            ArrayList<PieEntry> entries = new ArrayList<>();
+            entries.add(new PieEntry(unconstruct, "未施工桩数", null));
+            entries.add(new PieEntry(constructing, "施工中桩数", null));
+            entries.add(new PieEntry(calFinish, "检测完成桩数", null));
+            entries.add(new PieEntry(otherFinish, "非检测完成桩数", null));
 
-        entries.add(new PieEntry(calFinish, "检测完成", null));
-        entries.add(new PieEntry(constructing, "施工中", null));
-        entries.add(new PieEntry(otherFinish, "非检测完成", null));
-        entries.add(new PieEntry(unconstruct, "未施工", null));
-
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setDrawIcons(false);
-        dataSet.setSliceSpace(3f);
+            PieDataSet dataSet = new PieDataSet(entries, "");
+            dataSet.setDrawIcons(false);
+            dataSet.setSliceSpace(3f);
 //        dataSet.setIconsOffset(new MPPointF(0, 40));
-        dataSet.setSelectionShift(5f);
+            dataSet.setSelectionShift(5f);
 
-        ArrayList<Integer> colors = new ArrayList<Integer>();
+            ArrayList<Integer> colors = new ArrayList<Integer>();
 
-        colors.add(Color.parseColor("#0fd2ae"));
-        colors.add(Color.parseColor("#fcab1f"));
-        colors.add(Color.parseColor("#fdd100"));
-        colors.add(Color.parseColor("#ed6663"));
+            colors.add(Color.parseColor("#ed6663"));
+            colors.add(Color.parseColor("#6369d8"));
+            colors.add(Color.parseColor("#0fd2ae"));
+            colors.add(Color.parseColor("#fdd100"));
 
-        dataSet.setColors(colors);
-        //dataSet.setSelectionShift(0f);
+            dataSet.setColors(colors);
+            //dataSet.setSelectionShift(0f);
 
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter());
-        data.setValueTextSize(11f);
-        data.setValueTextColor(Color.WHITE);
-//        data.setValueTypeface(mTfLight);
-        mPieChart.setData(data);
+            PieData data = new PieData(dataSet);
+            data.setValueFormatter(new MyPercentFormatter());
+            data.setValueTextSize(18f);
+            data.setValueTextColor(Color.WHITE);
+            mPieChart.setData(data);
 
-        // undo all highlights
-        mPieChart.highlightValues(null);
-
+            // undo all highlights
+            mPieChart.highlightValues(null);
+        }
         mPieChart.invalidate();
     }
 }

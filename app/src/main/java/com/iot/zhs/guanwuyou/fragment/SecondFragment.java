@@ -4,13 +4,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -22,9 +27,12 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.NewTaskActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.chart.MonthAxisValueFormatter;
 import com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo;
+import com.iot.zhs.guanwuyou.utils.MyAxisValueFormatter;
+import com.iot.zhs.guanwuyou.utils.MyValueFormatter;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -34,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import okhttp3.Call;
@@ -49,6 +58,11 @@ public class SecondFragment extends Fragment {
     private MyApplication myApplication;
     private SharedPreferenceUtils mSpUtils;
     private BarChart mBarChart;
+    private TextView mBarXNameTv;
+    private AppCompatSpinner mYearSpinner;
+    private int visibleXMax = 12;
+
+    private String[] yearArray;
 
     @Nullable
     @Override
@@ -57,52 +71,73 @@ public class SecondFragment extends Fragment {
 
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
+        mBarChart=view.findViewById(R.id.chart_bar);
+        mBarXNameTv=view.findViewById(R.id.bar_x_name_tv);
+        mYearSpinner=view.findViewById(R.id.sp_year);
+        //年份
+        yearArray=getActivity().getResources().getStringArray(R.array.year);
+        String currYear=Calendar.getInstance().get(Calendar.YEAR) + "";
+        for(int i=0;i<yearArray.length;i++){
+            if(yearArray[i].equals(currYear)){
+                mYearSpinner.setSelection(i);
+                break;
+            }
+        }
 
-        mBarChart = view.findViewById(R.id.chart_bar);
+        mYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String aa=mYearSpinner.getSelectedItem().toString();
+                doSelectPileFinishedByPeriodInfo(mSpUtils.getKeyLoginToken(),
+                        mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginProjectId(), mYearSpinner.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         mBarChart.getDescription().setEnabled(false);
-        mBarChart.setMaxVisibleValueCount(60);
-        mBarChart.setDrawGridBackground(false);
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        //barChart.setMaxVisibleValueCount(20);
+        // scaling can now only be done on x- and y-axis separately
         mBarChart.setPinchZoom(false);
+        mBarChart.setDoubleTapToZoomEnabled(false);
+        mBarChart.setDrawGridBackground(false);
+        mBarChart.setDrawBarShadow(false);
+        mBarChart.setDrawValueAboveBar(true);//数值位于柱状图上
+        mBarChart.setHighlightFullBarEnabled(false);
+        mBarChart.setHighlightPerDragEnabled(false);
+        mBarChart.setHighlightPerTapEnabled(false);
+        mBarChart.setExtraOffsets(0, 0, 0, 0);//设置饼状图距离上下左右的偏移量
+        mBarChart.setNoDataText("暂无数据");
+        mBarChart.setNoDataTextColor(Color.parseColor("#4E585C"));
 
-        IAxisValueFormatter xAxisFormatter = new MonthAxisValueFormatter(mBarChart);
-        XAxis xAxis = mBarChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setTextSize(18);
-        xAxis.setTextColor(Color.parseColor("#696969"));
-        xAxis.setLabelCount(12);
-        xAxis.setValueFormatter(xAxisFormatter);
-
+        // y轴
         YAxis leftAxis = mBarChart.getAxisLeft();
-        leftAxis.setLabelCount(3, false);
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setTextSize(18);
+        leftAxis.setValueFormatter(new MyAxisValueFormatter());//y周的标注
+        leftAxis.setAxisMinimum(0); //setStartAtZero(true) 从0开始
         leftAxis.setTextColor(Color.parseColor("#696969"));
-        leftAxis.setSpaceTop(15f);
-        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setTextSize(14f);
+        mBarChart.getAxisRight().setEnabled(false);//右侧y轴没有
 
-        YAxis rightAxis = mBarChart.getAxisLeft();
-        rightAxis.setLabelCount(3, false);
-        rightAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        rightAxis.setTextSize(18);
-        rightAxis.setTextColor(Color.parseColor("#696969"));
-        rightAxis.setSpaceTop(15f);
-        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        mBarChart.getLegend().setEnabled(true);
 
         Legend ll = mBarChart.getLegend();
         ll.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         ll.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         ll.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        ll.setDrawInside(false);
-        ll.setForm(Legend.LegendForm.SQUARE);
-        ll.setFormSize(9f);
-        ll.setTextSize(18);
-        ll.setXEntrySpace(4f);
+        ll.setDrawInside(true);
+        ll.setForm(Legend.LegendForm.NONE);
+        ll.setTextSize(18f);
+        ll.setXEntrySpace(0f);
         ll.setTextColor(Color.parseColor("#696969"));
 
-        doSelectPileFinishedByPeriodInfo(mSpUtils.getKeyLoginToken(),
-                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginProjectId(), "2017");
+       /* doSelectPileFinishedByPeriodInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginProjectId(), mYearSpinner.getSelectedItem().toString());*/
         return view;
     }
 
@@ -144,41 +179,76 @@ public class SecondFragment extends Fragment {
                 );
     }
 
-    private void setBarData(List<com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo.Data.PileFinished> finishedList) {
-        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
-
-        for(int i = 0; i < finishedList.size(); i++) {
-            yVals1.add(new BarEntry(i, Integer.valueOf(finishedList.get(i).pileSumNum)));
-        }
-
-        BarDataSet set1;
-
-        if (mBarChart.getData() != null &&
-                mBarChart.getData().getDataSetCount() > 0) {
-            set1 = (BarDataSet) mBarChart.getData().getDataSetByIndex(0);
-            set1.setValues(yVals1);
-            mBarChart.getData().notifyDataChanged();
-            mBarChart.notifyDataSetChanged();
+    private void setBarData(final List<com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo.Data.PileFinished> finishedList) {
+        if (Utils.listIsEmpty(finishedList)) {
+            mBarChart.setData(null);
+            mBarXNameTv.setVisibility(View.GONE);
         } else {
-            set1 = new BarDataSet(yVals1, "检测完成数量");
-            set1.setDrawIcons(false);
+            mBarXNameTv.setVisibility(View.VISIBLE);
+            //x轴
+            XAxis xLabels = mBarChart.getXAxis();
+            xLabels.setGranularity(1f);
+            xLabels.setPosition(XAxis.XAxisPosition.BOTTOM);//x轴的位置
+            xLabels.setTextColor(Color.parseColor("#696969"));
+            xLabels.setTextSize(14f);
+            xLabels.setDrawGridLines(false);
+            if (finishedList.size() <= visibleXMax) {
+                xLabels.setLabelCount(finishedList.size());//设置x轴显示的标签个数
+            }
+            xLabels.setValueFormatter(new IAxisValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    int i = (int) value;
+                    //  LogUtil.i("aa","回调value="+value+",i="+i);
+                    String result = "";
+                    if (!Utils.listIsEmpty(finishedList)) {
+                        result = finishedList.get(i).month;
+                    }
+                    return result;
+                }
+            });
 
-            ArrayList<Integer> colors = new ArrayList<Integer>();
+            //x轴数据
+            ArrayList<String> xVals = new ArrayList<String>();
+            for (int i = 0; i < finishedList.size(); i++) {
+                xVals.add(i, finishedList.get(i).month);
+            }
 
-            colors.add(Color.parseColor("#b143f1"));
-            set1.setColors(colors);
+            //y轴数据
+            ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+            for (int i = 0; i < finishedList.size(); i++) {
+                com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo.Data.PileFinished pileFinished = finishedList.get(i);
+                float val1 = Utils.stringToFloat(pileFinished.pileSumNum);//非检测完成桩数
+                yVals1.add(new BarEntry(i, new float[]{val1}));
+            }
 
-            ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
-            dataSets.add(set1);
+            BarDataSet set1;
+            if (mBarChart.getData() != null &&
+                    mBarChart.getData().getDataSetCount() > 0) {
+                set1 = (BarDataSet) mBarChart.getData().getDataSetByIndex(0);
+                set1.setValues(yVals1);
+                mBarChart.getData().notifyDataChanged();
+                mBarChart.notifyDataSetChanged();
+            } else {
+                set1 = new BarDataSet(yVals1, "检测完成数量");
+                set1.setColors(Color.parseColor("#B143FE"));//柱状图颜色
+                set1.setStackLabels(new String[]{"检测完成数量"});//图例名称
 
-            BarData data = new BarData(dataSets);
-            data.setValueTextSize(18.0f);
-            data.setValueTextColor(Color.parseColor("#a0a9ff"));
-            data.setBarWidth(0.34f);
+                ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+                dataSets.add(set1);
 
-            mBarChart.setData(data);
-            mBarChart.invalidate();
+                //图上显示的数据
+                BarData data = new BarData(dataSets);
+                data.setValueFormatter(new MyValueFormatter());
+                data.setValueTextColor(Color.parseColor("#A0A9FF"));
+                data.setValueTextSize(18f);
+                data.setBarWidth(0.4f);
+                mBarChart.setData(data);
+            }
+            mBarChart.setVisibleXRangeMaximum(visibleXMax);
+            mBarChart.setFitBars(true);
         }
+        mBarChart.invalidate();
     }
 
     @Override

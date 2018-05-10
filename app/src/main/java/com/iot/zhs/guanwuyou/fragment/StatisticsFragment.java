@@ -44,6 +44,7 @@ public class StatisticsFragment extends Fragment {
     private int mCurIndex = 0;
     private TextView mSwitchTextView;
     private ImageView mSwitchImageView;
+    private TextView mProjectNameTv;
 
     @Nullable
     @Override
@@ -56,6 +57,8 @@ public class StatisticsFragment extends Fragment {
         mSecondFragment = new SecondFragment();
         mPager.setAdapter(new FragmentAdapter(getFragmentManager()));
 
+        mProjectNameTv=view.findViewById(R.id.tv_project_title);
+        mProjectNameTv.setText(MyApplication.getInstance().getSpUtils().getKeyLoginProjectName());
         mSwitchTextView = view.findViewById(R.id.tv_switch);
         mSwitchImageView = view.findViewById(R.id.iv_switch);
         mSwitchTextView.setText("查看各月检测完成情况");

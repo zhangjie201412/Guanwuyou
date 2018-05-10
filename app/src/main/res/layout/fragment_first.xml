@@ -10,7 +10,8 @@
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="10dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -23,16 +24,20 @@
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/chart_pie"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"/>
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:clipChildren="false">
 
         <TextView
+            android:id="@+id/bar_chart_title_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -45,9 +50,22 @@
             android:id="@+id/chart_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
-
-    </LinearLayout>
+            android:layout_margin="10dp"
+            android:layout_below="@+id/bar_chart_title_tv"
+            android:layout_toLeftOf="@+id/bar_x_name_tv"/>
+        <TextView
+            android:id="@+id/bar_x_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:text="差异\n等级"
+            android:textColor="#696969"
+            android:textSize="18sp"
+            android:visibility="gone"
+            android:layout_marginBottom="10dp"/>
+    </RelativeLayout>
 
 
 </LinearLayout>
