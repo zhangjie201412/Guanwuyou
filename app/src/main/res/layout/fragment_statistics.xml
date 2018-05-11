@@ -8,7 +8,7 @@
         android:id="@+id/tb_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@mipmap/ic_nav_bar_bg"
         android:minHeight="?attr/actionBarSize">
 
         <RelativeLayout
@@ -30,7 +30,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10px"
                 android:layout_toRightOf="@id/iv_location"
-                android:text="苏州乐园桩基项目"
+                android:text="--"
                 android:textColor="#ffffff"
                 android:textSize="18px" />
 

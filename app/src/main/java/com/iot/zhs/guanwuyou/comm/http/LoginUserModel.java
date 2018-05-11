@@ -13,6 +13,7 @@ public class LoginUserModel {
     public String masterDeviceSN;
     public String mobileNO;
     public String projectId;
+    public String projectName;
     public String userId;
     public String userName;
     public static class ConstructState {

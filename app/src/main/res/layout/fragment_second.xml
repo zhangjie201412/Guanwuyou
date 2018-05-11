@@ -8,13 +8,30 @@
         android:layout_width="150px"
         android:layout_height="36px"
         android:layout_marginLeft="10px"
-        android:layout_marginTop="14px"></android.support.v7.widget.AppCompatSpinner>
+        android:layout_marginTop="14px"
+        android:entries="@array/year"
+        style="@style/spinnerStyle"></android.support.v7.widget.AppCompatSpinner>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart_bar"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_height="match_parent"
-        android:layout_below="@id/sp_year"></com.github.mikephil.charting.charts.BarChart>
+        android:layout_below="@id/sp_year"
+        android:layout_margin="10dp"
+        android:layout_toLeftOf="@+id/bar_x_name_tv"></com.github.mikephil.charting.charts.BarChart>
+
+    <TextView
+        android:id="@+id/bar_x_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="月份"
+        android:textColor="#696969"
+        android:textSize="18sp"
+        android:visibility="visible"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp" />
 
 </RelativeLayout>

@@ -8,12 +8,14 @@
         android:id="@+id/tb_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@mipmap/ic_nav_bar_bg"
         android:minHeight="?attr/actionBarSize">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <ImageView
                 android:id="@+id/iv_back"
@@ -42,32 +44,40 @@
                 android:src="@mipmap/ic_switch" />
 
             <ImageView
-                android:src="@mipmap/ic_advance_search"
                 android:id="@+id/iv_advance"
-                android:layout_toLeftOf="@id/iv_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="20px"
                 android:layout_marginRight="30px"
-                android:layout_centerVertical="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_toLeftOf="@id/iv_switch"
+                android:src="@mipmap/ic_advance_search" />
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/sv_search"
-                android:layout_marginBottom="10px"
-                android:layout_toLeftOf="@id/iv_advance"
-                android:layout_marginTop="10px"
                 android:layout_width="400px"
-                android:layout_height="wrap_content"></android.support.v7.widget.SearchView>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:layout_marginTop="10px"
+                android:layout_toLeftOf="@id/iv_advance"></android.support.v7.widget.SearchView>
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
-    <ListView
-        android:id="@+id/lv_pile"
-        android:layout_marginBottom="20px"
-        android:layout_marginLeft="48px"
-        android:layout_marginRight="50px"
-        android:layout_marginTop="34px"
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/lv_pile"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="20px"
+            android:layout_marginLeft="48px"
+            android:layout_marginRight="50px"
+            android:layout_marginTop="34px"
+            android:scrollbars="none"></ListView>
+    </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
 </LinearLayout>

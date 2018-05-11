@@ -262,8 +262,8 @@ public class SerialPackage {
 
             List<String> dataList = new ArrayList<>();
             dataList.add("" + (year - 2000));
-            dataList.add("" + month + 1);
-            dataList.add("" + day + 1);
+            dataList.add("" + (month + 1));
+            dataList.add("" + day );
             dataList.add("" + hour);
             dataList.add("" + min);
             dataList.add("" + second);
@@ -540,9 +540,19 @@ public class SerialPackage {
             } else {
                 device.updateAll("serialNumber = ?", slaveSn);
             }
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = "alarm";
-            EventBus.getDefault().post(event);
+            boolean isAllSlaveAlarmed = true;
+            List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
+            for (SlaveDevice dev : slaveDeviceList) {
+                if(dev.getAlarm() != 2) {
+                    isAllSlaveAlarmed = false;
+                }
+            }
+
+            if(isAllSlaveAlarmed) {
+                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
+                event.message = "alarm";
+                EventBus.getDefault().post(event);
+            }
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "alarm", "none", 3, mData);

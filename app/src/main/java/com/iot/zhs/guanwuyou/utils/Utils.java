@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by H151136 on 1/22/2018.
@@ -82,4 +83,42 @@ public class Utils {
         }
     }
 
+
+    /**
+     * 字符串转int
+     *
+     * @param string
+     * @return
+     */
+    public static int stringToInt(String string) {
+        if (string == null || string.equals("")) {
+            string = "0";
+        }
+        return Integer.parseInt(string);
+    }
+    /**
+     * 判断list是否为空
+     * @param list
+     * @param <T>
+     * @return
+     */
+    public static <T> boolean listIsEmpty(List<T> list) {
+        if (list == null || list.size() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 字符串转浮点
+     *
+     * @param string
+     * @return
+     */
+    public static float stringToFloat(String string) {
+        if (string == null || string.equals("")) {
+            string = "0";
+        }
+        return Float.parseFloat(string);
+    }
 }

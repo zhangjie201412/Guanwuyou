@@ -60,7 +60,6 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 mSerialManager.setPowerUp();
                 mSerialManager.requestCalMac();
-                mSerialManager.matchList();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -195,10 +194,16 @@ public class LoginActivity extends AppCompatActivity {
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);
                     MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(userModel.masterDeviceSN);
                     MyApplication.getInstance().getSpUtils().setKeyLoginProjectId(userModel.projectId);
+                    MyApplication.getInstance().getSpUtils().setKeyLoginProjectName(userModel.projectName);
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserId(userModel.userId);
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
 
                     mProgressDialog.dismiss();
+                    try {
+                        mSerialManager.matchList();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     startActivity(intent);
                 }
