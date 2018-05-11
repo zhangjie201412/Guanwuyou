@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#5d000000">
+
+    <com.iot.zhs.guanwuyou.utils.OnTouchScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/sure_btn">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/sure_btn"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40px"
+                android:layout_marginRight="40px"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14px"
+                    android:layout_marginTop="14px"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="200px"
+                        android:layout_height="wrap_content"
+                        android:text="施工状态"
+                        android:textColor="#151515"
+                        android:textSize="24px" />
+
+                    <TextView
+                        android:id="@+id/pile_state_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:hint="请选择施工状态"
+                        android:lines="1"
+                        android:text=""
+                        android:textColorHint="#b0b3c1"
+                        android:textColor="#4e585c"                          android:textSize="22px" />
+                </LinearLayout>
+
+                <View style="@style/divider_style" />
+
+                <LinearLayout
+                    android:id="@+id/title_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14px"
+                    android:layout_marginTop="14px"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="200px"
+                        android:layout_height="wrap_content"
+                        android:text="点位坐标"
+                        android:textColor="#151515"
+                        android:textSize="24px" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <TextView
+                            android:id="@+id/x_key_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="X:"
+                            android:textColor="#151515"
+                            android:textSize="24px"/>
+
+                        <EditText
+                            android:id="@+id/x_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@+id/center_divider_tv"
+                            android:layout_toRightOf="@+id/x_key_tv"
+                            android:background="@null"
+                            android:hint="请输入"
+                            android:textColorHint="#b0b3c1"
+                            android:textColor="#4e585c"                            android:textSize="22px" />
+
+                        <TextView
+                            android:id="@+id/center_divider_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="-"
+                            android:textColor="#151515"
+                            android:textSize="24px"/>
+
+                        <TextView
+                            android:id="@+id/y_key_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/center_divider_tv"
+                            android:text="Y:"
+                            android:textColor="#151515"
+                            android:textSize="24px"/>
+
+                        <EditText
+                            android:id="@+id/y_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/y_key_tv"
+                            android:background="@null"
+                            android:hint="请输入"
+                            android:textColor="#b0b3c1"
+                            android:textSize="22px" />
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+                <View style="@style/divider_style" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14px"
+                    android:layout_marginTop="14px"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="200px"
+                        android:layout_height="wrap_content"
+                        android:text="桩头差异等级"
+                        android:textColor="#151515"
+                        android:textSize="24px" />
+
+                    <TextView
+                        android:id="@+id/differ_grade_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:hint="请选择桩头差异等级"
+                        android:lines="1"
+                        android:text=""
+                        android:textColorHint="#b0b3c1"
+                        android:textColor="#4e585c"
+                        android:textSize="22px" />
+                </LinearLayout>
+
+                <View style="@style/divider_style" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/check_complete_date_key_tv"
+                        android:layout_width="200px"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="检测完成时间"
+                        android:textColor="#151515"
+                        android:textSize="24px" />
+
+                    <TextView
+                        android:id="@+id/check_complete_start_date_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="14px"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="14px"
+                        android:layout_toRightOf="@+id/check_complete_date_key_tv"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:hint="请选择检测完成开始时间"
+                        android:lines="1"
+                        android:text=""
+                        android:textColorHint="#b0b3c1"
+                        android:textColor="#4e585c"
+                        android:textSize="22px" />
+
+                    <View
+                        style="@style/divider_style"
+                        android:layout_alignLeft="@+id/check_complete_start_date_tv"
+                        android:layout_below="@+id/check_complete_start_date_tv" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14px"
+                    android:layout_marginTop="14px"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="200px"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#151515"
+                        android:textSize="24px" />
+
+                    <TextView
+                        android:id="@+id/check_complete_end_date_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:hint="请选择检测完成结束时间"
+                        android:lines="1"
+                        android:text=""
+                        android:textColorHint="#b0b3c1"
+                        android:textColor="#4e585c"
+                        android:textSize="22px" />
+                </LinearLayout>
+
+                <View style="@style/divider_style" />
+
+
+            </LinearLayout>
+
+            <View
+                style="@style/divider_style"
+                android:layout_height="5dp"
+                android:layout_marginTop="14px" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="80px"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:paddingTop="14px"
+                    android:paddingBottom="14px">
+
+                    <Button
+                        android:id="@+id/reset_btn"
+                        android:layout_width="250px"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="55px"
+                        android:background="@drawable/com_fda534_line_bg"
+                        android:text="重置"
+                        android:textSize="25px"
+                        android:textColor="#fda534"/>
+
+                    <Button
+                        android:id="@+id/sure_btn"
+                        android:layout_width="250px"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="55px"
+                        android:background="@drawable/com_9b98fd_solid_bg"
+                        android:text="确定"
+                        android:textColor="@color/white"
+                        android:textSize="25px" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </com.iot.zhs.guanwuyou.utils.OnTouchScrollView>
+    >
+
+
+</LinearLayout>

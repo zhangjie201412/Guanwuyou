@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -23,6 +24,8 @@ import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.HttpResponse;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
+import com.iot.zhs.guanwuyou.utils.Constant;
+import com.iot.zhs.guanwuyou.utils.DisplayUtil;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -30,6 +33,7 @@ import com.zhy.http.okhttp.callback.Callback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.util.Const;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -119,6 +123,21 @@ public class LoginActivity extends AppCompatActivity {
 
         String md51 = Utils.encrypt("123456");
         Log.d(TAG, "password: " + Uri.encode(md51));
+        getWidthHeight();
+
+    }
+
+    /**
+     * 获取屏幕的宽高
+     */
+    private void getWidthHeight() {
+        DisplayMetrics dm =getResources().getDisplayMetrics();
+        Constant.display.widthPixels = dm.widthPixels;//宽度
+        Constant.display.heightPixels =dm.heightPixels;//高度
+        Constant.display.statusBarHeightPixels = DisplayUtil.getStatusBarHeight(this);//顶部状态栏
+        Constant.display.bottomBarHeightPixels= DisplayUtil.getDaoHangHeight(this);//底部导航栏
+        Log.d("aa","宽="+ Constant.display.widthPixels +",高="+ Constant.display.heightPixels
+                +",顶部状态栏="+Constant.display.statusBarHeightPixels+",底部导航栏="+Constant.display.bottomBarHeightPixels);
     }
 
     @Override
@@ -189,6 +208,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Object response, int id) {
                 LoginUserModel userModel = (LoginUserModel) response;
+                Constant.curUser=userModel;
                 if (userModel != null) {
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyId(userModel.companyId);
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);

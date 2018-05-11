@@ -1,15 +1,25 @@
 package com.iot.zhs.guanwuyou.utils;
 
+import android.app.Activity;
+import android.view.inputmethod.InputMethodManager;
+
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 /**
  * Created by H151136 on 1/22/2018.
@@ -120,5 +130,57 @@ public class Utils {
             string = "0";
         }
         return Float.parseFloat(string);
+    }
+
+    /**
+     * 隐藏键盘
+     *
+     * @param context
+     */
+    public static void hideSoftKeyboard(Activity context) {
+        // 先隐藏键盘
+        InputMethodManager manager = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+
+        if (context.getCurrentFocus() != null && context.getCurrentFocus().getWindowToken() != null) {
+            manager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    /**
+     * 深拷贝
+     *
+     * @param src
+     * @param <T>
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static <T> List<T> deepCopy(List<T> src) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        List<T> dest = null;
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(src);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream in = new ObjectInputStream(byteIn);
+            dest = (List<T>) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dest;
+    }
+
+    /**
+     * 判断字符串是否为空
+     *
+     * @param string
+     * @return
+     */
+    public static boolean stringIsEmpty(String string) {
+        if (string == null || string.equals("")) {
+            return true;
+        }
+        return false;
     }
 }

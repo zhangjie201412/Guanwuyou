@@ -1,5 +1,6 @@
 package com.iot.zhs.guanwuyou.comm.http;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ public class SelectProgressAndDiffGradeInfo {
     public String code;
     public Data data;
     public static class Data {
-        public List<DiffGrade> diffGradeList;
+        public List<DiffGrade> diffGradeList=new ArrayList<>();
         public static class DiffGrade {
             public String diffGrade;
             public String pileSumNum;

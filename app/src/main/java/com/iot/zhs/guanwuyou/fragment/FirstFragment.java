@@ -33,6 +33,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.PileListActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.chart.DiffGradeAxisValueFormatter;
 import com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo;
@@ -65,6 +66,7 @@ public class FirstFragment extends Fragment {
     private BarChart mBarChart;
     private TextView mBarXNameTv;
     private int visibleXMax = 6;
+    private com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo info;
 
     @Nullable
     @Override
@@ -101,6 +103,22 @@ public class FirstFragment extends Fragment {
         mPieChart.setEntryLabelColor(Color.WHITE);//设置绘制Label的颜色
         mPieChart.setEntryLabelTextSize(18f);//设置绘制Label的字体大小
 
+        mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index= (int) h.getX();
+                Intent intent=new Intent(FirstFragment.this.getActivity(),PileListActivity.class);
+                intent.putExtra("index",index+"");
+                startActivity(intent);
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+
+
         // enable rotation of the chart by touch
         mPieChart.setRotationEnabled(true);
         mPieChart.setHighlightPerTapEnabled(true);
@@ -136,11 +154,9 @@ public class FirstFragment extends Fragment {
             public void onValueSelected(Entry e, Highlight h) {
                 int index= (int) e.getX();
 
-               /* Intent intent=new Intent(context, PileListActivity.class);
-                intent.putExtra("projectId",project.getId());
-                intent.putExtra("projectName",project.getShowName());
-                intent.putExtra("diffGrade",pileDiffGradeModelList.get(index).getDiffGrade());//差异等级
-                startActivity(intent);*/
+                Intent intent=new Intent(FirstFragment.this.getActivity(), PileListActivity.class);
+                intent.putExtra("diffGrade",info.data.diffGradeList.get(index).diffGrade);//差异等级
+                startActivity(intent);
             }
 
             @Override
@@ -265,7 +281,7 @@ public class FirstFragment extends Fragment {
         public void onResponse(String response, int id) {
             Log.d(TAG, response);
             Gson gson = new Gson();
-            com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo info = gson.fromJson(response, com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.class);
+            info = gson.fromJson(response, com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo.class);
             //draw the chart
             int calFinish = Utils.stringToInt(info.data.pileProgress.calFinish);
             int constructing = Utils.stringToInt(info.data.pileProgress.constructing);

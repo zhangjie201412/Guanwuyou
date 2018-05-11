@@ -1,5 +1,6 @@
 package com.iot.zhs.guanwuyou;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,11 +15,14 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -28,8 +32,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.SelectPileOfAppInfo;
+import com.iot.zhs.guanwuyou.utils.Constant;
+import com.iot.zhs.guanwuyou.utils.GsonUtils;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.PileListFilterPopupWindow;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -38,7 +45,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,12 +61,11 @@ import okhttp3.Request;
  * Created by H151136 on 1/23/2018.
  */
 
-public class PileListActivity extends AppCompatActivity implements BGARefreshLayout.BGARefreshLayoutDelegate {
+public class PileListActivity extends AppCompatActivity implements BGARefreshLayout.BGARefreshLayoutDelegate,PileListFilterPopupWindow.OnFilterSureClickListener {
 
     private static final String TAG = "ZHS.IOT";
     private Toolbar mToolbar;
-    private SearchView mSearchView;
-    private TextView mSerarchTextView;
+    private EditText mSearchView;
     private BGARefreshLayout bgaRefreshLayout;
 
     private WaitProgressDialog mProgressDialog;
@@ -83,6 +91,12 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
     private int curPage = 1;
     private int totalPageNum;
     private Toast mToast;
+
+
+    private String diffGrade;//首页图表穿透的
+    private String index;//首页图表穿透的
+    private Map<String,Object> jsonMap=new HashMap<>();
+    private PileListFilterPopupWindow filterPopupWindow;
 
 
     @Override
@@ -119,25 +133,11 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
         mAdvanceImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                showFilterPop();
 
             }
         });
 
-        SpannableString spanText = new SpannableString("请输入桩号/系统编号");
-        spanText.setSpan(new AbsoluteSizeSpan(20, true), 0, spanText.length(),
-                Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        spanText.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanText.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        mSearchView.setQueryHint(spanText);
-        mSearchView.setIconifiedByDefault(false);
-        spanText.setSpan(new AbsoluteSizeSpan(20, true), 0, spanText.length(),
-                Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-
-        spanText.setSpan(new ForegroundColorSpan(Color.WHITE), 0,
-                spanText.length(),
-                Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        mSearchView.setQueryHint(spanText);
-        mSerarchTextView = mSearchView.findViewById(R.id.search_src_text);
-        mSerarchTextView.setTextColor(Color.WHITE);// 设置输入字的显示
         mProgressDialog = new WaitProgressDialog(this);
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
@@ -154,24 +154,53 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
             }
         });
         mListView.setTextFilterEnabled(true);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                curPage = 1;
-                mPileInfoList.clear();
-                doSelectPileOfAppInfo();
-
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    Utils.hideSoftKeyboard(PileListActivity.this);
+                    curPage = 1;
+                    mPileInfoList.clear();
+                    doSelectPileOfAppInfo();
+                    return true;
+                }
                 return false;
             }
         });
 
 
+        if(getIntent().getStringExtra("diffGrade")!=null){
+            diffGrade=  getIntent().getStringExtra("diffGrade");
+            jsonMap.put("diffGrade",diffGrade);//首页传递的差异等级
+        }
+
+        if(getIntent().getStringExtra("index")!=null){
+            index=  getIntent().getStringExtra("index");
+            String constructionState= Constant.curUser.constructStateList.get(Integer.parseInt(index)).id;
+            jsonMap.put("constructionState",constructionState);//首页传递的状态
+        }
+
+
+
     }
+
+    /**
+     * 筛选popup
+     */
+    public void showFilterPop() {
+        if (filterPopupWindow == null) {
+            filterPopupWindow = new PileListFilterPopupWindow(PileListActivity.this, mAdvanceImageView, this);
+            /*if(!Utils.stringIsEmpty(diffGrade)){
+                filterPopupWindow.setDifferGradeTv(diffGrade);
+            }*/
+            if(!Utils.stringIsEmpty(index)){
+                filterPopupWindow.setPileStateTv(index);
+            }
+        }
+        filterPopupWindow.setSearchEt(mSearchView);
+        filterPopupWindow.showPopupWindow(findViewById(R.id.tb_top));
+    }
+
 
     private void setListAdapter() {
         mAdapter = new PileInfoAdapter(this, mPileInfoList);
@@ -206,6 +235,26 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
             return false;
         }
         return true;
+    }
+
+    public void dismissFilterPop() {
+        if (filterPopupWindow != null) {
+            if (filterPopupWindow.isShowing()) {
+                mAdvanceImageView.setImageResource(R.mipmap.ic_advance_search);
+                filterPopupWindow.dismiss();
+            }
+        }
+    }
+
+    @Override
+    public void onFilterSureClick(Map<String, Object> map) {
+        dismissFilterPop();
+        if (map != null && map.size() != 0) {
+            jsonMap.putAll(map);
+        }
+        curPage=1;
+        mPileInfoList.clear();
+        doSelectPileOfAppInfo();
     }
 
     private class DoSelectPileOfAppInfoCallback extends StringCallback {
@@ -248,21 +297,16 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
 
 
     private void doSelectPileOfAppInfo() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("projectId", mSpUtils.getKeyLoginProjectId());
-            json.put("pileNumber", mSerarchTextView.getText().toString().trim());
+        jsonMap.put("projectId", mSpUtils.getKeyLoginProjectId());
+        jsonMap.put("pileNumber", mSearchView.getText().toString().trim());
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         String token = mSpUtils.getKeyLoginToken();
         String userName = mSpUtils.getKeyLoginUserId();
 
         String url = Utils.SERVER_ADDR + "/pile/doSelectPileOfAppInfo/cc/" + token + "/" + userName;
         mProgressDialog.show();
         OkHttpUtils.post().url(url)
-                .addParams("jsonStr", json.toString())
+                .addParams("jsonStr", GsonUtils.objectToString(jsonMap))
                 .addParams("pageNo", "" + curPage)
                 .addParams("pageSize", "20")
                 .build()
@@ -321,15 +365,20 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
 
             holder.pileId.setText(mDatas.get(i).pileNumber);
             holder.constructionState.setText(mDatas.get(i).constructionStateName);
+
             int state = Integer.valueOf(mDatas.get(i).constructionState);
             if (state == 0) {
-                holder.constructionStateIcon.setImageResource(R.mipmap.ic_location_orange);
+                holder.constructionStateIcon.setImageResource(R.mipmap.ic_location_blue);
+                holder.constructionState.setTextColor(Color.parseColor("#6369D8"));
             } else if (state == 1) {
                 holder.constructionStateIcon.setImageResource(R.mipmap.ic_location_red);
+                holder.constructionState.setTextColor(Color.parseColor("#ED6663"));
             } else if (state == 2) {
                 holder.constructionStateIcon.setImageResource(R.mipmap.ic_location_green);
+                holder.constructionState.setTextColor(Color.parseColor("#0FD2AE"));
             } else if (state == 3) {
                 holder.constructionStateIcon.setImageResource(R.mipmap.ic_location_yellow);
+                holder.constructionState.setTextColor(Color.parseColor("#FDD100"));
             }
             holder.pileLength.setText("桩长: " + mDatas.get(i).pileLength + "mm");
             holder.pileDiameter.setText("桩径: " + mDatas.get(i).pileDiameter + "mm");

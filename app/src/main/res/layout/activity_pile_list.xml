@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -55,13 +56,20 @@
                 android:layout_toLeftOf="@id/iv_switch"
                 android:src="@mipmap/ic_advance_search" />
 
-            <android.support.v7.widget.SearchView
+            <EditText
                 android:id="@+id/sv_search"
                 android:layout_width="400px"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10px"
-                android:layout_marginTop="10px"
-                android:layout_toLeftOf="@id/iv_advance"></android.support.v7.widget.SearchView>
+                android:layout_height="match_parent"
+                android:layout_marginBottom="12px"
+                android:layout_marginTop="12px"
+                android:layout_toLeftOf="@id/iv_advance"
+                android:background="@drawable/com_ffffff_solid_bg"
+                android:hint="请输入桩号/系统编号"
+                android:paddingLeft="10px"
+                android:paddingRight="10px"
+                android:textSize="22px"
+                android:imeOptions="actionSearch"
+                android:singleLine="true"></EditText>
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
@@ -78,7 +86,7 @@
             android:layout_marginBottom="20px"
             android:layout_marginLeft="48px"
             android:layout_marginRight="50px"
-            android:layout_marginTop="34px"
+            android:layout_marginTop="14px"
             android:scrollbars="none"></ListView>
     </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
