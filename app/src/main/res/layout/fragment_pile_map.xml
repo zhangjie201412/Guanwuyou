@@ -101,27 +101,10 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4px"
-            android:src="@mipmap/ic_show_1" />
+            android:layout_width="110px"
+            android:layout_height="193px"
+            android:src="@mipmap/icon_pile_chart_legend" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4px"
-            android:src="@mipmap/ic_show_2" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4px"
-            android:src="@mipmap/ic_show_3" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4px"
-            android:src="@mipmap/ic_show_4" />
     </LinearLayout>
 
 </RelativeLayout>
