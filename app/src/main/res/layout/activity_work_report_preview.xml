@@ -7,7 +7,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70px"
         android:background="@mipmap/ic_nav_bar_bg"
         android:minHeight="?attr/actionBarSize">
 
@@ -18,9 +18,10 @@
             <ImageView
                 android:id="@+id/iv_back"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="20px"
+                android:paddingRight="40px"
+                android:paddingLeft="20px"
                 android:src="@mipmap/ic_back" />
 
             <TextView
@@ -48,7 +49,7 @@
             android:id="@+id/layout_system_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/pile_detail_margin_top_first"
+            android:layout_marginTop="20px"
             android:orientation="horizontal">
 
             <TextView

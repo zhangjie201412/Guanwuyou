@@ -4,11 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -18,10 +14,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,7 +32,6 @@ import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.Callback;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
@@ -55,7 +47,6 @@ import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
 import okhttp3.Call;
 import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Created by H151136 on 1/23/2018.
@@ -76,7 +67,8 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
     private final Lock mLock = new ReentrantLock();
     private final Condition mCond = mLock.newCondition();
     private boolean mIsLast = false;
-    private List<SelectPileOfAppInfo.Data.Page.PileInfo> mPileInfoList;
+    private List<SelectPileOfAppInfo.Data.Page.PileInfo> mPileInfoList = new ArrayList<>();
+    ;
     private PileInfoAdapter mAdapter;
     private ListView mListView;
 
@@ -144,14 +136,11 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
                 spanText.length(),
                 Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         mSearchView.setQueryHint(spanText);
-        mSerarchTextView  = mSearchView.findViewById(R.id.search_src_text);
+        mSerarchTextView = mSearchView.findViewById(R.id.search_src_text);
         mSerarchTextView.setTextColor(Color.WHITE);// 设置输入字的显示
         mProgressDialog = new WaitProgressDialog(this);
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
-        mPileInfoList = new ArrayList<>();
-        mAdapter = new PileInfoAdapter(this, mPileInfoList);
-        mListView.setAdapter(mAdapter);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -183,6 +172,12 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
 
 
     }
+
+    private void setListAdapter() {
+        mAdapter = new PileInfoAdapter(this, mPileInfoList);
+        mListView.setAdapter(mAdapter);
+    }
+
 
     @Override
     protected void onStart() {
@@ -243,10 +238,11 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
             if (info.data.page.list.size() != 0) {
                 mPileInfoList.addAll(info.data.page.list);
             }
-            totalPageNum=info.data.page.allPage;
+            totalPageNum = info.data.page.allPage;
             mProgressDialog.dismiss();
             bgaRefreshLayout.endLoadingMore();
             bgaRefreshLayout.endRefreshing();
+            setListAdapter();
         }
     }
 
@@ -255,7 +251,7 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
         JSONObject json = new JSONObject();
         try {
             json.put("projectId", mSpUtils.getKeyLoginProjectId());
-            json.put("pileNumber",mSerarchTextView.getText().toString().trim());
+            json.put("pileNumber", mSerarchTextView.getText().toString().trim());
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -275,8 +271,6 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
                 .writeTimeOut(Utils.HTTP_TIMEOUT)
                 .execute(new DoSelectPileOfAppInfoCallback());
     }
-
-
 
 
     private class PileInfoAdapter extends BaseAdapter implements Filterable {

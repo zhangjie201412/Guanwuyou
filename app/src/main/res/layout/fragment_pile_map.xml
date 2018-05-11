@@ -6,7 +6,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70px"
         android:background="@mipmap/ic_nav_bar_bg"
         android:minHeight="?attr/actionBarSize">
 
@@ -45,10 +45,11 @@
             <ImageView
                 android:id="@+id/iv_switch"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="30px"
+                android:paddingRight="30px"
+                android:paddingLeft="30px"
                 android:src="@mipmap/ic_switch" />
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
