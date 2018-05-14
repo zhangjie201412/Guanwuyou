@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100px"
+    android:layout_marginBottom="3px"
+    android:layout_marginTop="3px">
+
+    <RelativeLayout
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30px"
+        android:layout_marginRight="30px"
+        android:background="@drawable/com_dcdbdb_solid_bg">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageView
+                android:id="@+id/device_icon_iv"
+                android:layout_width="40px"
+                android:layout_height="40px"
+                android:layout_marginLeft="30px"
+                android:layout_marginTop="28px"
+                android:src="@mipmap/ic_device_master" />
+
+            <LinearLayout
+                android:id="@+id/device_sn_layout"
+                android:layout_width="320px"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/device_icon_iv"
+                android:orientation="horizontal"
+                android:layout_marginLeft="20px">
+
+                <TextView
+                    android:id="@+id/device_type_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28px"
+                    android:text="[标定仪]"
+                    android:textColor="#4e585c"
+                    android:textSize="22px" />
+
+                <TextView
+                    android:id="@+id/device_sn_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28px"
+                    android:layout_toRightOf="@id/device_type_tv"
+                    android:text="SN0301TEST01010000"
+                    android:textColor="#4e585c"
+                    android:textSize="22px" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/device_ver_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/device_sn_layout"
+                android:layout_below="@+id/device_sn_layout"
+                android:layout_marginTop="0px"
+                android:text=""
+                android:textColor="#4e585c"
+                android:textSize="22px" />
+
+            <TextView
+                android:id="@+id/last_run_time_key_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/device_last_run_time_tv"
+                android:layout_alignBottom="@+id/device_last_run_time_tv"
+                android:layout_toEndOf="@+id/device_sn_layout"
+                android:background="@drawable/com_ededed_solid_bg"
+                android:padding="8px"
+                android:text="最后运行时间"
+                android:textColor="#4e585c"
+                android:textSize="22px"
+                android:layout_marginLeft="10px"/>
+
+            <TextView
+                android:id="@+id/device_last_run_time_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="22px"
+                android:layout_marginTop="28px"
+                android:layout_marginLeft="8px"
+                android:layout_toLeftOf="@+id/device_last_error_key_tv"
+                android:layout_toRightOf="@+id/last_run_time_key_tv"
+                android:text="2017.10.18 12:12:12"
+                android:textColor="#4e585c"
+                android:textSize="22px" />
+
+            <TextView
+                android:id="@+id/device_last_error_key_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8px"
+                android:layout_marginTop="20px"
+                android:layout_toLeftOf="@+id/device_last_error_tv"
+                android:background="@drawable/com_ededed_solid_bg"
+                android:padding="8px"
+                android:text="最后的错误代码"
+                android:textColor="#4e585c"
+                android:textSize="22px" />
+
+            <TextView
+                android:id="@+id/device_last_error_tv"
+                android:layout_width="60px"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20px"
+                android:layout_marginTop="28px"
+                android:layout_toLeftOf="@+id/elec_layout"
+                android:text="100"
+                android:textColor="#4e585c"
+                android:textSize="22px" />
+
+
+            <FrameLayout
+                android:id="@+id/elec_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/device_ele_tv"
+                android:layout_marginTop="28px"
+                android:layout_marginRight="12px">
+
+                <ImageView
+                    android:id="@+id/electric_bg_iv"
+                    android:layout_width="57px"
+                    android:layout_height="36px"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/electric_fore_iv"
+                    android:layout_width="57px"
+                    android:layout_height="36px"
+                    android:scaleType="fitXY" />
+
+            </FrameLayout>
+            
+
+            <TextView
+                android:id="@+id/device_ele_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="30px"
+                android:layout_marginTop="28px"
+                android:text="50%"
+                android:textColor="#fbbc05"
+                android:textSize="22px" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

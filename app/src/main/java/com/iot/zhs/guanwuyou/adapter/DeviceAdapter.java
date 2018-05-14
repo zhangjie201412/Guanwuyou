@@ -1,6 +1,9 @@
 package com.iot.zhs.guanwuyou.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,8 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.iot.zhs.guanwuyou.R;
+import com.iot.zhs.guanwuyou.comm.http.DeviceModel;
 import com.iot.zhs.guanwuyou.item.DeviceItem;
+import com.iot.zhs.guanwuyou.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,76 +27,133 @@ import java.util.List;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder> {
 
-    public static final int DEVICE_TYPE_MASTER = 0x01;
-    public static final int DEVICE_TYPE_SLAVE = 0x02;
-    public static final int DEVICE_TYPE_CALIBRATOR = 0x03;
-
-    private List<DeviceItem> mDeviceList;
+    public static final int DEVICE_TYPE_SLAVE = 0x00;
+    public static final int DEVICE_TYPE_CALIBRATOR = 0x01;
     private Context mContext;
 
-    public DeviceAdapter(List<DeviceItem> list, Context context) {
-        mDeviceList = list;
+    public DeviceModel.Data.MasterDevice masterDevice;
+
+    public List<DeviceModel.Data.SlaveDevice> slaveDevices = new ArrayList<>();
+
+    public DeviceAdapter(Context context) {
         mContext = context;
     }
 
     @Override
     public DeviceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.item_device, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.item_slave_device, parent, false);
         DeviceViewHolder holder = new DeviceViewHolder(v);
 
         return holder;
     }
 
+    public void setMasterDevice(DeviceModel.Data.MasterDevice masterDevice) {
+        this.masterDevice = masterDevice;
+    }
+
+    public void setSlaveDevices(List<DeviceModel.Data.SlaveDevice> slaveDevices) {
+        this.slaveDevices = slaveDevices;
+    }
+
     @Override
     public void onBindViewHolder(DeviceViewHolder holder, int position) {
-        DeviceItem deviceItem = mDeviceList.get(position);
-        switch (deviceItem.getDeviceType()) {
-            case DEVICE_TYPE_CALIBRATOR:
-                holder.deviceType.setImageResource(R.mipmap.ic_device_calibrator);
-                break;
-            case DEVICE_TYPE_MASTER:
-                holder.deviceType.setImageResource(R.mipmap.ic_device_master);
-                break;
-            case DEVICE_TYPE_SLAVE:
-                holder.deviceType.setImageResource(R.mipmap.ic_device_slave);
-                break;
-            default:
-                break;
+        Float elec;
+        if (position == 0) {
+            holder.deviceIocnIv.setImageResource(R.mipmap.ic_device_master);
+            holder.deviceTypeTv.setText("[主机]");
+            holder.deviceSNTv.setText(masterDevice.masterDeviceSN);
+            holder.deviceLastRunTimeTv.setText(masterDevice.lastRunTime);
+            holder.deviceLastErrorKeyTv.setText("最后的错误代码");
+            holder.deviceLastErrorTv.setText(masterDevice.errCode);
+            holder.deviceVerTv.setText("V" + masterDevice.deviceVer);
+
+            holder.deviceEleTv.setText(masterDevice.elcMany + "%");
+            elec= Utils.stringToFloat(masterDevice.elcMany);
+        } else {
+
+            DeviceModel.Data.SlaveDevice slaveDevice = slaveDevices.get(position - 1);
+            switch (slaveDevice.deviceType) {
+                case DEVICE_TYPE_CALIBRATOR:
+                    holder.deviceIocnIv.setImageResource(R.mipmap.ic_device_calibrator);
+                    holder.deviceTypeTv.setText("[标定仪]");
+                    break;
+                case DEVICE_TYPE_SLAVE:
+                    holder.deviceIocnIv.setImageResource(R.mipmap.ic_device_slave);
+                    holder.deviceTypeTv.setText("[从机]");
+                    break;
+                default:
+                    break;
+            }
+            holder.deviceSNTv.setText(slaveDevice.slaveDeviceSN);
+            holder.deviceLastRunTimeTv.setText(slaveDevice.lastRunTime);
+            holder.deviceLastErrorKeyTv.setText("传感器使用次数");
+            holder.deviceLastErrorTv.setText(slaveDevice.runTimes);
+            holder.deviceVerTv.setText("");
+
+            holder.deviceEleTv.setText(slaveDevice.elcMany + "%");
+            elec= Utils.stringToFloat(slaveDevice.elcMany);
         }
-        holder.deviceSN.setText(deviceItem.getDeviceSN());
-        holder.lastTime.setText(deviceItem.getLastTime());
-//        holder.codeOrSensorValue.setText(deviceItem.getCodeOrSensorValue());
-        holder.batteryText.setText(deviceItem.getBatteryLevel() + "%");
-        Log.d("####", "position = " +position);
+
+
+        Bitmap fillBitmap = null;
+        if(elec<=20f){
+            holder.elecBgIv.setBackground(mContext.getResources().getDrawable(R.mipmap.icon_elec_red));
+            fillBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.icon_elec_red_fill);
+            holder.deviceEleTv.setTextColor(Color.parseColor("#ED6663"));
+        }else if(elec>20f &&elec<60f){
+            holder.elecBgIv.setBackground(mContext.getResources().getDrawable(R.mipmap.icon_elec_yello));
+            fillBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.icon_elec_yello_fill);
+            holder.deviceEleTv.setTextColor(Color.parseColor("#FBBC05"));
+        } else{
+            holder.elecBgIv.setBackground(mContext.getResources().getDrawable(R.mipmap.icon_elec_green));
+            fillBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.icon_elec_green_fill);
+            holder.deviceEleTv.setTextColor(Color.parseColor("#6DD1B7"));
+        }
+        Float payPercent = elec/(100.0f);
+        if(Math.round(fillBitmap.getWidth() * payPercent)==0){
+            holder. elecForeIv.setVisibility(View.GONE);
+        }else{
+            Bitmap newbm = Bitmap.createBitmap(fillBitmap, 0, 0, Math.round(fillBitmap.getWidth() * payPercent), fillBitmap.getHeight());
+            holder.elecForeIv.setScaleType(ImageView.ScaleType.FIT_START);
+            holder.elecForeIv.setImageBitmap(newbm);
+            holder.elecForeIv.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        Log.d("ZHS", "size = " + mDeviceList.size());
-        return mDeviceList.size();
+        int count = 0;
+        if (masterDevice != null && !Utils.listIsEmpty(slaveDevices)) {
+            count = slaveDevices.size() + 1;
+        }
+        return count;
     }
 
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
-
-        CardView cardView;
-        ImageView deviceType;
-        TextView deviceSN;
-        TextView lastTime;
-        TextView codeOrSensor;
-        TextView codeOrSensorValue;
-        ImageView batteryImage;
-        TextView batteryText;
+        ImageView deviceIocnIv;
+        TextView deviceTypeTv;
+        TextView deviceSNTv;
+        TextView deviceVerTv;
+        TextView deviceLastRunTimeTv;
+        TextView deviceLastErrorKeyTv;
+        TextView deviceLastErrorTv;
+        ImageView elecBgIv;
+        ImageView elecForeIv;
+        TextView deviceEleTv;
 
         public DeviceViewHolder(final View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.card_view);
-            deviceType = itemView.findViewById(R.id.item_iv_device);
-            deviceSN = itemView.findViewById(R.id.item_tv_sn);
-            lastTime = itemView.findViewById(R.id.item_tv_last_time);
-            codeOrSensor = itemView.findViewById(R.id.item_tv_code_or_sensor);
-            codeOrSensorValue = itemView.findViewById(R.id.item_tv_error_code);
-            batteryImage = itemView.findViewById(R.id.item_iv_battery);
-            batteryText = itemView.findViewById(R.id.item_tv_battery);
+            deviceIocnIv = itemView.findViewById(R.id.device_icon_iv);
+            deviceTypeTv = itemView.findViewById(R.id.device_type_tv);
+            deviceSNTv = itemView.findViewById(R.id.device_sn_tv);
+            deviceVerTv = itemView.findViewById(R.id.device_ver_tv);
+            deviceLastRunTimeTv = itemView.findViewById(R.id.device_last_run_time_tv);
+            deviceLastErrorKeyTv = itemView.findViewById(R.id.device_last_error_key_tv);
+            deviceLastErrorTv = itemView.findViewById(R.id.device_last_error_tv);
+            elecBgIv = itemView.findViewById(R.id.electric_bg_iv);
+            elecForeIv = itemView.findViewById(R.id.electric_fore_iv);
+            deviceEleTv = itemView.findViewById(R.id.device_ele_tv);
         }
     }
 }

@@ -60,7 +60,7 @@
                 android:layout_marginRight="12px"
                 android:layout_marginTop="28px"
                 android:layout_toLeftOf="@id/item_tv_battery"
-                android:src="@mipmap/ic_battery_yellow" />
+                android:src="@mipmap/icon_elec_yello_fill" />
 
             <LinearLayout
                 android:layout_width="match_parent"

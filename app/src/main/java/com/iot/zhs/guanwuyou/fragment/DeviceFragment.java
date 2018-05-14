@@ -9,10 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.adapter.DeviceAdapter;
+import com.iot.zhs.guanwuyou.comm.http.DeviceModel;
 import com.iot.zhs.guanwuyou.item.DeviceItem;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
@@ -35,45 +38,49 @@ public class DeviceFragment extends Fragment {
     private MyApplication myApplication;
     private SharedPreferenceUtils mSpUtils;
 
+    private TextView projectNameTv;
     private RecyclerView mRecyclerView;
     private DeviceAdapter mAdapter;
-    private List<DeviceItem> mDeviceList;
+    private com.iot.zhs.guanwuyou.comm.http.DeviceModel info;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_device, container, false);
-
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
+
+        projectNameTv=view.findViewById(R.id.tv_project_title);
+        projectNameTv.setText(mSpUtils.getKeyLoginProjectName());
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mDeviceList = new ArrayList<>();
-        mAdapter = new DeviceAdapter(mDeviceList, getContext());
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(mAdapter);
-
-//        hello();
         doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
         return view;
     }
 
-    private void hello() {
-        mDeviceList.add(new DeviceItem(DeviceAdapter.DEVICE_TYPE_MASTER, "[主机]123456789", "2017.10.7", 1, 100, 50));
-        mDeviceList.add(new DeviceItem(DeviceAdapter.DEVICE_TYPE_SLAVE, "[从机]222222222", "2017.10.22", 1, 100, 80));
-        mDeviceList.add(new DeviceItem(DeviceAdapter.DEVICE_TYPE_CALIBRATOR, "[标定仪]333333333", "2017.12.7", 1, 100, 20));
-        mAdapter.notifyDataSetChanged();
-    }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
 
+    private void setListAdapter(){
+        if(mAdapter==null){
+            mAdapter = new DeviceAdapter(getContext());
+            mAdapter.setSlaveDevices(info.data.slaveDevices);
+            mAdapter.setMasterDevice(info.data.masterDevice);
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setAdapter(mAdapter);
+        }else{
+            mAdapter.notifyDataSetChanged();
+        }
+
+    }
 
     private class SelectSlaveDeviceInfo extends StringCallback {
 
@@ -85,14 +92,12 @@ public class DeviceFragment extends Fragment {
         @Override
         public void onResponse(String response, int id) {
             Log.d(TAG, response);
-//            Gson gson = new Gson();
-//            com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo info = gson.fromJson(response,
-//                    com.iot.zhs.guanwuyou.comm.http.SelectPileFinishedByPeriodInfo.class);
-//            if(info.code.equals(Utils.MSG_CODE_OK)) {
-//                setBarData(info.data.pileFinishedList);
-//            } else {
-//                Toast.makeText(getContext(), info.message, Toast.LENGTH_SHORT).show();
-//            }
+            Gson gson = new Gson();
+            info = gson.fromJson(response,
+                    com.iot.zhs.guanwuyou.comm.http.DeviceModel.class);
+            if(info.code.equals(Utils.MSG_CODE_OK)) {
+                setListAdapter();
+            }
         }
     }
 
