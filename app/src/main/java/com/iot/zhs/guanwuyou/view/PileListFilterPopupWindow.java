@@ -59,10 +59,6 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
 
     private String diffDregeeId = "";
     private String pileStateId = "";
-    private String projectId = "";
-    private String oldProjectId = "";//初始值
-    private String oldProjectName = "";//初始值
-
 
     public Map<String, Object> paramsMap = new HashMap<>();
     public Map<String, Object> jsonStrMap = new HashMap<>();
@@ -72,6 +68,9 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
     public int mDay;
     public List<LoginUserModel.ConstructState> constructStateList=new ArrayList<>();
     public String[] constructStateStrArray;
+    public String[] diffGradeStrArray;
+    public List<LoginUserModel.ShowModel> diffGradeList=new ArrayList<>();
+
 
     public PileListFilterPopupWindow(final Context context, final ImageView filterView, OnFilterSureClickListener onFilterSureClickListener) {
         this.context = context;
@@ -120,25 +119,21 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
         this.searchEt = searchEt;
     }
 
-  /*  public void setDifferGradeTv(String diffGrade) {
+    public void setDifferGradeTv(String diffGrade) {
         differGradeTv.setText(diffGrade);
-        for (ShowModel showModel : Constant.curUser.getDiffDegreeList()) {
-            if (showModel.getShowName().equals(diffGrade)) {
-                diffDregeeId = showModel.getId();
+        for (LoginUserModel.ShowModel showModel : Constant.curUser.diffDegreeList) {
+            if (showModel.showName.equals(diffGrade)) {
+                diffDregeeId = showModel.id;
                 break;
             }
         }
-    }*/
-
+    }
 
     public void setPileStateTv(String index){
         String name=Constant.curUser.constructStateList.get(Integer.parseInt(index)).showName;
         pileStateId=Constant.curUser.constructStateList.get(Integer.parseInt(index)).id;
         pileStateTv.setText(name);
     }
-
-
-
 
     private void initViews(View contentView) {
         rootLayout = contentView.findViewById(R.id.root_layout);
@@ -151,7 +146,6 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
         xEt = contentView.findViewById(R.id.x_et);
         yEt = contentView.findViewById(R.id.y_et);
 
-
         rootLayout.setOnClickListener(this);
         sureBtn.setOnClickListener(this);
         pileStateTv.setOnClickListener(this);
@@ -160,7 +154,7 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
         startDateTv.setOnClickListener(this);
         endDateTv.setOnClickListener(this);
 
-
+        //桩状态
         constructStateList= Utils.deepCopy(Constant.curUser.constructStateList);
         constructStateList.add(0,new LoginUserModel.ConstructState("","全部"));
         constructStateStrArray=new String[constructStateList.size()];
@@ -168,8 +162,15 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
             LoginUserModel.ConstructState constructState =constructStateList.get(i);
             constructStateStrArray[i]=constructState.showName;
         }
+        //差异等级
+        diffGradeList= Utils.deepCopy(Constant.curUser.diffDegreeList);
+        diffGradeList.add(0,new LoginUserModel.ShowModel("","全部"));
+        diffGradeStrArray=new String[diffGradeList.size()];
+        for(int i=0;i<diffGradeList.size();i++){
+            LoginUserModel.ShowModel showModel =diffGradeList.get(i);
+            diffGradeStrArray[i]=showModel.showName;
+        }
     }
-
 
     /**
      * 显示popupWindow
@@ -198,7 +199,6 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.root_layout:
-
                 filterView.setImageResource(R.mipmap.ic_advance_search);
                 this.dismiss();
                 if (searchEt != null) {
@@ -211,7 +211,7 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
                 map.put("coordinatey", yEt.getText().toString().trim());
                 map.put("fillEndTimeStart", startDateTv.getText().toString().trim());//灌注结束的开始条件
                 map.put("fillEndTimeEnd", endDateTv.getText().toString().trim());//灌注结束的结束条件
-              //  map.put("diffGrade", diffDregeeId);//差异等级
+                map.put("diffGrade", diffDregeeId);//差异等级
 
                 if (onFilterSureClickListener != null) {
                     onFilterSureClickListener.onFilterSureClick(map);
@@ -233,7 +233,6 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
 
                 diffDregeeId = "";
                 pileStateId = "";
-                projectId=oldProjectId;
                 break;
             case R.id.pile_state_tv:
                 new AlertDialog.Builder(context).setTitle("请选择").setItems(constructStateStrArray, new DialogInterface.OnClickListener() {
@@ -244,9 +243,16 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
 
                     }
                 }).show();
-
                 break;
             case R.id.differ_grade_tv:
+                new AlertDialog.Builder(context).setTitle("请选择").setItems(diffGradeStrArray, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        diffDregeeId=diffGradeList.get(which).id;
+                        differGradeTv.setText(diffGradeList.get(which).showName);
+
+                    }
+                }).show();
                 break;
             case R.id.check_complete_start_date_tv:
                 new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
@@ -266,7 +272,6 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
                     }
                 },mYear,mMonth,mDay).show();
                 break;
-
         }
     }
 

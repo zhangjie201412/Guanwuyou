@@ -65,8 +65,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             holder.deviceLastRunTimeTv.setText(masterDevice.lastRunTime);
             holder.deviceLastErrorKeyTv.setText("最后的错误代码");
             holder.deviceLastErrorTv.setText(masterDevice.errCode);
-            holder.deviceVerTv.setText("V" + masterDevice.deviceVer);
-
+            if(!Utils.stringIsEmpty(masterDevice.deviceVer)) {
+                holder.deviceVerTv.setText("V" + masterDevice.deviceVer);
+            }else{
+                holder.deviceVerTv.setText("");
+            }
             holder.deviceEleTv.setText(masterDevice.elcMany + "%");
             elec= Utils.stringToFloat(masterDevice.elcMany);
         } else {

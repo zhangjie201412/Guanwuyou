@@ -63,15 +63,15 @@ public class NavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_navigation);
         mBottomTabBar = findViewById(R.id.bottom_tab_bar);
         mBottomTabBar.init(getSupportFragmentManager())
-                .setImgSize(48, 48)
+                .setImgSize(40, 40)
                 .setFontSize(24)
                 .addTabItem("桩位图", R.mipmap.ic_tab_pile, PileMapFragment.class)
                 .addTabItem("统计图", R.mipmap.ic_tab_statistics, StatisticsFragment.class)
                 .addTabItem("设备", R.mipmap.ic_tab_device, DeviceFragment.class)
 //                .addTabItem("退出", R.mipmap.ic_tab_exit, ExitFragment.class)
-                .setTabBarBackgroundColor(0xfcfafa)
-//                .setDividerHeight(100)
-//                .setDividerColor(0xe5e5e5)
+                .setTabBarBackgroundColor(Color.parseColor("#fcfafa"))
+                .setDividerHeight(1)
+                .setDividerColor(Color.parseColor("#e5e5e5"))
                 .setTabPadding(8, 0, 8)
                 .isShowDivider(true);
 

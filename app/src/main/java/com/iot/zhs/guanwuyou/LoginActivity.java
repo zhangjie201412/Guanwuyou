@@ -198,7 +198,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(Call call, Exception e, int id) {
-//                showToast("无法从服务器获取回复!");
+                showToast("连接异常，请重试!");
                 e.printStackTrace();
                 if(mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();

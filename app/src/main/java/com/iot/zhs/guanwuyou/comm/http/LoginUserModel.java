@@ -29,9 +29,14 @@ public class LoginUserModel implements Serializable {
         }
     }
 
-    public static class ShowModel {
+    public static class ShowModel implements Serializable {
         public String id;
         public String showName;
+
+        public ShowModel(String id, String showName) {
+            this.id = id;
+            this.showName = showName;
+        }
     }
 
 

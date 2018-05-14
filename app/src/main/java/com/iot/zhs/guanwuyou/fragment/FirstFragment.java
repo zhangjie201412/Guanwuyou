@@ -307,8 +307,8 @@ public class FirstFragment extends Fragment {
             mPieChart.setData(null);
         }else {
             ArrayList<PieEntry> entries = new ArrayList<>();
-            entries.add(new PieEntry(unconstruct, "未施工桩数", null));
             entries.add(new PieEntry(constructing, "施工中桩数", null));
+            entries.add(new PieEntry(unconstruct, "未施工桩数", null));
             entries.add(new PieEntry(calFinish, "检测完成桩数", null));
             entries.add(new PieEntry(otherFinish, "非检测完成桩数", null));
 
@@ -319,9 +319,8 @@ public class FirstFragment extends Fragment {
             dataSet.setSelectionShift(5f);
 
             ArrayList<Integer> colors = new ArrayList<Integer>();
-
-            colors.add(Color.parseColor("#ed6663"));
             colors.add(Color.parseColor("#6369d8"));
+            colors.add(Color.parseColor("#ed6663"));
             colors.add(Color.parseColor("#0fd2ae"));
             colors.add(Color.parseColor("#fdd100"));
 

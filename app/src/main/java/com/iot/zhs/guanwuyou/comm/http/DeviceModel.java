@@ -29,7 +29,7 @@ public class DeviceModel {
             public String state;//设备状态
             public String companyId;//公司id
             public String projectState;//项目状态
-            public String elcMany;//电量
+            public String elcMany="0";//电量
             public String deviceVer;//版本号
         }
 
@@ -39,7 +39,7 @@ public class DeviceModel {
             public String slaveDeviceId;//从机Id
             public String slaveDeviceSN;//从机的sn编号
             public String lastRunTime;//最后使用时间
-            public String elcMany;//电量
+            public String elcMany="0";//电量
             public String errCode;//从机的错误代码
             public String sensorSN;//传感器编号
             public String runTimes;//传感器的使用次数

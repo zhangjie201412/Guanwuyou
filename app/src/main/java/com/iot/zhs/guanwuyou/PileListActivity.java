@@ -190,9 +190,9 @@ public class PileListActivity extends AppCompatActivity implements BGARefreshLay
     public void showFilterPop() {
         if (filterPopupWindow == null) {
             filterPopupWindow = new PileListFilterPopupWindow(PileListActivity.this, mAdvanceImageView, this);
-            /*if(!Utils.stringIsEmpty(diffGrade)){
+            if(!Utils.stringIsEmpty(diffGrade)){
                 filterPopupWindow.setDifferGradeTv(diffGrade);
-            }*/
+            }
             if(!Utils.stringIsEmpty(index)){
                 filterPopupWindow.setPileStateTv(index);
             }

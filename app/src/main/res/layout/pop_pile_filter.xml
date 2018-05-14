@@ -52,7 +52,9 @@
                         android:lines="1"
                         android:text=""
                         android:textColorHint="#b0b3c1"
-                        android:textColor="#4e585c"                          android:textSize="22px" />
+                        android:textColor="#4e585c"
+                        android:textSize="22px"
+                        android:drawableRight="@mipmap/icon_drop_purple"/>
                 </LinearLayout>
 
                 <View style="@style/divider_style" />
@@ -159,7 +161,8 @@
                         android:text=""
                         android:textColorHint="#b0b3c1"
                         android:textColor="#4e585c"
-                        android:textSize="22px" />
+                        android:textSize="22px"
+                        android:drawableRight="@mipmap/icon_drop_purple"/>
                 </LinearLayout>
 
                 <View style="@style/divider_style" />
@@ -194,7 +197,8 @@
                         android:text=""
                         android:textColorHint="#b0b3c1"
                         android:textColor="#4e585c"
-                        android:textSize="22px" />
+                        android:textSize="22px"
+                        android:drawableRight="@mipmap/icon_drop_purple"/>
 
                     <View
                         style="@style/divider_style"
@@ -229,7 +233,8 @@
                         android:text=""
                         android:textColorHint="#b0b3c1"
                         android:textColor="#4e585c"
-                        android:textSize="22px" />
+                        android:textSize="22px"
+                        android:drawableRight="@mipmap/icon_drop_purple"/>
                 </LinearLayout>
 
                 <View style="@style/divider_style" />
