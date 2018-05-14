@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#64a9a7a7"
+    android:background="#ffffff"
     android:orientation="vertical">
 
     <TextView
@@ -10,9 +10,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="40px"
-        android:textColor="#ffffff"
-        android:textSize="22px" />
+        android:textColor="#4e585c"
+        android:textSize="22px"
+        android:text=""/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +30,7 @@
             android:layout_marginLeft="70px"
             android:layout_marginRight="20px"
             android:layout_weight="1"
-            android:background="#a3a3a3"
+            android:background="@drawable/com_a3a3a3_soild_bg"
             android:text="是"
             android:textColor="#ffffff"
             android:textSize="22px" />
@@ -41,7 +43,7 @@
             android:layout_marginLeft="20px"
             android:layout_marginRight="70px"
             android:layout_weight="1"
-            android:background="#a3a3a3"
+            android:background="@drawable/com_a3a3a3_soild_bg"
             android:text="否"
             android:textColor="#ffffff"
             android:textSize="22px" />
