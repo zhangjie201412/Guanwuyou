@@ -33,6 +33,7 @@ import com.iot.zhs.guanwuyou.FillingActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.PileDetailActivity;
 import com.iot.zhs.guanwuyou.PileListActivity;
+import com.iot.zhs.guanwuyou.PileSearchActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
 import com.iot.zhs.guanwuyou.utils.PileInfo;
@@ -53,6 +54,8 @@ import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.Response;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by H151136 on 1/21/2018.
  */
@@ -67,6 +70,7 @@ public class PileMapFragment extends Fragment {
     private ImageView mZoomInImageView;
     private ImageView mZoomOutImageView;
     private TextView mProjectNameTv;
+    private TextView mSearchTv;
 
     private PileMapInfo mPileMapInfo;
     private MyApplication mApplication;
@@ -85,6 +89,9 @@ public class PileMapFragment extends Fragment {
     private float mInitScale;
     private boolean mIsInit = true;
     private boolean mIsReset = false;
+    private final static int UPDATE_SYS_NUM_CODE = 106;
+    private boolean isSearch = false;
+
 
     @SuppressLint("HandlerLeak")
     private Handler mUiHandler = new Handler() {
@@ -93,7 +100,17 @@ public class PileMapFragment extends Fragment {
             super.handleMessage(msg);
             String response = (String) msg.obj;
             Log.d(TAG, "Response: " + response);
-            mPileMapWebView.loadUrl("javascript:alert(pielDataToMap('" + response + "'))");
+
+            int what=msg.what;
+            switch (what){
+                case 0:
+                    mPileMapWebView.loadUrl("javascript:alert(pielDataToMap('" + response + "'))");
+                    break;
+                case 1:
+                    mPileMapWebView.loadUrl("javascript:alert(focusPile('" + response + "'))");
+                    break;
+            }
+
         }
     };
 
@@ -105,8 +122,16 @@ public class PileMapFragment extends Fragment {
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
         mPileInfoList = new ArrayList<>();
-        mProjectNameTv=view.findViewById(R.id.tv_project_title);
+        mProjectNameTv = view.findViewById(R.id.tv_project_title);
         mProjectNameTv.setText(mSpUtils.getKeyLoginProjectName());
+        mSearchTv = view.findViewById(R.id.search_tv);
+        mSearchTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), PileSearchActivity.class);
+                startActivityForResult(intent, UPDATE_SYS_NUM_CODE);
+            }
+        });
         mPileMapWebView = view.findViewById(R.id.wv_pile_map);
         mSwitchImageView = view.findViewById(R.id.iv_switch);
         mSwitchImageView.setOnClickListener(new View.OnClickListener() {
@@ -208,14 +233,27 @@ public class PileMapFragment extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == UPDATE_SYS_NUM_CODE) {//修改系统编号
+                String systemNumber = data.getStringExtra("systemNumber");
+                mSearchTv.setText(systemNumber);
+                isSearch=true;
+            }
+        }
+    }
+
+
+    @Override
     public void onResume() {
         Log.d(TAG, "++onResume++");
         if (mNotificationDialog.isAdded()) {
             mNotificationDialog.dismiss();
         }
-        mNoFinishPileNumber="";
-        mNoFinishState=-1;
-        mNoFinishPileId="";
+        mNoFinishPileNumber = "";
+        mNoFinishState = -1;
+        mNoFinishPileId = "";
         mProgressDialog.show();
         doQueryPileMap(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(),
@@ -236,12 +274,20 @@ public class PileMapFragment extends Fragment {
     }
 
     private void doQueryPileMap(String token, String userName, String projectId, final String masterSN) {
+
+        if(!Utils.stringIsEmpty(mSearchTv.getText().toString().trim())){
+            isSearch=true;
+        }else{
+            isSearch=false;
+        }
         Log.d(TAG, "user name = " + userName);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject();
             jsonObject.put("projectId", projectId);
             jsonObject.put("masterDeviceSN", masterSN);
+            jsonObject.put("pileNumber", mSearchTv.getText().toString().trim());
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -263,56 +309,76 @@ public class PileMapFragment extends Fragment {
                             JSONObject object = new JSONObject(rsp);
                             String data = object.getString("data");
                             String message = object.getString("message");
-                            Gson gson = new Gson();
-                            mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
+                            String code = object.getString("code");
 
-                            for (PileMapInfo.PileMap map : mPileMapInfo.pileMap) {
-                                PileInfo info = new PileInfo();
-                                info.constructionState = map.constructionState;
-                                info.coordinatex = map.coordinatex;
-                                info.coordinatey = map.coordinatey;
-                                info.pileId = map.pileId;
-                                info.pileNumber = map.pileNumber;
-                                info.projectId = map.projectId;
-                                info.state = map.state;
-                                info.systemNumber = map.systemNumber;
-                                mPileInfoList.add(info);
-                            }
+                            if (code.equals("1")) {
 
-                            if (mPileMapInfo.noFinishPile != null) {
-                                Log.d(TAG, "noFinishPile -> reportState: " + mPileMapInfo.noFinishPile.reportState);
-                                Log.d(TAG, "noFinishPile -> pileNumber: " + mPileMapInfo.noFinishPile.pileNumber);
-                                mNoFinishPileNumber = mPileMapInfo.noFinishPile.pileNumber;
-                                mNoFinishState = Integer.valueOf(mPileMapInfo.noFinishPile.reportState);
-                                //show no finish pile notification
-                                mNotificationDialog.setMessage("您的" + mPileMapInfo.noFinishPile.pileNumber + "桩有未完成的任务单哦！");
-                                mNotificationDialog.show(getFragmentManager(), "Notification");
+                                if (!isSearch) {
+                                    Gson gson = new Gson();
+                                    mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
+                                    for (PileMapInfo.PileMap map : mPileMapInfo.pileMap) {
+                                        PileInfo info = new PileInfo();
+                                        info.constructionState = map.constructionState;
+                                        info.coordinatex = map.coordinatex;
+                                        info.coordinatey = map.coordinatey;
+                                        info.pileId = map.pileId;
+                                        info.pileNumber = map.pileNumber;
+                                        info.projectId = map.projectId;
+                                        info.state = map.state;
+                                        info.systemNumber = map.systemNumber;
+                                        mPileInfoList.add(info);
+                                    }
 
-                                boolean foundNoFinishPileId = false;
-                                String noFinishPileNum = mNoFinishPileNumber; //= Float.valueOf(mNoFinishPileNumber);
-                                for (PileInfo info : mPileInfoList) {
-                                    Log.d(TAG, " -> " + info.systemNumber);
-                                    if (info.systemNumber.equals(noFinishPileNum)) {
-                                        mNoFinishPileId = info.pileId;
-                                        foundNoFinishPileId = true;
-                                        break;
+                                    if (mPileMapInfo.noFinishPile != null) {
+                                        Log.d(TAG, "noFinishPile -> reportState: " + mPileMapInfo.noFinishPile.reportState);
+                                        Log.d(TAG, "noFinishPile -> pileNumber: " + mPileMapInfo.noFinishPile.pileNumber);
+                                        mNoFinishPileNumber = mPileMapInfo.noFinishPile.pileNumber;
+                                        mNoFinishState = Integer.valueOf(mPileMapInfo.noFinishPile.reportState);
+                                        //show no finish pile notification
+                                        mNotificationDialog.setMessage("您的" + mPileMapInfo.noFinishPile.pileNumber + "桩有未完成的任务单哦！");
+                                        mNotificationDialog.show(getFragmentManager(), "Notification");
+
+                                        boolean foundNoFinishPileId = false;
+                                        String noFinishPileNum = mNoFinishPileNumber; //= Float.valueOf(mNoFinishPileNumber);
+                                        for (PileInfo info : mPileInfoList) {
+                                            Log.d(TAG, " -> " + info.systemNumber);
+                                            if (info.systemNumber.equals(noFinishPileNum)) {
+                                                mNoFinishPileId = info.pileId;
+                                                foundNoFinishPileId = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!foundNoFinishPileId) {
+                                            Log.e(TAG, "Cannot find no finish pile id by " + mNoFinishPileNumber);
+                                        }
+
+                                    } else {
+                                        Log.d(TAG, "No no finish pile task");
+                                    }
+
+
+                                    Message msg = new Message();
+                                    msg.obj = rsp;
+                                    msg.what=0;
+                                    mUiHandler.sendMessage(msg);
+                                } else {//查询的时候
+                                    Gson gson = new Gson();
+                                    mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
+                                    if (mPileMapInfo.searchValue == null) {
+                                        showToast("您查找的桩不存在!");
+                                    } else {
+                                        Message msg = new Message();
+                                        msg.obj = mPileMapInfo.searchValue.systemNumber;
+                                        msg.what=1;
+                                        mUiHandler.sendMessage(msg);
+
                                     }
                                 }
-                                if (!foundNoFinishPileId) {
-                                    Log.e(TAG, "Cannot find no finish pile id by " + mNoFinishPileNumber);
-                                }
-
+                                isSearch = false;
+                                return message;
                             } else {
-                                Log.d(TAG, "No no finish pile task");
+                                Log.e(TAG, "Failed to parse response");
                             }
-
-                            Message msg = new Message();
-                            msg.obj = rsp;
-                            mUiHandler.sendMessage(msg);
-
-                            return message;
-                        } else {
-                            Log.e(TAG, "Failed to parse response");
                         }
                         return null;
                     }
@@ -337,31 +403,6 @@ public class PileMapFragment extends Fragment {
                         }
                     }
                 });
-    }
-
-    private class PileInfpAdapter extends ArrayAdapter<PileInfo> {
-        private int resId;
-
-        public PileInfpAdapter(Context context, int id, List<PileInfo> objs) {
-            super(context, id, objs);
-            resId = id;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            PileInfo info = getItem(position);
-            View view = LayoutInflater.from(getContext()).inflate(resId, null);
-            TextView pileId = view.findViewById(R.id.tv_pile_id);
-            TextView pileNumber = view.findViewById(R.id.tv_pile_number);
-            TextView projectId = view.findViewById(R.id.tv_project_id);
-
-            pileId.setText(info.pileId);
-            pileNumber.setText(info.pileNumber);
-            projectId.setText(info.projectId);
-
-            return view;
-        }
     }
 
     private class JsInterface {

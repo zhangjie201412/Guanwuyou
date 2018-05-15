@@ -4,6 +4,11 @@
     android:layout_centerInParent="true"
     android:layout_height="80px">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
+
     <TextView
         android:id="@+id/item_tv_title"
         android:layout_width="wrap_content"
@@ -76,4 +81,5 @@
         android:textColor="#0fd2ae"
         android:textSize="22px" />
 
+    </RelativeLayout>
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.iot.zhs.guanwuyou.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,8 +77,10 @@ public class DeviceListAdapter extends BaseAdapter {
         }
         if(mSlaveDeviceList.get(i).getComm() == 1) {
             holder.comm.setText("正常");
+            holder.comm.setTextColor(Color.parseColor("#0FD2AE"));
         } else {
             holder.comm.setText("异常");
+            holder.comm.setTextColor(Color.parseColor("#ED6663"));
         }
         if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 1) {
             holder.title.setText("从机");

@@ -32,29 +32,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="桩列表"
+                android:text="系统编号"
                 android:textColor="#ffffff"
                 android:textSize="24px" />
-
-            <ImageView
-                android:id="@+id/iv_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:paddingRight="30px"
-                android:paddingLeft="20px"
-                android:src="@mipmap/ic_switch" />
-
-            <ImageView
-                android:id="@+id/iv_advance"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:paddingLeft="20px"
-                android:paddingRight="20px"
-                android:layout_toLeftOf="@id/iv_switch"
-                android:src="@mipmap/ic_advance_search" />
 
             <EditText
                 android:id="@+id/sv_search"
@@ -62,7 +42,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="12px"
                 android:layout_marginTop="12px"
-                android:layout_toLeftOf="@id/iv_advance"
                 android:background="@drawable/com_ffffff_solid_bg"
                 android:hint="请输入桩号/系统编号"
                 android:paddingLeft="10px"
@@ -71,7 +50,9 @@
                 android:imeOptions="actionSearch"
                 android:singleLine="true"
                 android:drawableLeft="@mipmap/icon_search"
-                android:drawablePadding="10px"></EditText>
+                android:drawablePadding="10px"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="40px"></EditText>
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
@@ -81,7 +62,7 @@
         android:layout_height="match_parent">
 
         <ListView
-            android:id="@+id/lv_pile"
+            android:id="@+id/lv_sysnumber"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

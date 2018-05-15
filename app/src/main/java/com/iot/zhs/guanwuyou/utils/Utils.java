@@ -1,6 +1,10 @@
 package com.iot.zhs.guanwuyou.utils;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -184,5 +188,26 @@ public class Utils {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * 获取当前程序的版本名
+     * @return
+     * @throws Exception
+     */
+    public static String getVersionName(Context context){
+        //获取packagemanager的实例
+        PackageManager packageManager = context.getPackageManager();
+        //getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = null;
+        try {
+            packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Log.d("TAG","版本号"+packInfo.versionCode);
+        Log.d("TAG","版本名"+packInfo.versionName);
+        return packInfo.versionName;
     }
 }

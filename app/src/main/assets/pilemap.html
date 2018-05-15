@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.1, maximum-scale=1.0,target-densitydpi=device-dpi" />-->
-    <meta name="viewport" content="initial-scale=0.5, minimum-scale=0.1, maximum-scale=1.5, user-scalable=yes" />
+    <meta name="viewport" content="initial-scale=0.1, minimum-scale=0.1, maximum-scale=6.0, user-scalable=yes" />
     <script type="text/javascript" src="jQuery-2.2.0.min.js"></script>
     <script type="text/javascript" src="md5.min.js"></script>
     <title>桩位图forApp</title>
@@ -42,7 +42,7 @@
 
             //生成桩位图接口
             function pielDataToMap(jsonStr) {
-                //window.AndroidWebView.showInfoFromJs(11);
+                window.AndroidWebView.showInfoFromJs(11);
                 var json=JSON.parse(jsonStr);
                 if ($.isEmptyObject(json))return;
                 var rs = json.data;
@@ -132,6 +132,7 @@
                 $(".pileMap_map").empty().attr("style","");
             }
             function focusPile(systemNumber) {
+            window.AndroidWebView.showInfoFromJs(44444);
                 var classStr = hex_md5(systemNumber);//由于编号有特殊符号，故改为md5
                 $(".pileMap_map").find(".select").removeClass("select");
                 $(".pileMap_map").find(".focus").removeClass("focus");

@@ -75,7 +75,11 @@
             android:configChanges="orientation|keyboardHidden"
             android:theme="@style/AppThemeNoAction"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
-
+        <activity
+            android:name=".PileSearchActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:theme="@style/AppThemeNoAction"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <service
             android:name=".service.SerialService"
             android:enabled="true"
