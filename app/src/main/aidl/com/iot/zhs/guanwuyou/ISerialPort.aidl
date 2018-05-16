@@ -14,4 +14,5 @@ interface ISerialPort {
     void requestCalMac();
     void matchList();
     void requestMode();
+    void sendApkVersion();
 }

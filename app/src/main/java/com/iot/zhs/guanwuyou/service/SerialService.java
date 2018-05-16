@@ -5,18 +5,22 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.iot.serialport.SerialPort;
 import com.iot.zhs.guanwuyou.ISerialPort;
+import com.iot.zhs.guanwuyou.LoginActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
 import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
 import com.iot.zhs.guanwuyou.protocol.SerialPackage;
+import com.iot.zhs.guanwuyou.utils.DowloadFileUtils;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.NotificationDialog;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Call;
@@ -226,6 +231,49 @@ public class SerialService extends Service {
                         }
                     });
         }
+
+        /**
+         * 发送apk 版本号
+         * @throws RemoteException
+         */
+        @Override
+        public void sendApkVersion() throws RemoteException {
+            Log.d(TAG, "send apk version");
+            List<String> data = new ArrayList<>();
+            String versionName = Utils.getVersionName(getApplicationContext());
+            String[] dataArray = versionName.split("\\.");
+            data = Arrays.asList(dataArray);
+            final ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
+                    "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
+                    "0", "ver", "get", data.size(), data);
+
+            Log.d(TAG, "-> " + pkg.toString());
+            final List<String> finalData = data;
+            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
+                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
+                    pkg.toString(),
+                    new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            Log.d(TAG, response);
+                            Gson gson = new Gson();
+                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
+                            if (info.code.equals("1")) {
+                                Log.d(TAG, "apk ver ack ok!");
+                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
+                                pkgResponse.setUpdateVersionData(finalData, 0, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+                                pkgResponse.parse();
+                            } else {
+                                Log.e(TAG, "message: " + info.message);
+                            }
+                        }
+                    });
+        }
     };
 
     @Override
@@ -269,13 +317,13 @@ public class SerialService extends Service {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
-        if(event.type == MessageEvent.EVENT_TYPE_SERIAL_WRITE) {
+        if (event.type == MessageEvent.EVENT_TYPE_SERIAL_WRITE) {
             try {
                 mOutput.write(event.message.getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if(event.type == MessageEvent.EVENT_TYPE_ERROR_UART) {
+        } else if (event.type == MessageEvent.EVENT_TYPE_ERROR_UART) {
             List<String> data = new ArrayList<>();
             data.add(event.message);
             ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
@@ -374,7 +422,7 @@ public class SerialService extends Service {
                     Thread.sleep(4000);
                     mtrsd();
                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
-                    if(mIsCommFailed) {
+                    if (mIsCommFailed) {
                         Log.d(TAG, "Serial port communicate failed");
                         event.message = "1";
                     } else {

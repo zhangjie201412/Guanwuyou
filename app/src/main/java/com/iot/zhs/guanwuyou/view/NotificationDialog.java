@@ -78,7 +78,7 @@ public class NotificationDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog =  super.onCreateDialog(savedInstanceState);
-
+        dialog.setCanceledOnTouchOutside(false);
         dialog.setTitle(mTitle);
 
         return dialog;

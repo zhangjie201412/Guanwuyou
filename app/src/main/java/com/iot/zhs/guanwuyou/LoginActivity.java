@@ -54,6 +54,12 @@ public class LoginActivity extends AppCompatActivity {
     private CheckBox mRememberCheckBox;
     private Toast mToast;
     private WaitProgressDialog mProgressDialog;
+    public static LoginActivity loginActivity;
+
+    public static LoginActivity getIntance(){
+        return loginActivity;
+    }
+
 
     private ISerialPort mSerialManager;
 
@@ -64,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 mSerialManager.setPowerUp();
                 mSerialManager.requestCalMac();
+                mSerialManager.sendApkVersion();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -79,6 +86,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        loginActivity=this;
         mLoginButton = findViewById(R.id.bt_login);
         mUserEditText = findViewById(R.id.et_username);
         mPasswordEditText = findViewById(R.id.et_password);

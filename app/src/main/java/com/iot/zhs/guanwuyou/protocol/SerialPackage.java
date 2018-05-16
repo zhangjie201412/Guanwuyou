@@ -197,16 +197,27 @@ public class SerialPackage {
                             Log.d(TAG, response);
                             Gson gson = new Gson();
                             ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
+                            ProtocolPackage pkgResponse = null;
                             if (info.code.equals("1")) {
                                 Log.d(TAG, "ver ack ok!");
+                                pkgResponse = new ProtocolPackage(info.data);
+                                if(mDeviceId1.equals("0")) {
+                                    Log.d(TAG, "update master version");
+                                    pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+
+                                }else{
+                                    Log.d(TAG, "update slave version");
+                                    pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+
+                                }
+                                pkgResponse.parse();
+
                             } else {
                                 Log.e(TAG, "ver response message: " + info.message);
                             }
 
                             if(mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
-
+                                if(pkgResponse!=null && pkgResponse.getData()!=null) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -239,6 +250,17 @@ public class SerialPackage {
                                                         ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
                                                         if (info.code.equals("1")) {
                                                             Log.d(TAG, "ver ack ok!");
+                                                            ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
+                                                            if(mDeviceId1.equals("0")) {
+                                                                Log.d(TAG, "update master version");
+                                                                pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+
+                                                            }else{
+                                                                Log.d(TAG, "update slave version");
+                                                                pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+
+                                                            }
+                                                            pkgResponse.parse();
                                                         } else {
                                                             Log.e(TAG, "ver response message: " + info.message);
                                                         }

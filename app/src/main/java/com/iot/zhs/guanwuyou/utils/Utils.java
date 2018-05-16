@@ -210,4 +210,39 @@ public class Utils {
         Log.d("TAG","版本名"+packInfo.versionName);
         return packInfo.versionName;
     }
+
+    /**
+     * 判断两个集合里面的元素是否一致
+     * @param a
+     * @param b
+     * @param <T>
+     * @return
+     */
+    public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
+        if(a.size() != b.size())
+            return false;
+        for(int i=0;i<a.size();i++){
+            if(!a.get(i).equals(b.get(i)))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * 字符串集合转string
+     * @param stringList
+     * @param splitStr
+     * @return
+     */
+    public static String listToString(List<String> stringList, String splitStr) {
+        if (stringList == null || stringList.size() == 0) {
+            return "";
+        }
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < stringList.size(); i++) {
+            buffer.append(stringList.get(i)).append(splitStr);
+        }
+        String value = buffer.substring(0, buffer.length() - 1);
+        return value;
+    }
 }

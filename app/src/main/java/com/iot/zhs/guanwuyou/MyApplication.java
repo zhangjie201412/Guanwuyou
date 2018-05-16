@@ -1,6 +1,10 @@
 package com.iot.zhs.guanwuyou;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.iot.zhs.guanwuyou.comm.http.EndPourInfo;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
@@ -23,6 +27,7 @@ public class MyApplication extends Application {
     public SharedPreferenceUtils mSpUtils;
     private int mSyncId;
     private EndPourInfo mEndPourInfo;
+    private AppCompatActivity app_activity = null;
 
     public synchronized static MyApplication getInstance() {
         return mApplication;
@@ -48,6 +53,7 @@ public class MyApplication extends Application {
                 .build();
         OkHttpUtils.initClient(okHttpClient);
         LitePal.initialize(this);
+        initGlobeActivity();
     }
 
     public synchronized SharedPreferenceUtils getSpUtils() {
@@ -66,6 +72,49 @@ public class MyApplication extends Application {
 
     public synchronized void setSyncId(int id) {
         mSyncId = id;
+    }
+
+
+    private void initGlobeActivity() {
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+            }
+
+            /** Unused implementation **/
+            @Override
+            public void onActivityStarted(Activity activity) {
+                app_activity = (AppCompatActivity)activity;
+                Log.d("onActivityStarted===", app_activity + "");
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
+        });
+    }
+
+    /**
+     * 公开方法，外部可通过 MyApplication.getInstance().getCurrentActivity() 获取到当前最上层的activity
+     */
+    public AppCompatActivity getCurrentActivity() {
+        return app_activity;
     }
 
 }

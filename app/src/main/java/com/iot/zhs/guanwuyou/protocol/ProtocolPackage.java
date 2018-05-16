@@ -1,9 +1,15 @@
 package com.iot.zhs.guanwuyou.protocol;
 
+import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 
+import com.iot.zhs.guanwuyou.LoginActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.utils.DowloadFileUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.NotificationDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +36,10 @@ public class ProtocolPackage {
     private List<String> mData;
 
     private String mRawData;
+
+    private List<String> localVerData;
+    private int flag;//0--中控 1--主机 2-从机
+    private String updateFileURL;//下载文件的地址
 
     public ProtocolPackage(int syncId, String device0, String device1, String device2,
                            String type, String operation,
@@ -117,6 +127,9 @@ public class ProtocolPackage {
             }
         } else if(mType.equals("mode")) {
             MyApplication.getInstance().getSpUtils().setKeyMode(mData.get(0));
+        } else if(mType.equals("ver")) {
+            updateVersion();
+
         }
         return true;
     }
@@ -140,4 +153,51 @@ public class ProtocolPackage {
 
         return value;
     }
+
+    /**
+     * 更新
+     * @return
+     */
+    public void updateVersion(){
+        if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致
+            final NotificationDialog mNotificationDialog = new NotificationDialog();
+            mNotificationDialog.init("提醒",
+                    "取消",
+                    "更新",
+                    new NotificationDialog.NotificationDialogListener() {
+                        @Override
+                        public void onButtonClick(int id) {
+                            //响应左边的button
+                            if (id == 1) {
+                                mNotificationDialog.dismiss();
+                            } else if (id == 2) {
+                                new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL);
+                                mNotificationDialog.dismiss();
+                            }
+                        }
+                    });
+            String message = "";
+            switch (flag){
+                case 0:
+                    message="app发现新版本(" + Utils.listToString(mData, ".") + ")，是否需要更新?";
+                    break;
+                case 1:
+                    message="主机发现新版本(" + Utils.listToString(mData, ".") + ")，是否需要更新?";
+                    break;
+                case 2:
+                    message="从机发现新版本(" + Utils.listToString(mData, ".") + ")，是否需要更新?";
+                    break;
+            }
+            mNotificationDialog.setMessage(message);
+            AppCompatActivity cur=MyApplication.getInstance().getCurrentActivity();
+            mNotificationDialog.show(MyApplication.getInstance().getCurrentActivity().getSupportFragmentManager(), "Notification");
+        }
+    }
+
+    public void setUpdateVersionData(List<String> localVerData, int flag, String  updateFileURL){
+        this.localVerData=localVerData;
+        this.flag=flag;
+        this.updateFileURL=updateFileURL;
+    }
+
 }
