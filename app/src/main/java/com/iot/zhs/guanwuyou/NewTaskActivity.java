@@ -75,7 +75,7 @@ public class NewTaskActivity extends AppCompatActivity {
                 for (int i = 0; i < mSaveAccountReportData.data.pileTypeList.size(); i++)
                     pileTypeObjects[i] = mSaveAccountReportData.data.pileTypeList.get(i).showName;
                 ArrayAdapter<String> pileTypeAdapter = new ArrayAdapter<String>(
-                        NewTaskActivity.this, android.R.layout.simple_spinner_dropdown_item, pileTypeObjects);
+                        NewTaskActivity.this, R.layout.simple_spinner_dropdown_item, pileTypeObjects);
                 mPileTypeSpinner.setAdapter(pileTypeAdapter);
                 mCoordinatexEditText.setText(mSaveAccountReportData.data.pile.coordinatex);
                 mCoordinatexEditText.setEnabled(false);
@@ -87,13 +87,13 @@ public class NewTaskActivity extends AppCompatActivity {
                 for (int i = 0; i < mSaveAccountReportData.data.conGradeList.size(); i++)
                     conGradeObjects[i] = mSaveAccountReportData.data.conGradeList.get(i).showName;
                 ArrayAdapter<String> conGradeAdapter = new ArrayAdapter<String>(
-                        NewTaskActivity.this, android.R.layout.simple_spinner_dropdown_item, conGradeObjects);
+                        NewTaskActivity.this, R.layout.simple_spinner_dropdown_item, conGradeObjects);
                 mConGradeNumberSpinner.setAdapter(conGradeAdapter);
                 String[] pillingMachineObjects = new String[mSaveAccountReportData.data.pillingMachineList.size()];
                 for (int i = 0; i < mSaveAccountReportData.data.pillingMachineList.size(); i++)
                     pillingMachineObjects[i] = mSaveAccountReportData.data.pillingMachineList.get(i).showName;
                 ArrayAdapter<String> pillingMachineAdapter = new ArrayAdapter<String>(
-                        NewTaskActivity.this, android.R.layout.simple_spinner_dropdown_item, pillingMachineObjects);
+                        NewTaskActivity.this, R.layout.simple_spinner_dropdown_item, pillingMachineObjects);
                 mPillingMachineIdSpinner.setAdapter(pillingMachineAdapter);
             }
         }

@@ -10,7 +10,8 @@
         android:layout_marginLeft="10px"
         android:layout_marginTop="14px"
         android:entries="@array/year"
-        style="@style/spinnerStyle"></android.support.v7.widget.AppCompatSpinner>
+        android:background="@drawable/shape_drop_down_normal"
+        />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart_bar"

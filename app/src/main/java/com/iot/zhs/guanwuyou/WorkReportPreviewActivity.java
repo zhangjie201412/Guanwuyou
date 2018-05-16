@@ -123,7 +123,7 @@ public class WorkReportPreviewActivity extends AppCompatActivity {
         for (int i = 0; i < mEndPourInfo.data.pileTypeList.size(); i++)
             pileTypeObjects[i] = mEndPourInfo.data.pileTypeList.get(i).showName;
         ArrayAdapter<String> pileTypeAdapter = new ArrayAdapter<String>(
-                WorkReportPreviewActivity.this, android.R.layout.simple_spinner_dropdown_item, pileTypeObjects);
+                WorkReportPreviewActivity.this, R.layout.simple_spinner_dropdown_item, pileTypeObjects);
         mPileTypeSpinner.setAdapter(pileTypeAdapter);
         mCoordinatexEditText.setText(mEndPourInfo.data.accountReport.coordinatex);
         mCoordinatexEditText.setEnabled(false);
@@ -135,14 +135,14 @@ public class WorkReportPreviewActivity extends AppCompatActivity {
         for (int i = 0; i < mEndPourInfo.data.conGradeList.size(); i++)
             conGradeObjects[i] = mEndPourInfo.data.conGradeList.get(i).showName;
         ArrayAdapter<String> conGradeAdapter = new ArrayAdapter<String>(
-                WorkReportPreviewActivity.this, android.R.layout.simple_spinner_dropdown_item, conGradeObjects);
+                WorkReportPreviewActivity.this, R.layout.simple_spinner_dropdown_item, conGradeObjects);
         mConGradeNumberSpinner.setAdapter(conGradeAdapter);
         mEmptyPileLengthEditText.setText(mEndPourInfo.data.accountReport.emptyPile);
         String[] pillingMachineObjects = new String[mEndPourInfo.data.pillingMachineList.size()];
         for (int i = 0; i < mEndPourInfo.data.pillingMachineList.size(); i++)
             pillingMachineObjects[i] = mEndPourInfo.data.pillingMachineList.get(i).showName;
         ArrayAdapter<String> pillingMachineAdapter = new ArrayAdapter<String>(
-                WorkReportPreviewActivity.this, android.R.layout.simple_spinner_dropdown_item, pillingMachineObjects);
+                WorkReportPreviewActivity.this, R.layout.simple_spinner_dropdown_item, pillingMachineObjects);
         mPillingMachineIdSpinner.setAdapter(pillingMachineAdapter);
         mDesignOfConcreteEditText.setText(mEndPourInfo.data.accountReport.designOfConcrete);
         mNotificationDialog = new NotificationDialog();
