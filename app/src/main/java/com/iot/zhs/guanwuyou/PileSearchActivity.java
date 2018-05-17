@@ -52,7 +52,7 @@ import com.iot.zhs.guanwuyou.comm.http.PileNumInfo.Data.Page.ShowModel;
  * Created by H151136 on 1/23/2018.
  */
 
-public class PileSearchActivity extends AppCompatActivity implements BGARefreshLayout.BGARefreshLayoutDelegate {
+public class PileSearchActivity extends BaseActivity implements BGARefreshLayout.BGARefreshLayoutDelegate {
 
     private static final String TAG = "ZHS.IOT";
     private Toolbar mToolbar;

@@ -34,7 +34,7 @@ import okhttp3.MediaType;
  * Created by H151136 on 2/8/2018.
  */
 
-public class WorkReportPreviewActivity extends AppCompatActivity {
+public class WorkReportPreviewActivity extends BaseActivity {
 
     private static final String TAG = "ZHS.IOT";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

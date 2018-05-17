@@ -42,7 +42,7 @@ import okhttp3.MediaType;
  * Created by H151136 on 1/20/2018.
  */
 
-public class FillingActivity extends AppCompatActivity {
+public class FillingActivity extends BaseActivity {
     private static final String TAG = "FillingZHS.IOT";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 

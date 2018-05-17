@@ -39,7 +39,7 @@ import okhttp3.Response;
  * Created by H151136 on 1/18/2018.
  */
 
-public class PileMapListActivity extends AppCompatActivity {
+public class PileMapListActivity extends BaseActivity {
     private static final String TAG = "ZHS.IOT";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private Toast mToast;

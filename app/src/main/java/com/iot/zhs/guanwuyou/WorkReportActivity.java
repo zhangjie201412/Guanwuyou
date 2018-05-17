@@ -24,7 +24,7 @@ import okhttp3.Call;
  * Created by H151136 on 3/4/2018.
  */
 
-public class WorkReportActivity extends AppCompatActivity {
+public class WorkReportActivity extends BaseActivity {
 
     private static final String TAG = "ZHS.IOT";
     private ImageView mBackImageView;

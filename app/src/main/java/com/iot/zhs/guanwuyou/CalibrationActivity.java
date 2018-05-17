@@ -42,7 +42,7 @@ import okhttp3.internal.Util;
  * Created by H151136 on 1/20/2018.
  */
 
-public class CalibrationActivity extends AppCompatActivity {
+public class CalibrationActivity extends BaseActivity {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final String TAG = "ZHS.IOT";
     private EditText mConGradeCalEditText;

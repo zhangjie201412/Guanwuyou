@@ -38,21 +38,13 @@ import java.util.List;
  * Created by H151136 on 1/21/2018.
  */
 
-public class NavigationActivity extends AppCompatActivity {
+public class NavigationActivity extends BaseActivity {
     private static final String TAG = "ZHS.IOT";
     private BottomTabBar mBottomTabBar;
     private ISerialPort mSerialManager;
-    private ImageView mMenuImageView;
     private NotificationDialog mNotificationDialog;
-
-    private Intent mIntent;
-    private FloatingViewService floatingViewService;
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
-        if(floatingViewService!=null){
-            floatingViewService.dismissPop();
-        }
         mNotificationDialog.setMessage("是否确认退出?");
         mNotificationDialog.show(getSupportFragmentManager(), "Notification");
     }
@@ -127,37 +119,16 @@ public class NavigationActivity extends AppCompatActivity {
                     public void onButtonClick(int id) {
                         //响应左边的button
                         if (id == 1) {
-                            if(mIntent!=null) {
-                                unbindService(mServiceConnection);
-                                stopService(mIntent);
-                            }
                             NavigationActivity.this.finish();
                         } else if(id == 2) {
                             mNotificationDialog.dismiss();
                         }
                     }
                 });
-        mIntent = new Intent(NavigationActivity.this, FloatingViewService.class);
-       // startService(mIntent);
-        bindService(mIntent, mServiceConnection,
-                Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            floatingViewService = ((FloatingViewService.MyBinder) service).getFloatingViewService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-    };
-
 }

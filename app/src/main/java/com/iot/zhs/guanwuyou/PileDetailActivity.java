@@ -32,7 +32,7 @@ import okhttp3.Request;
  * Created by H151136 on 1/19/2018.
  */
 
-public class PileDetailActivity extends AppCompatActivity {
+public class PileDetailActivity extends BaseActivity {
     private static final String TAG = "ZHS.IOT";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private Toast mToast;

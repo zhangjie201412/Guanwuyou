@@ -37,7 +37,7 @@ import okhttp3.RequestBody;
  * Created by H151136 on 1/20/2018.
  */
 
-public class NewTaskActivity extends AppCompatActivity {
+public class NewTaskActivity extends BaseActivity {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final String TAG = "ZHS.IOT";
     private TextView mSystemNumberTextView;

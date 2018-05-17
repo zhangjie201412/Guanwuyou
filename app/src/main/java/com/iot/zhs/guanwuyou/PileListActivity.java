@@ -61,7 +61,7 @@ import okhttp3.Request;
  * Created by H151136 on 1/23/2018.
  */
 
-public class PileListActivity extends AppCompatActivity implements BGARefreshLayout.BGARefreshLayoutDelegate,PileListFilterPopupWindow.OnFilterSureClickListener {
+public class PileListActivity extends BaseActivity implements BGARefreshLayout.BGARefreshLayoutDelegate,PileListFilterPopupWindow.OnFilterSureClickListener {
 
     private static final String TAG = "ZHS.IOT";
     private Toolbar mToolbar;
