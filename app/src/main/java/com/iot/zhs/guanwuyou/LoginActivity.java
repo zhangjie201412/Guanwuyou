@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -21,7 +20,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.iot.zhs.guanwuyou.comm.http.HttpResponse;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
 import com.iot.zhs.guanwuyou.utils.Constant;
@@ -33,7 +31,6 @@ import com.zhy.http.okhttp.callback.Callback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.litepal.util.Const;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -145,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
         Constant.display.statusBarHeightPixels = DisplayUtil.getStatusBarHeight(this);//顶部状态栏
         Constant.display.bottomBarHeightPixels= DisplayUtil.getDaoHangHeight(this);//底部导航栏
         Log.d("aa","宽="+ Constant.display.widthPixels +",高="+ Constant.display.heightPixels
-                +",顶部状态栏="+Constant.display.statusBarHeightPixels+",底部导航栏="+Constant.display.bottomBarHeightPixels);
+                +",顶部状态栏="+ Constant.display.statusBarHeightPixels+",底部导航栏="+ Constant.display.bottomBarHeightPixels);
     }
 
     @Override
@@ -183,20 +180,27 @@ public class LoginActivity extends AppCompatActivity {
                     if(!code.equals(Utils.MSG_CODE_OK)) {
                         showToast(message);
                     }
-
-                    String data = object.getString("data");
-                    String token = object.getString("token");
                     Log.d(TAG, "clientType: " + clientType);
                     Log.d(TAG, "code: " + code);
-                    Log.d(TAG, "token: " + token);
-                    Log.d(TAG, "data: " + data);
                     Log.d(TAG, "message: " + message);
-                    Gson gson = new Gson();
-                    JSONObject userObject = new JSONObject(data);
-                    LoginUserModel userModel = gson.fromJson(userObject.getString("loginUserModel"), LoginUserModel.class);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginToken(token);
-                    showToast(message);
-                    MyApplication.getInstance().getSpUtils().setKeyPassword(password);
+
+                    if(object.has("token")) {
+                        String token = object.getString("token");
+                        Log.d(TAG, "token: " + token);
+                        MyApplication.getInstance().getSpUtils().setKeyLoginToken(token);
+                    }
+
+                    LoginUserModel userModel=null;
+                    if(object.has("data")) {
+                        String data = object.getString("data");
+                        Log.d(TAG, "data: " + data);
+
+                        Gson gson = new Gson();
+                        JSONObject userObject = new JSONObject(data);
+                        userModel = gson.fromJson(userObject.getString("loginUserModel"), LoginUserModel.class);
+                        showToast(message);
+                        MyApplication.getInstance().getSpUtils().setKeyPassword(password);
+                    }
                     return userModel;
                 } else {
                     Log.e(TAG, "Failed to parse response");
@@ -216,8 +220,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Object response, int id) {
                 LoginUserModel userModel = (LoginUserModel) response;
-                Constant.curUser=userModel;
                 if (userModel != null) {
+                    Constant.curUser=userModel;
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyId(userModel.companyId);
                     MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);
                     MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(userModel.masterDeviceSN);
@@ -234,6 +238,9 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     startActivity(intent);
+                }
+                if(mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
                 }
             }
         });
