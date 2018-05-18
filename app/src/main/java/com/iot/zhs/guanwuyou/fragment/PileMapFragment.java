@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.iot.zhs.guanwuyou.CalibrationActivity;
 import com.iot.zhs.guanwuyou.FillingActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
@@ -36,6 +37,8 @@ import com.iot.zhs.guanwuyou.PileListActivity;
 import com.iot.zhs.guanwuyou.PileSearchActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
+import com.iot.zhs.guanwuyou.utils.Constant;
+import com.iot.zhs.guanwuyou.utils.GsonUtils;
 import com.iot.zhs.guanwuyou.utils.PileInfo;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
@@ -48,7 +51,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -91,6 +96,12 @@ public class PileMapFragment extends Fragment {
     private boolean mIsReset = false;
     private final static int UPDATE_SYS_NUM_CODE = 106;
     private boolean isSearch = false;
+
+    private float minX;
+    private float maxX;
+    private float minY;
+    private float maxY;
+    private float avgPileDiameter;
 
 
     @SuppressLint("HandlerLeak")
@@ -356,11 +367,59 @@ public class PileMapFragment extends Fragment {
                                         Log.d(TAG, "No no finish pile task");
                                     }
 
+                                    if (mPileMapInfo.pileMap!=null&&mPileMapInfo.coRange != null) {
+                                        minX = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex);
+                                        maxX = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex);
+                                        minY = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey);
+                                        maxY = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey);
 
-                                    Message msg = new Message();
-                                    msg.obj = rsp;
-                                    msg.what=0;
-                                    mUiHandler.sendMessage(msg);
+                                        avgPileDiameter=Utils.stringToFloat(mPileMapInfo.coRange.avgPileDiameter)/10f;
+
+                                        float sacle=1;
+                                        if(avgPileDiameter!=0){
+                                            float width=Math.abs(maxX-minX)/ Constant.display.widthPixels;
+                                            float height=Math.abs(maxY-minY)/Constant.display.heightPixels;
+
+                                            sacle=Math.min(width,height);
+                                            sacle=sacle/mPileMapInfo.pileMap.size()*avgPileDiameter;
+                                        }
+
+                                        float screenScale = getActivity().getResources().getDisplayMetrics().density;
+
+                                        for(PileMapInfo.PileMap pileMap :mPileMapInfo.pileMap){
+                                            float x=Utils.stringToFloat(pileMap.coordinatex)/sacle/screenScale;
+                                            pileMap.coordinatex=x+"";
+
+                                            float y=Utils.stringToFloat(pileMap.coordinatey)/sacle/screenScale;
+                                            pileMap.coordinatey=y+"";
+                                        }
+
+                                        float minX=Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex)/sacle/screenScale;
+                                        float maxX=Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex)/sacle/screenScale;
+                                        float minY=Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey)/sacle/screenScale;
+                                        float maxY=Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey)/sacle/screenScale;
+
+                                        mPileMapInfo.coRange.minCoordinatex=minX+"";
+                                        mPileMapInfo.coRange.maxCoordinatex=maxX+"";
+                                        mPileMapInfo.coRange.minCoordinatey=minY+"";
+                                        mPileMapInfo.coRange.maxCoordinatey=maxY+"";
+
+                                        Map<String,Object> dataMap=new HashMap<String, Object>();
+                                        Map<String,Object> map=new HashMap<String, Object>();
+                                        map.put("coRange",mPileMapInfo.coRange);
+                                        map.put("pileMap",mPileMapInfo.pileMap);
+
+                                        dataMap.put("data",map);
+
+                                        String dataMapStr= GsonUtils.objectToString(dataMap);
+                                        JsonObject pileObject = GsonUtils.structureGson(dataMapStr);
+                                        String pileJsonStr =pileObject.toString();
+
+                                        Message msg = new Message();
+                                        msg.obj = pileJsonStr;
+                                        msg.what=0;
+                                        mUiHandler.sendMessage(msg);
+                                    }
                                 } else {//查询的时候
                                     Gson gson = new Gson();
                                     mPileMapInfo = gson.fromJson(data, PileMapInfo.class);

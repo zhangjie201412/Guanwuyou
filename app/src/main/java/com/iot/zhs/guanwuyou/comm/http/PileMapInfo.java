@@ -23,6 +23,8 @@ public class PileMapInfo {
         public String minCoordinatex;
         public String minCoordinatey;
         public String projectId;
+        public String avgPileDiameter;
+
     }
 
     public static class PileMap {
