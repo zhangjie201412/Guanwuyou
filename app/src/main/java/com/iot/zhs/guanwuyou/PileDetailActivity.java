@@ -12,9 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
 import com.iot.zhs.guanwuyou.comm.http.ViewPileInfo;
-import com.iot.zhs.guanwuyou.utils.PileInfo;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
@@ -63,8 +61,9 @@ public class PileDetailActivity extends BaseActivity {
     private static final int BUTTON_EVENT_REPORT = 2;
 
     private int mButtonEvent = -1;
-    private int mNoFinishState;
-    private String mNoFinishPileId;
+  //  private int mNoFinishState;
+    private String pileId;
+    private int constructionState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,8 +88,8 @@ public class PileDetailActivity extends BaseActivity {
         });
 
         mNewTaskButton = findViewById(R.id.bt_new_task);
-        mNoFinishState = getIntent().getIntExtra("noFinishState", -1);
-        mNoFinishPileId = getIntent().getStringExtra("noFinishPileId");
+        //mNoFinishState = getIntent().getIntExtra("noFinishState", -1);
+        //mNoFinishPileId = getIntent().getStringExtra("noFinishPileId");
         mNewTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,15 +105,15 @@ public class PileDetailActivity extends BaseActivity {
                     startActivity(intent);
                 } else if (mButtonEvent == BUTTON_EVENT_CONTINUE) {
                     //get no finish status
-                    if (mNoFinishState == 0||mNoFinishState ==-1) {
+                    if (constructionState ==1) {//未施工
                         //跳转到标定界面
                         Intent intent = new Intent(PileDetailActivity.this, CalibrationActivity.class);
-                        intent.putExtra("pileId", mNoFinishPileId);
+                        intent.putExtra("pileId", pileId);
                         startActivity(intent);
-                    } else if(mNoFinishState == 1) {
+                    } else if(constructionState==0) {//施工中
                         //跳转到开始灌注
                         Intent intent = new Intent(PileDetailActivity.this, FillingActivity.class);
-                        intent.putExtra("pileId", mNoFinishPileId);
+                        intent.putExtra("pileId", pileId);
                         startActivity(intent);
                     }
                 }
@@ -167,7 +166,7 @@ public class PileDetailActivity extends BaseActivity {
             Log.d(TAG, response);
             Gson gson = new Gson();
             ViewPileInfo info = gson.fromJson(response, ViewPileInfo.class);
-
+            pileId=info.data.pile.pileId;
             mSystemNumberTextView.setText(info.data.pile.systemNumber);
             mPileNumberTextView.setText(info.data.pile.pileNumber);
             mPileTypeTextView.setText(info.data.pile.pileTypeName);
@@ -179,7 +178,7 @@ public class PileDetailActivity extends BaseActivity {
             mConGradeTextView.setText(info.data.pile.conGrade);
             mFillEndTimeTextView.setText(info.data.pile.fillEndTime);
 
-            int constructionState = Integer.valueOf(info.data.pile.constructionState);
+            constructionState = Integer.valueOf(info.data.pile.constructionState);
 
             mHasReport = Integer.valueOf(info.data.pile.isHasMasterDeviceRep);
             Log.d(TAG, "has report = " + mHasReport);
