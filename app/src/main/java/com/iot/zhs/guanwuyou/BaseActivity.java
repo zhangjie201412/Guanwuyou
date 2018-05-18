@@ -29,10 +29,10 @@ public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "ZHS#Base";
     private Button mMenuButton;
 
-    @Override
+ /*   @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
-    }
+    }*/
 
     @Override
     protected void onDestroy() {
