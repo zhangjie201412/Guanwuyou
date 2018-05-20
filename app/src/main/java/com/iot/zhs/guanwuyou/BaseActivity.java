@@ -18,6 +18,7 @@ import com.iot.zhs.guanwuyou.database.SlaveDevice;
 
 import org.litepal.crud.DataSupport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +53,8 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
+                List<SlaveDevice> slaveDeviceList = new ArrayList<>();
+                List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
                 SlaveDevice masterDevice = new SlaveDevice();
                 masterDevice.setSerialNumber(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
                 masterDevice.setSlaveOrMaster(0);
@@ -62,6 +64,30 @@ public class BaseActivity extends AppCompatActivity {
                 masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery());
 
                 slaveDeviceList.add(0, masterDevice);
+                String[] serialNumberList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
+                for(String sn: serialNumberList) {
+                    Log.d(TAG, "### saved serial list " + sn);
+                    boolean isExist = false;
+                    int i;
+                    for(i = 0; i < savedDeviceList.size(); i++) {
+                        if(sn.equals(savedDeviceList.get(i).getSerialNumber())) {
+                            isExist = true;
+                            break;
+                        }
+                    }
+                    if(isExist) {
+                        slaveDeviceList.add(savedDeviceList.get(i));
+                    } else {
+                        SlaveDevice lostDevice = new SlaveDevice();
+                        lostDevice.setSerialNumber(sn);
+                        lostDevice.setSlaveOrMaster(1);
+                        lostDevice.setOnline(0);
+                        lostDevice.setAlarm(0);
+                        lostDevice.setComm(0);
+                        lostDevice.setBattery(0);
+                        slaveDeviceList.add(lostDevice);
+                    }
+                }
                 for(SlaveDevice device: slaveDeviceList) {
                     Log.d(TAG, "### serialNumber: " + device.getSerialNumber());
                     Log.d(TAG, "### online: " + device.getOnline());

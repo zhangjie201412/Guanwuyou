@@ -55,6 +55,7 @@ public class SharedPreferenceUtils {
     public static final String KEY_MODE = "key_mode";
 
     public static final String KEY_MATCH_LIST = "key_match_list";
+    public static final String KEY_ALMSTA = "key_almsta";
 
     private SharedPreferences mSp;
     private SharedPreferences.Editor mEditor;
@@ -201,6 +202,10 @@ public class SharedPreferenceUtils {
         String[] matchList = val.split(",");
 
         return matchList;
+    }
+
+    public String getKeyAlmsta() {
+        return mSp.getString(KEY_ALMSTA, "0");
     }
 
     public void setKeyKeepAccount(boolean val) {
@@ -378,6 +383,11 @@ public class SharedPreferenceUtils {
             mEditor.putString(KEY_MATCH_LIST, val);
             mEditor.commit();
         }
+    }
+
+    public void setKeyAlmsta(String val) {
+        mEditor.putString(KEY_ALMSTA, val);
+        mEditor.commit();
     }
 
 }

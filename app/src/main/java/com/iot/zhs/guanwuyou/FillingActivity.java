@@ -114,6 +114,7 @@ public class FillingActivity extends BaseActivity {
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
         mSpUtils.setKeySlaveAlarm(false);
+        mAnimationStage = Integer.parseInt(mSpUtils.getKeyAlarmStatus());
         mPileId = getIntent().getStringExtra("pileId");
         Log.d(TAG, "####pile id = " + mPileId);
 //        mFinalCheckData = mSpUtils.getKeyLatestRaw();
@@ -405,11 +406,7 @@ public class FillingActivity extends BaseActivity {
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
-            if (event.message.equals("prealarm")) {
-                mAnimationStage = 1;
-            } else if (event.message.equals("alarm")) {
-                mAnimationStage = 2;
-            }
+            mAnimationStage = Integer.parseInt(event.message);
         }
     }
 

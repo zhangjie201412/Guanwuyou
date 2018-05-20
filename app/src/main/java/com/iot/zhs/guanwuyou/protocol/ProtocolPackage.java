@@ -7,9 +7,12 @@ import android.util.Log;
 
 import com.iot.zhs.guanwuyou.LoginActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.utils.DowloadFileUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.NotificationDialog;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,14 +110,31 @@ public class ProtocolPackage {
             Log.d(TAG, "calmac: " + mData.get(0));
             MyApplication.getInstance().getSpUtils().setKeyCalMac(mData.get(0));
         } else if (mType.equals("matchlist")) {
+
+            List<SlaveDevice> allDevices = DataSupport.findAll(SlaveDevice.class);
+            int slaveNumber = Integer.parseInt(mData.get(0));
             for(int i = 0; i < mDatNum; i++) {
-                Log.d(TAG, String.format("[%d] => %s", i, mData.get(i)));
+                Log.d(TAG, String.format("### [%d] => %s", i, mData.get(i)));
             }
-            String[] matchList = new String[mDatNum];
-            for(int i = 0; i < mDatNum; i++) {
-                matchList[i] = mData.get(i);
+            String[] matchList = new String[slaveNumber];
+            for(int i = 0; i < slaveNumber; i++) {
+                matchList[i] = mData.get(i + 1);
             }
             MyApplication.getInstance().getSpUtils().setKeyMatchList(matchList);
+
+            for(int i = 0; i < allDevices.size(); i++) {
+                boolean isExist = false;
+                for(int j = 0; j < slaveNumber; j++) {
+                    if(mData.get(j + 1).equals(allDevices.get(i).getSerialNumber())) {
+                        isExist = true;
+                    }
+                }
+                if(!isExist) {
+                    String deleteSn = allDevices.get(i).getSerialNumber();
+                    Log.d(TAG, "delete serial number: " + deleteSn);
+                    DataSupport.deleteAll(SlaveDevice.class, "serialNumber = ?", deleteSn);
+                }
+            }
         } else if(mType.equals("raw")) {
 
         } else if(mType.equals("mtrsd")) {

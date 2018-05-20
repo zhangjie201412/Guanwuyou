@@ -170,7 +170,7 @@ public class SerialPackage {
                     + mData.get(1) + ", " + mData.get(2));
             //request controller's version
             ProtocolPackage pkg = null;
-            if(mDeviceId1.equals("0")) {
+            if (mDeviceId1.equals("0")) {
                 Log.d(TAG, "####MASTER VER");
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
@@ -201,11 +201,11 @@ public class SerialPackage {
                             if (info.code.equals("1")) {
                                 Log.d(TAG, "ver ack ok!");
                                 pkgResponse = new ProtocolPackage(info.data);
-                                if(mDeviceId1.equals("0")) {
+                                if (mDeviceId1.equals("0")) {
                                     Log.d(TAG, "update master version");
                                     pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
-                                }else{
+                                } else {
                                     Log.d(TAG, "update slave version");
                                     pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
@@ -216,8 +216,8 @@ public class SerialPackage {
                                 Log.e(TAG, "ver response message: " + info.message);
                             }
 
-                            if(mNeedResend) {
-                                if(pkgResponse!=null && pkgResponse.getData()!=null) {
+                            if (mNeedResend) {
+                                if (pkgResponse != null && pkgResponse.getData() != null) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -251,11 +251,11 @@ public class SerialPackage {
                                                         if (info.code.equals("1")) {
                                                             Log.d(TAG, "ver ack ok!");
                                                             ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                                            if(mDeviceId1.equals("0")) {
+                                                            if (mDeviceId1.equals("0")) {
                                                                 Log.d(TAG, "update master version");
                                                                 pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
-                                                            }else{
+                                                            } else {
                                                                 Log.d(TAG, "update slave version");
                                                                 pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
@@ -285,7 +285,7 @@ public class SerialPackage {
             List<String> dataList = new ArrayList<>();
             dataList.add("" + (year - 2000));
             dataList.add("" + (month + 1));
-            dataList.add("" + day );
+            dataList.add("" + day);
             dataList.add("" + hour);
             dataList.add("" + min);
             dataList.add("" + second);
@@ -318,9 +318,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "calmac response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -422,9 +422,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "almfactor response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -485,9 +485,9 @@ public class SerialPackage {
             } else {
                 device.updateAll("serialNumber = ?", slaveSn);
             }
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = "prealarm";
-            EventBus.getDefault().post(event);
+//            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
+//            event.message = "prealarm";
+//            EventBus.getDefault().post(event);
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "prealarm", "none", 3, mData);
@@ -511,9 +511,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "prealarm response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -562,19 +562,19 @@ public class SerialPackage {
             } else {
                 device.updateAll("serialNumber = ?", slaveSn);
             }
-            boolean isAllSlaveAlarmed = true;
-            List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
-            for (SlaveDevice dev : slaveDeviceList) {
-                if(dev.getAlarm() != 2) {
-                    isAllSlaveAlarmed = false;
-                }
-            }
-
-            if(isAllSlaveAlarmed) {
-                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-                event.message = "alarm";
-                EventBus.getDefault().post(event);
-            }
+//            boolean isAllSlaveAlarmed = true;
+//            List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
+//            for (SlaveDevice dev : slaveDeviceList) {
+//                if(dev.getAlarm() != 2) {
+//                    isAllSlaveAlarmed = false;
+//                }
+//            }
+//
+//            if(isAllSlaveAlarmed) {
+//                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
+//                event.message = "alarm";
+//                EventBus.getDefault().post(event);
+//            }
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "alarm", "none", 3, mData);
@@ -598,9 +598,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "alarm response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -663,9 +663,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "cal.con response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -731,9 +731,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "cal.slurry response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -778,6 +778,9 @@ public class SerialPackage {
             Log.d(TAG, "-> " + pkg.toString());
             String alarm = mData.get(0);
             String orgAlarm = MyApplication.getInstance().getSpUtils().getKeyAlarmStatus();
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
+            event.message = alarm;
+            EventBus.getDefault().post(event);
             if (!alarm.equals(orgAlarm)) {
                 MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
                 Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
@@ -799,9 +802,9 @@ public class SerialPackage {
                                 } else {
                                     Log.e(TAG, "almsta response message: " + info.message);
                                 }
-                                if(mNeedResend) {
+                                if (mNeedResend) {
                                     ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                    if(pkgResponse.parse()) {
+                                    if (pkgResponse.parse()) {
                                         if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                             //resend the package
                                             int syncid = pkgResponse.getSyncId() + 1;
@@ -869,9 +872,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "uselist response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -954,9 +957,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "battery response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -1022,6 +1025,10 @@ public class SerialPackage {
             status.thresholdStatus = mData.get(3);
             status.networkStatus = mData.get(4);
 
+            for (int i = 0; i < mDataNum; i++) {
+                Log.d(TAG, "### useno " + mDeviceId1 + " -> " + mData.get(i));
+            }
+
             //save slave
             String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
@@ -1072,9 +1079,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "usenodesta response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -1188,9 +1195,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "mspeed response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -1252,9 +1259,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "almfactor response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -1329,9 +1336,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "mode response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
@@ -1404,7 +1411,7 @@ public class SerialPackage {
                             if (info.code.equals("1")) {
                                 Log.d(TAG, "sensorid ack ok!");
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     List<String> dataList = pkgResponse.getData();
                                     String rsp = makeResponse("sensorid", dataList);
                                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
@@ -1416,7 +1423,7 @@ public class SerialPackage {
                             }
                         }
                     });
-        } else if(mOperation.equals("fin")) {
+        } else if (mOperation.equals("fin")) {
             ProtocolPackage pkg;
             pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
@@ -1441,9 +1448,9 @@ public class SerialPackage {
                             } else {
                                 Log.e(TAG, "fin response message: " + info.message);
                             }
-                            if(mNeedResend) {
+                            if (mNeedResend) {
                                 ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if(pkgResponse.parse()) {
+                                if (pkgResponse.parse()) {
                                     if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
                                         //resend the package
                                         int syncid = pkgResponse.getSyncId() + 1;
