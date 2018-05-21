@@ -55,6 +55,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 List<SlaveDevice> slaveDeviceList = new ArrayList<>();
                 List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
+                //主机
                 SlaveDevice masterDevice = new SlaveDevice();
                 masterDevice.setSerialNumber(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
                 masterDevice.setSlaveOrMaster(0);
@@ -62,8 +63,8 @@ public class BaseActivity extends AppCompatActivity {
                 masterDevice.setAlarm(0);
                 masterDevice.setComm(1);
                 masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery());
-
                 slaveDeviceList.add(0, masterDevice);
+                //从机
                 String[] serialNumberList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
                 for(String sn: serialNumberList) {
                     Log.d(TAG, "### saved serial list " + sn);
@@ -88,6 +89,19 @@ public class BaseActivity extends AppCompatActivity {
                         slaveDeviceList.add(lostDevice);
                     }
                 }
+                //标定仪
+                int j=0;
+                for(j = 0; j < savedDeviceList.size(); j++) {
+                    String slaveSn=savedDeviceList.get(j).getSerialNumber();
+                    if(!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")){
+                        if(slaveSn.equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())){//区分标定仪
+                            savedDeviceList.get(j).setSlaveOrMaster(2);
+                            slaveDeviceList.add(savedDeviceList.get(j));
+                            break;
+                        }
+                    }
+                }
+
                 for(SlaveDevice device: slaveDeviceList) {
                     Log.d(TAG, "### serialNumber: " + device.getSerialNumber());
                     Log.d(TAG, "### online: " + device.getOnline());

@@ -109,6 +109,19 @@ public class ProtocolPackage {
         } else if(mType.equals("calmac")) {
             Log.d(TAG, "calmac: " + mData.get(0));
             MyApplication.getInstance().getSpUtils().setKeyCalMac(mData.get(0));
+
+            String slaveSn=mData.get(0);
+            SlaveDevice device = new SlaveDevice();
+            device.setSerialNumber(slaveSn);
+            device.setSlaveOrMaster(2);//2--标定仪
+            if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
+                //insert new data
+                device.setSerialNumber(slaveSn);
+                device.save();
+            } else {
+                device.updateAll("serialNumber = ?", slaveSn);
+            }
+
         } else if (mType.equals("matchlist")) {
 
             List<SlaveDevice> allDevices = DataSupport.findAll(SlaveDevice.class);
@@ -123,16 +136,18 @@ public class ProtocolPackage {
             MyApplication.getInstance().getSpUtils().setKeyMatchList(matchList);
 
             for(int i = 0; i < allDevices.size(); i++) {
-                boolean isExist = false;
-                for(int j = 0; j < slaveNumber; j++) {
-                    if(mData.get(j + 1).equals(allDevices.get(i).getSerialNumber())) {
-                        isExist = true;
+                if(allDevices.get(i).getSlaveOrMaster()!=2) {//2--标定仪 这里不需要处理标定仪
+                    boolean isExist = false;
+                    for (int j = 0; j < slaveNumber; j++) {
+                        if (mData.get(j + 1).equals(allDevices.get(i).getSerialNumber())) {
+                            isExist = true;
+                        }
                     }
-                }
-                if(!isExist) {
-                    String deleteSn = allDevices.get(i).getSerialNumber();
-                    Log.d(TAG, "delete serial number: " + deleteSn);
-                    DataSupport.deleteAll(SlaveDevice.class, "serialNumber = ?", deleteSn);
+                    if (!isExist) {
+                        String deleteSn = allDevices.get(i).getSerialNumber();
+                        Log.d(TAG, "delete serial number: " + deleteSn);
+                        DataSupport.deleteAll(SlaveDevice.class, "serialNumber = ?", deleteSn);
+                    }
                 }
             }
         } else if(mType.equals("raw")) {

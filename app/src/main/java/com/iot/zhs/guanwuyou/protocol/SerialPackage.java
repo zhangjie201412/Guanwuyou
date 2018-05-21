@@ -399,20 +399,25 @@ public class SerialPackage {
             Log.d(TAG, "-> " + pkg.toString());
             String alarm = mData.get(0);
             String orgAlarm = MyApplication.getInstance().getSpUtils().getKeyAlarmStatus();
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = alarm;
-            EventBus.getDefault().post(event);
-            if (!alarm.equals(orgAlarm)) {
-                MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
 
-                Utils.doProcessProtocolInfo(
-                        pkg.toString(), new Utils.ResponseCallback() {
-                            @Override
-                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-
-                            }
-                        });
+            int alarmInt=Utils.stringToInt(alarm);//（0,1,2）数值大的可以覆盖小的
+            int orgAlarmInt=Utils.stringToInt(orgAlarm);
+            if(orgAlarmInt<alarmInt){
+                orgAlarm=alarm;
             }
+            MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(orgAlarm);
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
+            event.message = orgAlarm;
+            EventBus.getDefault().post(event);
+
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
+                        @Override
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                        }
+                    });
+
 
         } else if (mOperation.equals("uselist")) {
             Log.d(TAG, "uselist " + mDataNum + " slave devices");
@@ -467,11 +472,11 @@ public class SerialPackage {
         } else if (mOperation.equals("usenodesta")) {
             SlaveStatusList.SlaveStatus status = new SlaveStatusList.SlaveStatus();
             status.slaveSerialNumber = mDeviceId1;
-            status.online = mData.get(0);
+            status.online = mData.get(4);
             status.versionStatus = mData.get(1);
-            status.commStatus = mData.get(2);
-            status.thresholdStatus = mData.get(3);
-            status.networkStatus = mData.get(4);
+            status.sensorStatus = mData.get(2);
+            status.motorStatus = mData.get(3);
+            status.networkStatus = mData.get(0);
 
             for (int i = 0; i < mDataNum; i++) {
                 Log.d(TAG, "### useno " + mDeviceId1 + " -> " + mData.get(i));
@@ -480,8 +485,8 @@ public class SerialPackage {
             //save slave
             String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
-            device.setOnline(Integer.valueOf(mData.get(0)));
-            device.setComm(Integer.valueOf(mData.get(2)));
+            device.setOnline(Integer.valueOf(mData.get(4)));
+            device.setComm(Integer.valueOf(mData.get(0)));
             device.setSlaveOrMaster(1);
             if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                 //insert new data
@@ -522,12 +527,13 @@ public class SerialPackage {
             String[] matchList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
             if (matchList == null) {
                 Log.d(TAG, "match list is null");
-                dataList.add("1");
                 dataList.add("0");
             } else {
                 for (int i = 0; i < matchList.length; i++) {
                     dataList.add(matchList[i]);
                 }
+                dataList.add(0, "1");
+
             }
             String rsp = makeResponse("matchlist", dataList);
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
@@ -631,11 +637,11 @@ public class SerialPackage {
                     mDeviceId1, "fin", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(pkg.toString(), new Utils.ResponseCallback() {
-                        @Override
-                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+                @Override
+                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        }
-                    });
+                }
+            });
         }
     }
 

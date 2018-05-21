@@ -45,11 +45,18 @@
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tb_top"
-        android:layout_marginTop="10px"></android.support.v7.widget.RecyclerView>
+        android:layout_below="@id/tb_top">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10px"></android.support.v7.widget.RecyclerView>
+    </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
 </RelativeLayout>

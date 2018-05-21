@@ -13,8 +13,8 @@ public class SlaveStatusList {
         public String slaveSerialNumber;
         public String online;
         public String versionStatus;
-        public String commStatus;
-        public String thresholdStatus;
+        public String sensorStatus;
+        public String motorStatus;
         public String networkStatus;
     }
 }

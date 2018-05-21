@@ -122,9 +122,19 @@ public class FillingActivity extends BaseActivity {
         mFinalCheckData = new ArrayList<>();
         mFinalCheckData.clear();
         List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
-        for (SlaveDevice device : slaveDeviceList) {
-            mFinalCheckData.add("" + device.getLatestData());
+        String[] useList= MyApplication.getInstance().getSpUtils().getKeyUseList();//uselist协议的值
+
+        for (SlaveDevice device : slaveDeviceList) {//取在线从机的最后一笔
+            if(useList!=null&&useList.length>0) {
+                for (int i = 0; i < useList.length; i++) {
+                    if (device.getSerialNumber().equals(useList[i])){
+                        mFinalCheckData.add("" + device.getLatestData());
+                        Log.d(TAG,"mFinalCheckData:"+device.getLatestData());
+                    }
+                }
+            }
         }
+
         mNotificationDialog = new NotificationDialog();
         mNotificationDialog.init("提醒", "是", "否", new NotificationDialog.NotificationDialogListener() {
             @Override

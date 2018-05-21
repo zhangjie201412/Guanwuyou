@@ -65,6 +65,8 @@ public class SlaveDevice extends DataSupport {
         return comm;
     }
 
+
+
     public int getBattery() {
         return battery;
     }

@@ -86,6 +86,8 @@ public class DeviceListAdapter extends BaseAdapter {
             holder.title.setText("从机");
         } else if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 0) {
             holder.title.setText("主机");
+        }else if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 2) {
+            holder.title.setText("标定仪");
         }
         return view;
     }

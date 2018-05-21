@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.PileListActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.adapter.DeviceAdapter;
 import com.iot.zhs.guanwuyou.comm.http.DeviceModel;
@@ -25,6 +26,8 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
 import okhttp3.Call;
 import okhttp3.MediaType;
 
@@ -32,11 +35,13 @@ import okhttp3.MediaType;
  * Created by H151136 on 1/21/2018.
  */
 
-public class DeviceFragment extends Fragment {
+public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefreshLayoutDelegate {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final String TAG = "ZHS.IOT";
     private MyApplication myApplication;
     private SharedPreferenceUtils mSpUtils;
+    private BGARefreshLayout bgaRefreshLayout;
+
 
     private TextView projectNameTv;
     private RecyclerView mRecyclerView;
@@ -57,8 +62,13 @@ public class DeviceFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
+        bgaRefreshLayout = view.findViewById(R.id.refreshLayout);
+        bgaRefreshLayout.setDelegate(this);
+        bgaRefreshLayout.setRefreshViewHolder(new BGANormalRefreshViewHolder(this.getContext(), false));
+
         doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
+
         return view;
     }
 
@@ -82,11 +92,24 @@ public class DeviceFragment extends Fragment {
 
     }
 
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+
+        doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        return false;
+    }
+
     private class SelectSlaveDeviceInfo extends StringCallback {
 
         @Override
         public void onError(Call call, Exception e, int id) {
             e.printStackTrace();
+            bgaRefreshLayout.endRefreshing();
         }
 
         @Override
@@ -98,6 +121,8 @@ public class DeviceFragment extends Fragment {
             if(info.code.equals(Utils.MSG_CODE_OK)) {
                 setListAdapter();
             }
+            bgaRefreshLayout.endRefreshing();
+
         }
     }
 
