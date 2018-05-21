@@ -183,92 +183,20 @@ public class SerialPackage {
             }
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            ProtocolPackage pkgResponse = null;
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "ver ack ok!");
-                                pkgResponse = new ProtocolPackage(info.data);
-                                if (mDeviceId1.equals("0")) {
-                                    Log.d(TAG, "update master version");
-                                    pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-
-                                } else {
-                                    Log.d(TAG, "update slave version");
-                                    pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-
-                                }
-                                pkgResponse.parse();
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+                            if (mDeviceId1.equals("0")) {
+                                Log.d(TAG, "update master version");
+                                pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
                             } else {
-                                Log.e(TAG, "ver response message: " + info.message);
+                                Log.d(TAG, "update slave version");
+                                pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+
                             }
-
-                            if (mNeedResend) {
-                                if (pkgResponse != null && pkgResponse.getData() != null) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg = null;
-                                        if (mDeviceId1.equals("0")) {
-                                            Log.d(TAG, "####MASTER VER");
-                                            pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                    "0", "ver", "get", 3, mData);
-                                        } else {
-                                            Log.d(TAG, "####SLAVER VER");
-                                            pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                    mDeviceId1, "ver", "get", 3, mData);
-                                        }
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "ver ack ok!");
-                                                            ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                                            if (mDeviceId1.equals("0")) {
-                                                                Log.d(TAG, "update master version");
-                                                                pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-
-                                                            } else {
-                                                                Log.d(TAG, "update slave version");
-                                                                pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-
-                                                            }
-                                                            pkgResponse.parse();
-                                                        } else {
-                                                            Log.e(TAG, "ver response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
+                            pkgResponse.parse();
                         }
                     });
         } else if (mOperation.equals("systime")) {
@@ -299,62 +227,14 @@ public class SerialPackage {
                     "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "calmac", "get", 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "calmac ack ok!");
-                            } else {
-                                Log.e(TAG, "calmac response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                "0", "calmac", "get", 1, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "calmac ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "calmac response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
             Log.d(TAG, "###send calmac to master");
             List<String> dataList = new ArrayList<>();
             if (MyApplication.getInstance().getSpUtils().getKeyCalMac().isEmpty()) {
@@ -403,74 +283,14 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "raw", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "raw ack ok!");
-                            } else {
-                                Log.e(TAG, "almfactor response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        String slaveSn = mDeviceId1;
-                                        SlaveDevice device = new SlaveDevice();
-                                        device.setLatestData(Integer.valueOf(mData.get(mDataNum - 1)));
-                                        if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
-                                            //insert new data
-                                            device.setSerialNumber(slaveSn);
-                                            device.save();
-                                        } else {
-                                            device.updateAll("serialNumber = ?", slaveSn);
-                                        }
-                                        //save the latest data
-                                        MyApplication.getInstance().getSpUtils().setKeyLatestRaw(mData.get(mDataNum - 1));
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "raw", "none", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "raw ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "almfactor response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("prealarm")) {
             MyApplication.getInstance().getSpUtils().setKeySlavePrealarm(true);
             Log.d(TAG, "######prealarm#######");
@@ -492,60 +312,11 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "prealarm", "none", 3, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "prealarm ack ok!");
-                            } else {
-                                Log.e(TAG, "prealarm response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "prealarm", "none", 3, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "prealarm ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "prealarm response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
         } else if (mOperation.equals("alarm")) {
@@ -579,62 +350,14 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "alarm", "none", 3, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "alarm ack ok!");
-                            } else {
-                                Log.e(TAG, "alarm response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "alarm", "none", 3, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "alarm ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "alarm response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("cal.con")) {
             Log.d(TAG, "set cal con: " + mData.get(0));
             MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
@@ -644,65 +367,14 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "cal.con", "set", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "cal.con ack ok!");
-                            } else {
-                                Log.e(TAG, "cal.con response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
-                                        MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION);
-                                        EventBus.getDefault().post(event);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "cal.con", "set", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "cal.con ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "cal.con response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("cal.slurry")) {
             Log.d(TAG, "set cal slurry: " + mData.get(0));
             MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
@@ -712,65 +384,14 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "cal.slurry", "set", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "cal.slurry ack ok!");
-                            } else {
-                                Log.e(TAG, "cal.slurry response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
-                                        MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION);
-                                        EventBus.getDefault().post(event);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "cal.slurry", "set", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "cal.slurry ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "cal.slurry response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("almsta")) {
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
@@ -783,68 +404,16 @@ public class SerialPackage {
             EventBus.getDefault().post(event);
             if (!alarm.equals(orgAlarm)) {
                 MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
-                Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                        MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                        pkg.toString(),
-                        new StringCallback() {
-                            @Override
-                            public void onError(Call call, Exception e, int id) {
-                                e.printStackTrace();
-                            }
 
+                Utils.doProcessProtocolInfo(
+                        pkg.toString(), new Utils.ResponseCallback() {
                             @Override
-                            public void onResponse(String response, int id) {
-                                Log.d(TAG, response);
-                                Gson gson = new Gson();
-                                ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                if (info.code.equals("1")) {
-                                    Log.d(TAG, "almsta ack ok!");
-                                } else {
-                                    Log.e(TAG, "almsta response message: " + info.message);
-                                }
-                                if (mNeedResend) {
-                                    ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                    if (pkgResponse.parse()) {
-                                        if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                            //resend the package
-                                            int syncid = pkgResponse.getSyncId() + 1;
-                                            MyApplication.getInstance().setSyncId(syncid);
-                                            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                    "0", "almsta", "none", 1, mData);
-                                            Log.d(TAG, "-> " + pkg.toString());
-                                            String alarm = mData.get(0);
-                                            String orgAlarm = MyApplication.getInstance().getSpUtils().getKeyAlarmStatus();
-                                            if (!alarm.equals(orgAlarm)) {
-                                                MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
-                                                Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                        MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                        pkg.toString(),
-                                                        new StringCallback() {
-                                                            @Override
-                                                            public void onError(Call call, Exception e, int id) {
-                                                                e.printStackTrace();
-                                                            }
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                                                            @Override
-                                                            public void onResponse(String response, int id) {
-                                                                Log.d(TAG, response);
-                                                                Gson gson = new Gson();
-                                                                ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                                if (info.code.equals("1")) {
-                                                                    Log.d(TAG, "almsta ack ok!");
-                                                                } else {
-                                                                    Log.e(TAG, "almsta response message: " + info.message);
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    }
-                                }
                             }
                         });
             }
+
         } else if (mOperation.equals("uselist")) {
             Log.d(TAG, "uselist " + mDataNum + " slave devices");
             MyApplication.getInstance().getSpUtils().setKeyUseList(mData);
@@ -853,62 +422,11 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "uselist", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "uselist ack ok!");
-                            } else {
-                                Log.e(TAG, "uselist response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        MyApplication.getInstance().getSpUtils().setKeyUseList(mData);
-                                        ProtocolPackage pkg;
-                                        pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                "0", "uselist", "none", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "uselist ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "uselist response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
         } else if (mOperation.equals("battery")) {
@@ -938,84 +456,14 @@ public class SerialPackage {
                         mDeviceId1, "battery", "none", 1, mData);
             }
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "battery ack ok!");
-                            } else {
-                                Log.e(TAG, "battery response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg;
-                                        if (mDeviceId1.equals("0")) {
-                                            pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                    "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                    "0", "battery", "none", 1, mData);
-                                            MyApplication.getInstance().getSpUtils().setKeyMasterBattery(Integer.valueOf(mData.get(0)));
-                                        }
-                                        //send slave battery
-                                        else {
-                                            //save slave
-                                            String slaveSn = mDeviceId1;
-                                            SlaveDevice device = new SlaveDevice();
-                                            device.setBattery(Integer.valueOf(mData.get(0)));
-                                            if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
-                                                //insert new data
-                                                device.setSerialNumber(slaveSn);
-                                                device.save();
-                                            } else {
-                                                device.updateAll("serialNumber = ?", slaveSn);
-                                            }
-
-                                            pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                    mDeviceId1, "battery", "none", 1, mData);
-                                        }
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "battery ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "battery response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("usenodesta")) {
             SlaveStatusList.SlaveStatus status = new SlaveStatusList.SlaveStatus();
             status.slaveSerialNumber = mDeviceId1;
@@ -1060,97 +508,14 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "usenodesta", "none", mDataNum + 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "usenodesta ack ok!");
-                            } else {
-                                Log.e(TAG, "usenodesta response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        SlaveStatusList.SlaveStatus status = new SlaveStatusList.SlaveStatus();
-                                        status.slaveSerialNumber = mDeviceId1;
-                                        status.online = mData.get(0);
-                                        status.versionStatus = mData.get(1);
-                                        status.commStatus = mData.get(2);
-                                        status.thresholdStatus = mData.get(3);
-                                        status.networkStatus = mData.get(4);
-
-                                        //save slave
-                                        String slaveSn = mDeviceId1;
-                                        SlaveDevice device = new SlaveDevice();
-                                        device.setOnline(Integer.valueOf(mData.get(0)));
-                                        device.setComm(Integer.valueOf(mData.get(2)));
-                                        device.setSlaveOrMaster(1);
-                                        if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
-                                            //insert new data
-                                            device.setSerialNumber(slaveSn);
-                                            device.save();
-                                        } else {
-                                            device.updateAll("serialNumber = ?", slaveSn);
-                                        }
-
-                                        List<SlaveStatusList.SlaveStatus> list = MyApplication.getInstance().getSpUtils().getKeySlaveStatusList();
-                                        if (list == null) {
-                                            list = new ArrayList<>();
-                                        } else {
-                                            for (int i = 0; i < list.size(); i++) {
-                                                if (list.get(i).slaveSerialNumber.equals(status.slaveSerialNumber)) {
-                                                    list.remove(i);
-                                                }
-                                            }
-                                        }
-                                        list.add(status);
-                                        MyApplication.getInstance().getSpUtils().setKeySlaveStatusList(list);
-                                        mData.add(0, mDeviceId1);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                "0", "usenodesta", "none", mDataNum + 1, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "usenodesta ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "usenodesta response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("matchlist")) {
             Log.d(TAG, "matchlist!!");
             List<String> dataList = new ArrayList<>();
@@ -1176,126 +541,28 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "mspeed", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "mspeed ack ok!");
-                            } else {
-                                Log.e(TAG, "mspeed response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        MyApplication.getInstance().getSpUtils().setKeyLatestRaw(mData.get(mDataNum - 1));
-                                        //send to server
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "mspeed", "none", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "mspeed ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "mspeed response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("almfactor")) {
             //send to server
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "almfactor", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "almfactor ack ok!");
-                            } else {
-                                Log.e(TAG, "almfactor response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "almfactor", "none", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "almfactor ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "almfactor response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("mode")) {
             List<String> dataList = new ArrayList<>();
             if (MyApplication.getInstance().getSpUtils().getKeyMode().isEmpty()) {
@@ -1317,63 +584,14 @@ public class SerialPackage {
                     "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "mode", "get", 1, modeData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "mode ack ok!");
-                            } else {
-                                Log.e(TAG, "mode response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        //send to server
-                                        ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                "0", "mode", "get", 1, modeData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "mode ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "mode response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
+
         } else if (mOperation.equals("mtrsd")) {
             List<String> dataList = new ArrayList<>();
             if (MyApplication.getInstance().getSpUtils().getKeyMtrsd0().isEmpty()) {
@@ -1394,96 +612,28 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "sensorid", "get", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "sensorid ack ok!");
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    List<String> dataList = pkgResponse.getData();
-                                    String rsp = makeResponse("sensorid", dataList);
-                                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
-                                    event.message = rsp;
-                                    EventBus.getDefault().post(event);
-                                }
-                            } else {
-                                Log.e(TAG, "sensorid response message: " + info.message);
-                            }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+                            List<String> dataList = pkgResponse.getData();
+                            String rsp = makeResponse("sensorid", dataList);
+                            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+                            event.message = rsp;
+                            EventBus.getDefault().post(event);
                         }
                     });
+
         } else if (mOperation.equals("fin")) {
             ProtocolPackage pkg;
             pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "fin", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "fin ack ok!");
-                            } else {
-                                Log.e(TAG, "fin response message: " + info.message);
-                            }
-                            if (mNeedResend) {
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                if (pkgResponse.parse()) {
-                                    if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                        //resend the package
-                                        int syncid = pkgResponse.getSyncId() + 1;
-                                        MyApplication.getInstance().setSyncId(syncid);
-                                        ProtocolPackage pkg;
-                                        pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                                                "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                                                mDeviceId1, "fin", "none", mDataNum, mData);
-                                        Log.d(TAG, "-> " + pkg.toString());
-                                        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                                                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                                                pkg.toString(),
-                                                new StringCallback() {
-                                                    @Override
-                                                    public void onError(Call call, Exception e, int id) {
-                                                        e.printStackTrace();
-                                                    }
-
-                                                    @Override
-                                                    public void onResponse(String response, int id) {
-                                                        Log.d(TAG, response);
-                                                        Gson gson = new Gson();
-                                                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                                        if (info.code.equals("1")) {
-                                                            Log.d(TAG, "fin ack ok!");
-                                                        } else {
-                                                            Log.e(TAG, "fin response message: " + info.message);
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
                         }
                     });
         }

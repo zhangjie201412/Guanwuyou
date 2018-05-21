@@ -71,25 +71,11 @@ public class SerialService extends Service {
                     "0", "power", "none", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "set powerup ack ok!");
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -104,25 +90,11 @@ public class SerialService extends Service {
                     "0", "power", "none", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "set powerdown ack ok!");
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -137,27 +109,11 @@ public class SerialService extends Service {
                     "0", "calmac", "get", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "calmac ack ok!");
-                                ProtocolPackage rspPackage = new ProtocolPackage(info.data);
-                                rspPackage.parse();
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -172,27 +128,11 @@ public class SerialService extends Service {
                     "0", "matchlist", "get", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "matchlist ack ok!");
-                                ProtocolPackage rspPackage = new ProtocolPackage(info.data);
-                                rspPackage.parse();
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -207,27 +147,11 @@ public class SerialService extends Service {
                     "0", "mode", "get", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "mode ack ok!");
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                pkgResponse.parse();
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -249,28 +173,12 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             final List<String> finalData = data;
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "apk ver ack ok!");
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                pkgResponse.setUpdateVersionData(finalData, 0, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-                                pkgResponse.parse();
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+                            pkgResponse.setUpdateVersionData(finalData, 0, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+                            pkgResponse.parse();
                         }
                     });
         }
@@ -331,27 +239,11 @@ public class SerialService extends Service {
                     "0", "err", "none", 1, data);
 
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                    MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                    pkg.toString(),
-                    new StringCallback() {
+            Utils.doProcessProtocolInfo(
+                    pkg.toString(), new Utils.ResponseCallback() {
                         @Override
-                        public void onError(Call call, Exception e, int id) {
-                            e.printStackTrace();
-                        }
+                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        @Override
-                        public void onResponse(String response, int id) {
-                            Log.d(TAG, response);
-                            Gson gson = new Gson();
-                            ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                            if (info.code.equals("1")) {
-                                Log.d(TAG, "err ack ok!");
-                                ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                pkgResponse.parse();
-                            } else {
-                                Log.e(TAG, "message: " + info.message);
-                            }
                         }
                     });
         }
@@ -446,29 +338,14 @@ public class SerialService extends Service {
                 "0", "cal&trsd", "get", 1, data);
 
         Log.d(TAG, "-> " + pkg.toString());
-        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                pkg.toString(),
-                new StringCallback() {
+        Utils.doProcessProtocolInfo(
+                pkg.toString(), new Utils.ResponseCallback() {
                     @Override
-                    public void onError(Call call, Exception e, int id) {
-                        e.printStackTrace();
-                    }
+                    public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        Log.d(TAG, response);
-                        Gson gson = new Gson();
-                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                        if (info.code.equals("1")) {
-                            Log.d(TAG, "cal&trsd ack ok!");
-                            ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                            pkgResponse.parse();
-                        } else {
-                            Log.e(TAG, "message: " + info.message);
-                        }
                     }
                 });
+
     }
 
     private void mtrsd() {
@@ -480,27 +357,11 @@ public class SerialService extends Service {
                 "0", "mtrsd", "get", 1, data);
 
         Log.d(TAG, "-> " + pkg.toString());
-        Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                pkg.toString(),
-                new StringCallback() {
+        Utils.doProcessProtocolInfo(
+                pkg.toString(), new Utils.ResponseCallback() {
                     @Override
-                    public void onError(Call call, Exception e, int id) {
-                        e.printStackTrace();
-                    }
+                    public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        Log.d(TAG, response);
-                        Gson gson = new Gson();
-                        ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                        if (info.code.equals("1")) {
-                            Log.d(TAG, "trsd ack ok!");
-                            ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                            pkgResponse.parse();
-                        } else {
-                            Log.e(TAG, "message: " + info.message);
-                        }
                     }
                 });
     }
@@ -520,27 +381,14 @@ public class SerialService extends Service {
                             "0", "heartb", "none", 1, data);
 
                     Log.d(TAG, "-> " + pkg.toString());
-                    Utils.doProcessProtocolInfo(MyApplication.getInstance().getSpUtils().getKeyLoginToken(),
-                            MyApplication.getInstance().getSpUtils().getKeyLoginUserId(),
-                            pkg.toString(),
-                            new StringCallback() {
+                    Utils.doProcessProtocolInfo(
+                            pkg.toString(), new Utils.ResponseCallback() {
                                 @Override
-                                public void onError(Call call, Exception e, int id) {
-                                    e.printStackTrace();
-                                }
+                                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                                @Override
-                                public void onResponse(String response, int id) {
-                                    Log.d(TAG, response);
-                                    Gson gson = new Gson();
-                                    ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
-                                    if (info.code.equals("1")) {
-                                        Log.d(TAG, "heart beat ack ok!");
-                                    } else {
-                                        Log.e(TAG, "message: " + info.message);
-                                    }
                                 }
                             });
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

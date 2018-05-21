@@ -154,6 +154,10 @@ public class ProtocolPackage {
         return true;
     }
 
+    public String getmType() {
+        return mType;
+    }
+
     public String toString() {
         String value = "";
         value += "" + FRAME_HEAD + PROTOCOL_ID + SPLIT;
@@ -179,6 +183,9 @@ public class ProtocolPackage {
      * @return
      */
     public void updateVersion(){
+        if(Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)){
+            return;
+        }
         if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致
             final NotificationDialog mNotificationDialog = new NotificationDialog();
             mNotificationDialog.init("提醒",

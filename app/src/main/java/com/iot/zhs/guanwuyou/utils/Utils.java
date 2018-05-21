@@ -7,9 +7,14 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.gson.Gson;
+import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
+import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +27,8 @@ import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import okhttp3.Call;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -40,28 +47,32 @@ public class Utils {
     public static final int MASTER_HAS_REPORT_CHECK_REPORT2 = 2;
 
     public static final String SERVER_ADDR = "http://61.177.48.122:8685";
-   // public static final String SERVER_ADDR = "http://10.10.18.128:8081";//星星
+    // public static final String SERVER_ADDR = "http://10.10.18.128:8081";//星星
 
 
     public static final String SLAVE_DEVICE_RECORD = "ZHS";
+    private static final String TAG = "ZSH.IOT";
 
-    public static void doProcessProtocolInfo(String token, String loginName, String str, StringCallback callback) {
+    public interface ResponseCallback {
+        void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse);
+    }
+    public interface HttpCallback {
+        void onResponseCallback(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse);
+    }
+
+
+    public static void doProcessProtocolInfo(String str, final ResponseCallback responseCallback) {
         String url = Utils.SERVER_ADDR + "/protocol/doProcessProtocolInfo/cc/";
-        SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = format.format(new Date());
 
-        OkHttpUtils.post().url(url)
-                .addParams("protocolStr", str)
-                .addParams("timeStamp", date)
-                .build()
-                .execute(
-                        callback
-                );
+
+        HttpClient httpClient= new HttpClient(str,responseCallback);
+        httpClient.doSendProtocolInfo();
     }
 
-    public static void resendProtocolInfo() {
 
-    }
+
 
     public static int calcCheckSum(String data, int len) {
         int cs = 0x00;
@@ -112,8 +123,10 @@ public class Utils {
         }
         return Integer.parseInt(string);
     }
+
     /**
      * 判断list是否为空
+     *
      * @param list
      * @param <T>
      * @return
@@ -193,10 +206,11 @@ public class Utils {
 
     /**
      * 获取当前程序的版本名
+     *
      * @return
      * @throws Exception
      */
-    public static String getVersionName(Context context){
+    public static String getVersionName(Context context) {
         //获取packagemanager的实例
         PackageManager packageManager = context.getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
@@ -206,23 +220,24 @@ public class Utils {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        Log.d("TAG","版本号"+packInfo.versionCode);
-        Log.d("TAG","版本名"+packInfo.versionName);
+        Log.d("TAG", "版本号" + packInfo.versionCode);
+        Log.d("TAG", "版本名" + packInfo.versionName);
         return packInfo.versionName;
     }
 
     /**
      * 判断两个集合里面的元素是否一致
+     *
      * @param a
      * @param b
      * @param <T>
      * @return
      */
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
-        if(a.size() != b.size())
+        if (a.size() != b.size())
             return false;
-        for(int i=0;i<a.size();i++){
-            if(!a.get(i).equals(b.get(i)))
+        for (int i = 0; i < a.size(); i++) {
+            if (!a.get(i).equals(b.get(i)))
                 return false;
         }
         return true;
@@ -230,6 +245,7 @@ public class Utils {
 
     /**
      * 字符串集合转string
+     *
      * @param stringList
      * @param splitStr
      * @return
