@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
+import com.iot.zhs.guanwuyou.database.AlarmState;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.item.SlaveDeviceItem;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
@@ -184,7 +185,7 @@ public class SerialPackage {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
                             if (mDeviceId1.equals("0")) {
@@ -196,7 +197,7 @@ public class SerialPackage {
                                 pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
 
                             }
-                            pkgResponse.parse();
+                           // pkgResponse.parse();
                         }
                     });
         } else if (mOperation.equals("systime")) {
@@ -228,7 +229,7 @@ public class SerialPackage {
                     "0", "calmac", "get", 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -284,7 +285,7 @@ public class SerialPackage {
                     mDeviceId1, "raw", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -313,14 +314,14 @@ public class SerialPackage {
                     mDeviceId1, "prealarm", "none", 3, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
                         }
                     });
         } else if (mOperation.equals("alarm")) {
-            MyApplication.getInstance().getSpUtils().setKeySlaveAlarm(true);
+           // MyApplication.getInstance().getSpUtils().setKeySlaveAlarm(true);
             Log.d(TAG, "######alarm#######");
             //save slave
             String slaveSn = mDeviceId1;
@@ -351,7 +352,7 @@ public class SerialPackage {
                     mDeviceId1, "alarm", "none", 3, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -368,7 +369,7 @@ public class SerialPackage {
                     mDeviceId1, "cal.con", "set", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -385,7 +386,7 @@ public class SerialPackage {
                     mDeviceId1, "cal.slurry", "set", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -397,21 +398,43 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "almsta", "none", 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            String alarm = mData.get(0);
-            String orgAlarm = MyApplication.getInstance().getSpUtils().getKeyAlarmStatus();
 
-            int alarmInt=Utils.stringToInt(alarm);//（0,1,2）数值大的可以覆盖小的
-            int orgAlarmInt=Utils.stringToInt(orgAlarm);
-            if(orgAlarmInt<alarmInt){
-                orgAlarm=alarm;
+            String alarm = mData.get(0);
+            String realAlarm="";
+            //存入数据库
+            AlarmState alarmState=new AlarmState();
+            //alarmId=主机SN_项目id
+            String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
+                    MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
+
+            if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
+                //insert new data
+                realAlarm=alarm;
+                alarmState.setAlarmValue(realAlarm);
+                alarmState.setAlarmId(alarmId);
+                alarmState.save();
+            } else {
+                List<AlarmState> alarmStateList=DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class);//只会有一条数据
+                AlarmState orgAlarmState=alarmStateList.get(0);
+                String orgAlarm = orgAlarmState.getAlarmValue();
+
+                int alarmInt=Utils.stringToInt(alarm);//（0,1,2）数值大的可以覆盖小的
+                int orgAlarmInt=Utils.stringToInt(orgAlarm);
+                if(orgAlarmInt<alarmInt){
+                    realAlarm=alarm;
+                }else{
+                    realAlarm=orgAlarm;
+                }
+                alarmState.setAlarmValue(realAlarm);
+                alarmState.updateAll("alarmId = ?", alarmId);
             }
-            MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(orgAlarm);
+
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = orgAlarm;
+            event.message = realAlarm;
             EventBus.getDefault().post(event);
 
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -428,7 +451,7 @@ public class SerialPackage {
                     "0", "uselist", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -462,7 +485,7 @@ public class SerialPackage {
             }
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -514,7 +537,7 @@ public class SerialPackage {
                     "0", "usenodesta", "none", mDataNum + 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -548,7 +571,7 @@ public class SerialPackage {
                     mDeviceId1, "mspeed", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -562,7 +585,7 @@ public class SerialPackage {
                     mDeviceId1, "almfactor", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -591,7 +614,7 @@ public class SerialPackage {
                     "0", "mode", "get", 1, modeData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -619,7 +642,7 @@ public class SerialPackage {
                     mDeviceId1, "sensorid", "get", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
                             List<String> dataList = pkgResponse.getData();
@@ -636,7 +659,7 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "fin", "none", mDataNum, mData);
             Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(pkg.toString(), new Utils.ResponseCallback() {
+            Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
                 @Override
                 public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 

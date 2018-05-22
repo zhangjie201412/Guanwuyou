@@ -72,7 +72,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -91,7 +91,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -110,7 +110,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -129,7 +129,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -148,7 +148,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -174,11 +174,11 @@ public class SerialService extends Service {
             Log.d(TAG, "-> " + pkg.toString());
             final List<String> finalData = data;
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
                             pkgResponse.setUpdateVersionData(finalData, 0, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-                            pkgResponse.parse();
+                           // pkgResponse.parse();
                         }
                     });
         }
@@ -240,7 +240,7 @@ public class SerialService extends Service {
 
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
-                    pkg.toString(), new Utils.ResponseCallback() {
+                    pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -339,7 +339,7 @@ public class SerialService extends Service {
 
         Log.d(TAG, "-> " + pkg.toString());
         Utils.doProcessProtocolInfo(
-                pkg.toString(), new Utils.ResponseCallback() {
+                pkg, new Utils.ResponseCallback() {
                     @Override
                     public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -358,7 +358,7 @@ public class SerialService extends Service {
 
         Log.d(TAG, "-> " + pkg.toString());
         Utils.doProcessProtocolInfo(
-                pkg.toString(), new Utils.ResponseCallback() {
+                pkg, new Utils.ResponseCallback() {
                     @Override
                     public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
@@ -382,7 +382,7 @@ public class SerialService extends Service {
 
                     Log.d(TAG, "-> " + pkg.toString());
                     Utils.doProcessProtocolInfo(
-                            pkg.toString(), new Utils.ResponseCallback() {
+                            pkg, new Utils.ResponseCallback() {
                                 @Override
                                 public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 

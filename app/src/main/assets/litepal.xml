@@ -8,7 +8,7 @@
     	For example:
     	<dbname value="demo" />
     -->
-    <dbname value="SlaveDevice" />
+    <dbname value="AndroidGZZSQL" />
 
     <!--
     	Define the version of your database. Each time you want
@@ -33,6 +33,8 @@
     -->
     <list>
         <mapping class="com.iot.zhs.guanwuyou.database.SlaveDevice" />
+        <mapping class="com.iot.zhs.guanwuyou.database.AlarmState" />
+
     </list>
 
     <!--

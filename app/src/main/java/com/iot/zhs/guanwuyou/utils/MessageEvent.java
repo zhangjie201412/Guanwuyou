@@ -10,7 +10,8 @@ public class MessageEvent {
     public static final int EVENT_TYPE_ERROR_UART = 2;
     public static final int EVENT_TYPE_UPDATE_CALIBRATION = 3;
 
-    public static final int EVENT_TYPE_RE_SEND_PROTOCOL = 4;//重发机制
+    public static final int EVENT_TYPE_REJECT = 4;//reject重发
+    public static final int EVENT_TYPE_NO_RESPONE = 5;//无响应
 
 
     public int type;

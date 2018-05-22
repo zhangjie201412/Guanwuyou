@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.EndPourData;
 import com.iot.zhs.guanwuyou.comm.http.EndPourInfo;
 import com.iot.zhs.guanwuyou.comm.http.ViewPileInfo;
+import com.iot.zhs.guanwuyou.database.AlarmState;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
+import okhttp3.internal.Util;
 
 /**
  * Created by H151136 on 1/20/2018.
@@ -90,12 +92,14 @@ public class FillingActivity extends BaseActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSpUtils.getKeySlaveAlarm()) {
+                if (mAnimationStage==2) {
+                    //结束灌注
                     doEndPourInfo(mSpUtils.getKeyLoginToken(),
                             mSpUtils.getKeyLoginUserId(),
                             mPileId,
                             mFinalCheckData);
                 } else {
+                    //计算差异等级
                     doEndPourData(mSpUtils.getKeyLoginToken(),
                             mSpUtils.getKeyLoginUserId(),
                             mPileId,
@@ -113,8 +117,18 @@ public class FillingActivity extends BaseActivity {
 
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
-        mSpUtils.setKeySlaveAlarm(false);
-        mAnimationStage = Integer.parseInt(mSpUtils.getKeyAlarmStatus());
+
+        //alarmId=主机SN_项目id
+        String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
+                MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
+        if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
+            mAnimationStage=0;
+        } else {
+            List<AlarmState> alarmStateList=DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class);//只会有一条数据
+            AlarmState orgAlarmState=alarmStateList.get(0);
+            mAnimationStage=Utils.stringToInt(orgAlarmState.getAlarmValue());
+        }
+
         mPileId = getIntent().getStringExtra("pileId");
         Log.d(TAG, "####pile id = " + mPileId);
 //        mFinalCheckData = mSpUtils.getKeyLatestRaw();
@@ -140,6 +154,7 @@ public class FillingActivity extends BaseActivity {
             @Override
             public void onButtonClick(int id) {
                 if (id == 1) {
+                    //结束灌注
                     doEndPourInfo(mSpUtils.getKeyLoginToken(),
                             mSpUtils.getKeyLoginUserId(),
                             mPileId,
@@ -149,6 +164,7 @@ public class FillingActivity extends BaseActivity {
                 }
             }
         });
+        //初始化
         doViewPileInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(),
                 mPileId,
@@ -156,7 +172,7 @@ public class FillingActivity extends BaseActivity {
         mAnimationThread = new AnimationThread();
         mAnimationRunning = true;
         mAnimationThread.start();
-        mActivedByPileMap = getIntent().getBooleanExtra("ACTIVITY_BY_PILE_MAP", false);
+       /* mActivedByPileMap = getIntent().getBooleanExtra("ACTIVITY_BY_PILE_MAP", false);
         if (mActivedByPileMap) {
             if (mSpUtils.getKeySlaveAlarm()) {
                 doEndPourInfo(mSpUtils.getKeyLoginToken(),
@@ -169,7 +185,7 @@ public class FillingActivity extends BaseActivity {
                         mPileId,
                         mFinalCheckData);
             }
-        }
+        }*/
     }
 
     @Override
@@ -249,6 +265,32 @@ public class FillingActivity extends BaseActivity {
         }
     }
 
+
+    /**
+     * 初始化
+     * @param token
+     * @param loginName
+     * @param pileId
+     * @param masterSN
+     */
+    private void doViewPileInfo(String token, String loginName, String pileId, String masterSN) {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("pileId", pileId);
+            object.put("masterDeviceSN", masterSN);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String url = Utils.SERVER_ADDR + "/pile/doViewPileInfo/cc/" + token + "/" + loginName;
+        OkHttpUtils.post().url(url)
+                .addParams("jsonStr", object.toString())
+                .build()
+                .connTimeOut(Utils.HTTP_TIMEOUT)
+                .readTimeOut(Utils.HTTP_TIMEOUT)
+                .writeTimeOut(Utils.HTTP_TIMEOUT)
+                .execute(new DoViewPileInfoCallback());
+    }
     private class DoViewPileInfoCallback extends StringCallback {
 
         @Override
@@ -277,55 +319,14 @@ public class FillingActivity extends BaseActivity {
         }
     }
 
-    private void doViewPileInfo(String token, String loginName, String pileId, String masterSN) {
-        JSONObject object = new JSONObject();
-        try {
-            object.put("pileId", pileId);
-            object.put("masterDeviceSN", masterSN);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        String url = Utils.SERVER_ADDR + "/pile/doViewPileInfo/cc/" + token + "/" + loginName;
-        OkHttpUtils.post().url(url)
-                .addParams("jsonStr", object.toString())
-                .build()
-                .connTimeOut(Utils.HTTP_TIMEOUT)
-                .readTimeOut(Utils.HTTP_TIMEOUT)
-                .writeTimeOut(Utils.HTTP_TIMEOUT)
-                .execute(new DoViewPileInfoCallback());
-    }
-
-    private class DoEndPourInfoCallback extends StringCallback {
-
-        @Override
-        public void onError(Call call, Exception e, int id) {
-
-        }
-
-        @Override
-        public void onResponse(String response, int id) {
-            Log.d(TAG, response);
-            Gson gson = new Gson();
-            EndPourInfo info = gson.fromJson(response, EndPourInfo.class);
-            String code = info.code;
-//            myApplication.setEndPourInfo(info);
-            mSpUtils.setKeyEndPourInfo(response);
-
-            if (code.equals(Utils.MSG_CODE_OK)) {
-                //jump to report activity
-                Intent intent = new Intent(FillingActivity.this, WorkReportPreviewActivity.class);
-                intent.putExtra("pileId", mPileId);
-                startActivity(intent);
-                FillingActivity.this.finish();
-            } else {
-
-            }
-            showToast(info.message);
-        }
-    }
-
-    ;
+    /**
+     * 结束灌注
+     * @param token
+     * @param loginName
+     * @param pileId
+     * @param finalCheckData
+     */
 
     private void doEndPourInfo(String token, String loginName, String pileId, List<String> finalCheckData) {
         JSONObject object = new JSONObject();
@@ -348,7 +349,7 @@ public class FillingActivity extends BaseActivity {
                 .execute(new DoEndPourInfoCallback());
     }
 
-    private class DoEndPourDataCallback extends StringCallback {
+    private class DoEndPourInfoCallback extends StringCallback {
 
         @Override
         public void onError(Call call, Exception e, int id) {
@@ -359,21 +360,44 @@ public class FillingActivity extends BaseActivity {
         public void onResponse(String response, int id) {
             Log.d(TAG, response);
             Gson gson = new Gson();
-            EndPourData data = gson.fromJson(response, EndPourData.class);
-            Log.d(TAG, "code: " + data.code);
-            Log.d(TAG, "diffGrade: " + data.data.diffGrade);
-            if (data.code.equals(Utils.MSG_CODE_OK)) {
-                mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
-                        + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
-                mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
-            }
+            EndPourInfo info = gson.fromJson(response, EndPourInfo.class);
+            String code = info.code;
+//            myApplication.setEndPourInfo(info);
+            mSpUtils.setKeyEndPourInfo(response);
 
-            showToast(data.message);
+            if (code.equals(Utils.MSG_CODE_OK)) {
+                String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
+                        MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
+                AlarmState alarmState=new AlarmState();
+                alarmState.setAlarmValue("0");
+                if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
+                    alarmState.setAlarmId(alarmId);
+                    alarmState.save();
+                } else {
+                    alarmState.updateAll("alarmId = ?", alarmId);
+                }
+
+                //jump to report activity
+                Intent intent = new Intent(FillingActivity.this, WorkReportPreviewActivity.class);
+                intent.putExtra("pileId", mPileId);
+                startActivity(intent);
+                FillingActivity.this.finish();
+            } else {
+
+            }
+            showToast(info.message);
         }
     }
 
-    ;
 
+
+    /**
+     * 计算差异等级
+     * @param token
+     * @param loginName
+     * @param pileId
+     * @param finalCheckData
+     */
     private void doEndPourData(String token, String loginName, String pileId, List<String> finalCheckData) {
         JSONObject object = new JSONObject();
         try {
@@ -394,6 +418,30 @@ public class FillingActivity extends BaseActivity {
                 .writeTimeOut(Utils.HTTP_TIMEOUT)
                 .execute(new DoEndPourDataCallback());
     }
+
+    private class DoEndPourDataCallback extends StringCallback {
+
+        @Override
+        public void onError(Call call, Exception e, int id) {
+
+        }
+
+        @Override
+        public void onResponse(String response, int id) {
+            Log.d(TAG, response);
+            Gson gson = new Gson();
+            EndPourData data = gson.fromJson(response, EndPourData.class);
+            Log.d(TAG, "code: " + data.code);
+            Log.d(TAG, "diffGrade: " + data.data.diffGrade);
+            if (data.code.equals(Utils.MSG_CODE_OK)) {
+                    mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
+                            + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
+                    mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
+            }
+            showToast(data.message);
+        }
+    }
+
 
     private void showToast(String msg) {
         mToast.setText(msg);
@@ -416,7 +464,7 @@ public class FillingActivity extends BaseActivity {
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
-            mAnimationStage = Integer.parseInt(event.message);
+            mAnimationStage = Utils.stringToInt(event.message);
         }
     }
 

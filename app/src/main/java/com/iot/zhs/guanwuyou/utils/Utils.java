@@ -48,6 +48,7 @@ public class Utils {
 
     public static final String SERVER_ADDR = "http://61.177.48.122:8685";
     // public static final String SERVER_ADDR = "http://10.10.18.128:8081";//星星
+    // public static final String SERVER_ADDR = "http://10.10.58.242:8081";//小童
 
 
     public static final String SLAVE_DEVICE_RECORD = "ZHS";
@@ -61,13 +62,13 @@ public class Utils {
     }
 
 
-    public static void doProcessProtocolInfo(String str, final ResponseCallback responseCallback) {
+    public static void doProcessProtocolInfo(ProtocolPackage pkg, final ResponseCallback responseCallback) {
         String url = Utils.SERVER_ADDR + "/protocol/doProcessProtocolInfo/cc/";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = format.format(new Date());
 
 
-        HttpClient httpClient= new HttpClient(str,responseCallback);
+        HttpClient httpClient= new HttpClient(pkg,responseCallback);
         httpClient.doSendProtocolInfo();
     }
 

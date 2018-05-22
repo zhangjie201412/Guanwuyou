@@ -30,31 +30,30 @@ import okhttp3.Call;
 public class HttpClient {
 
     private String protocolStr;
+    private ProtocolPackage pkg;
     private Utils.ResponseCallback responseCallback;
     private static final String TAG = "ZSH.IOT";
 
-    private int count = 0;
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        if (event.type == MessageEvent.EVENT_TYPE_RE_SEND_PROTOCOL) {
-            doSendProtocolInfo();
-        }
-    }
-
-    public HttpClient(String protocolStr, Utils.ResponseCallback responseCallback) {
-        this.protocolStr = protocolStr;
+    public HttpClient(ProtocolPackage pkg, Utils.ResponseCallback responseCallback) {
+        this.pkg = pkg;
+        this.protocolStr = pkg.toString();
         this.responseCallback = responseCallback;
-        count = 0;
-        EventBus.getDefault().register(this);
     }
-
 
     public void doSendProtocolInfo() {
+        int count=0;
+        http(count);
+    }
+
+    private void http( int count ){
         count++;
+        Log.d(TAG, pkg.getmType() + "发送给服务器的次数：" + count);
+
         String url = Utils.SERVER_ADDR + "/protocol/doProcessProtocolInfo/cc/";
         SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
         String date = format.format(new Date());
+
+        final int finalCount = count;
 
         OkHttpUtils.post().url(url)
                 .addParams("protocolStr", protocolStr)
@@ -64,51 +63,53 @@ public class HttpClient {
                         new StringCallback() {
                             @Override
                             public void onError(Call call, Exception e, int id) {
-                                if (count < 3) {
-                                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_RE_SEND_PROTOCOL);
-                                    EventBus.getDefault().post(event);
+                                Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---"+e.getMessage());
+                                if (finalCount < 3) {
+                                    Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---onError 无反应重发");
+                                    http(finalCount);
                                 }
                             }
 
                             @Override
                             public void onResponse(String response, int id) {
                                 if (Utils.stringIsEmpty(response)) {
-                                    if (count < 3) {
-                                        MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_RE_SEND_PROTOCOL);
-                                        EventBus.getDefault().post(event);
+                                    Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---response为空");
+                                    if (finalCount < 3) {
+                                        Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---onResponse 无反应重发");
+                                        http(finalCount);
                                     }
                                 } else {
-                                    Log.d(TAG, "server onResponse 服务器返回数据：" + response);
+                                    Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---server onResponse 服务器返回数据：" + response);
 
                                     Gson gson = new Gson();
                                     ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
 
-                                    if (info.code.equals("1")) {//成功
-                                        ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
-                                        if (pkgResponse.parse()) {
-                                            //重发数据
-                                            if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                                int syncid = pkgResponse.getSyncId() + 1;
-                                                MyApplication.getInstance().setSyncId(syncid);
+                                    ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
+                                    if (pkgResponse.parse()) {
+                                        //重发数据
+                                        if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
+                                            int syncid = pkgResponse.getSyncId();
+                                            MyApplication.getInstance().setSyncId(syncid);
+                                            Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---reject 无反应重发");
 
-                                                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_RE_SEND_PROTOCOL);
-                                                EventBus.getDefault().post(event);
-
-                                            } else {
-                                                if (!Utils.stringIsEmpty(pkgResponse.getmType())) {
-                                                    Log.d(TAG, pkgResponse.getmType() + " ack ok!");
-                                                }
-                                                if (responseCallback != null) {
-                                                    responseCallback.onResponse(response, info, pkgResponse);
-                                                }
-                                            }
+                                            pkg.setmSyncId(MyApplication.getInstance().getSyncId());
+                                            protocolStr=pkg.toString();
+                                            http(finalCount);
                                         }
-                                    } else {
+                                    }
 
+                                    if (info.code.equals("1")) {//成功
+                                        if (!Utils.stringIsEmpty(pkgResponse.getmType())) {
+                                            Log.d(TAG, pkgResponse.getmType() + " ack ok!");
+                                        }
+                                        if (responseCallback != null) {
+                                            responseCallback.onResponse(response, info, pkgResponse);
+                                        }
                                     }
                                 }
                             }
                         }
                 );
     }
+
 }

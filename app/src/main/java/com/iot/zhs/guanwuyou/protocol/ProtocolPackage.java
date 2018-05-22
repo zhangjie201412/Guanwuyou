@@ -62,6 +62,10 @@ public class ProtocolPackage {
         mData = new ArrayList<>();
     }
 
+    public void setmSyncId(int mSyncId) {
+        this.mSyncId = mSyncId;
+    }
+
     public int getSyncId() {
         return mSyncId;
     }
