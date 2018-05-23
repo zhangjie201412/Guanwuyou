@@ -177,8 +177,7 @@ public class SerialService extends Service {
                     pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-                            pkgResponse.setUpdateVersionData(finalData, 0, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
-                           // pkgResponse.parse();
+                            pkgResponse.setUpdateVersionData(finalData, 0, processProtocolInfo.data.downloadUrl);
                         }
                     });
         }

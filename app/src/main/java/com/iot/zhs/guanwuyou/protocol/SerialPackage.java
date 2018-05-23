@@ -190,14 +190,13 @@ public class SerialPackage {
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
                             if (mDeviceId1.equals("0")) {
                                 Log.d(TAG, "update master version");
-                                pkgResponse.setUpdateVersionData(mData, 1, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+                                pkgResponse.setUpdateVersionData(mData, 1, processProtocolInfo.data.downloadUrl);
 
                             } else {
                                 Log.d(TAG, "update slave version");
-                                pkgResponse.setUpdateVersionData(mData, 2, "http://10.10.58.252:8080/cssiot-gzz02/0508.apk");
+                                pkgResponse.setUpdateVersionData(mData, 2, processProtocolInfo.data.downloadUrl);
 
                             }
-                           // pkgResponse.parse();
                         }
                     });
         } else if (mOperation.equals("systime")) {
@@ -502,21 +501,22 @@ public class SerialPackage {
             status.networkStatus = mData.get(0);
 
             for (int i = 0; i < mDataNum; i++) {
-                Log.d(TAG, "### useno " + mDeviceId1 + " -> " + mData.get(i));
+                Log.d(TAG, "### useno " + mDeviceId1 + " -> i="+i+" -> " + mData.get(i));
             }
 
             //save slave
-            String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
-            device.setOnline(Integer.valueOf(mData.get(4)));
-            device.setComm(Integer.valueOf(mData.get(0)));
+           /* device.setOnline(Integer.valueOf(mData.get(4)));
+            device.setComm(Integer.valueOf(mData.get(0)));*/
+            device.setOnline(3);
+            device.setComm(4);
             device.setSlaveOrMaster(1);
-            if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
+            if (DataSupport.where("serialNumber = ?", mDeviceId1).find(SlaveDevice.class).size() == 0) {
                 //insert new data
-                device.setSerialNumber(slaveSn);
+                device.setSerialNumber(mDeviceId1);
                 device.save();
             } else {
-                device.updateAll("serialNumber = ?", slaveSn);
+                device.updateAll("serialNumber = ?", mDeviceId1);
             }
 
             List<SlaveStatusList.SlaveStatus> list = MyApplication.getInstance().getSpUtils().getKeySlaveStatusList();

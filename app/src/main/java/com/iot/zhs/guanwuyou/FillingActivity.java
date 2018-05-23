@@ -56,6 +56,7 @@ public class FillingActivity extends BaseActivity {
     private TextView mPileDiameterTextView;
     private TextView mPileLengthTextView;
     private TextView mConGradeTextView;
+    private TextView mReporterTextView;
 
     private Button mButton;
     private ImageView mBackImageView;
@@ -87,6 +88,7 @@ public class FillingActivity extends BaseActivity {
         mConGradeTextView = findViewById(R.id.tv_con_grade);
         mButton = findViewById(R.id.bt_end_filling);
         mAnimationImageView = findViewById(R.id.iv_animation);
+        mReporterTextView=findViewById(R.id.tv_last_user);
 
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -314,6 +316,7 @@ public class FillingActivity extends BaseActivity {
                 mPileDiameterTextView.setText(info.data.pile.pileDiameter);
                 mPileLengthTextView.setText(info.data.pile.pileLength);
                 mConGradeTextView.setText(info.data.pile.conGrade);
+                mReporterTextView.setText(info.data.pile.reporter);
             }
             showToast(info.message);
         }

@@ -7,7 +7,13 @@ package com.iot.zhs.guanwuyou.comm.http;
 public class ProcessProtocolInfo {
     public String clientType;
     public String code;
-    public String data;
+    public DataModel data;
     public String message;
     public String msgCode;
+
+    public class DataModel{
+        public String protocol;
+        public String downloadUrl;
+
+    }
 }

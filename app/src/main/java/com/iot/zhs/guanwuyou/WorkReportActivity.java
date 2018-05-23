@@ -133,8 +133,6 @@ public class WorkReportActivity extends BaseActivity {
         }
     }
 
-    ;
-
     private void doViewAccountReportInfo(String token, String loginName) {
 //        JSONObject object = new JSONObject();
 //        try {

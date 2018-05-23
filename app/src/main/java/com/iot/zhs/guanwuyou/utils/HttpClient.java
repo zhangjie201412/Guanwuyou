@@ -84,7 +84,7 @@ public class HttpClient {
                                     Gson gson = new Gson();
                                     ProcessProtocolInfo info = gson.fromJson(response, ProcessProtocolInfo.class);
 
-                                    ProtocolPackage pkgResponse = new ProtocolPackage(info.data);
+                                    ProtocolPackage pkgResponse = new ProtocolPackage(info.data.protocol);
                                     if (pkgResponse.parse()) {
                                         //重发数据
                                         if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {

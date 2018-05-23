@@ -1,6 +1,8 @@
 package com.iot.zhs.guanwuyou.utils;
 
 import android.content.Context;
+import android.nfc.Tag;
+import android.os.StatFs;
 import android.widget.Toast;
 import android.app.Activity;
 import android.content.Context;
@@ -15,6 +17,8 @@ import android.widget.Toast;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
+
+import org.litepal.util.LogUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +66,7 @@ public class DowloadFileUtils {
                     .execute(new FileCallBack(BASE_PATH, fileName) {
                         @Override
                         public void onError(Call call, Exception e, int id) {
+                            showToast("下载错误："+e.getMessage());
                             if (mProgressDialog.isShowing()) {
                                 mProgressDialog.dismiss();
                             }
@@ -79,6 +84,11 @@ public class DowloadFileUtils {
                         @Override
                         public void inProgress(float progress, long total, int id) {
                             super.inProgress(progress, total, id);
+                            if(total>FileUtils.availableSize()){
+                                //存储空间不足
+                                showToast("存储空间不足");
+                                return;
+                            }
                         }
                     });
         }
@@ -124,6 +134,24 @@ public class DowloadFileUtils {
         //  /storage/emulated/0/AndroidGZZ20/rdp.apk
 
     }
+
+
+    /**
+     * 获取手机剩余内存大小
+     *
+     * @return 手机剩余内存(单位：byte)
+     */
+    public static long availableSize() {
+        // 取得SD卡文件路径
+        File file = Environment.getExternalStorageDirectory();
+        StatFs fs = new StatFs(file.getPath());
+        // 获取单个数据块的大小(Byte)
+        int blockSize = fs.getBlockSize();
+        // 空闲的数据块的数量
+        long availableBlocks = fs.getAvailableBlocks();
+        return blockSize * availableBlocks;
+    }
+
 
     private void showToast(String msg) {
         mToast.setText(msg);

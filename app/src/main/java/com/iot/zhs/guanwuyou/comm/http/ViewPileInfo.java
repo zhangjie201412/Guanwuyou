@@ -35,6 +35,7 @@ public class ViewPileInfo {
             public String projectName;
             public String state;
             public String systemNumber;
+            public String reporter;
         }
     }
 }

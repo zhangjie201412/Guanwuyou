@@ -95,7 +95,6 @@ public class PileMapFragment extends Fragment {
     private boolean mIsInit = true;
     private boolean mIsReset = false;
     private final static int UPDATE_SYS_NUM_CODE = 106;
-    private boolean isSearch = false;
 
     private float minX;
     private float maxX;
@@ -103,6 +102,7 @@ public class PileMapFragment extends Fragment {
     private float maxY;
     private float avgPileDiameter;
 
+    private int jumpFlag=0;
 
     @SuppressLint("HandlerLeak")
     private Handler mUiHandler = new Handler() {
@@ -112,8 +112,8 @@ public class PileMapFragment extends Fragment {
             String response = (String) msg.obj;
             Log.d(TAG, "Response: " + response);
 
-            int what=msg.what;
-            switch (what){
+            int what = msg.what;
+            switch (what) {
                 case 0:
                     mPileMapWebView.loadUrl("javascript:alert(pielDataToMap('" + response + "'))");
                     break;
@@ -140,6 +140,7 @@ public class PileMapFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), PileSearchActivity.class);
+                jumpFlag=1;
                 startActivityForResult(intent, UPDATE_SYS_NUM_CODE);
             }
         });
@@ -149,6 +150,7 @@ public class PileMapFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), PileListActivity.class);
+                jumpFlag=1;
                 startActivity(intent);
             }
         });
@@ -188,11 +190,13 @@ public class PileMapFragment extends Fragment {
                                 //跳转到标定界面
                                 Intent intent = new Intent(getContext(), CalibrationActivity.class);
                                 intent.putExtra("pileId", mNoFinishPileId);
+                                jumpFlag=1;
                                 startActivity(intent);
                             } else if (mNoFinishState == 1) {
                                 //跳转到开始灌注
                                 Intent intent = new Intent(getContext(), FillingActivity.class);
                                 intent.putExtra("pileId", mNoFinishPileId);
+                                jumpFlag=1;
                                 startActivity(intent);
                             }
                         } else if (id == 2) {
@@ -200,24 +204,12 @@ public class PileMapFragment extends Fragment {
                             Intent intent = new Intent(getContext(), FillingActivity.class);
                             intent.putExtra("pileId", mNoFinishPileId);
                             intent.putExtra("ACTIVITY_BY_PILE_MAP", true);
+                            jumpFlag=1;
                             startActivity(intent);
                         }
                     }
                 });
         mProgressDialog = new WaitProgressDialog(getContext());
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                PileInfo info = mPileInfoList.get(i);
-//                //send info to next activity
-//                Intent intent = new Intent(getContext(), PileDetailActivity.class);
-//                intent.putExtra("pileId", info.pileId);
-//                intent.putExtra("projectId", info.projectId);
-//                intent.putExtra("noFinishState", mNoFinishState);
-//                intent.putExtra("noFinishPileId", mNoFinishPileId);
-//                startActivity(intent);
-//            }
-//        });
         WebSettings webSettings = mPileMapWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(true);
@@ -239,6 +231,7 @@ public class PileMapFragment extends Fragment {
 
         mInitScale = 1.0f;
         mCurScale = mInitScale;
+        jumpFlag=0;
         mPileMapWebView.loadUrl(mPoliceUrl);
         return view;
     }
@@ -250,7 +243,6 @@ public class PileMapFragment extends Fragment {
             if (requestCode == UPDATE_SYS_NUM_CODE) {//修改系统编号
                 String systemNumber = data.getStringExtra("systemNumber");
                 mSearchTv.setText(systemNumber);
-                isSearch=true;
             }
         }
     }
@@ -259,17 +251,10 @@ public class PileMapFragment extends Fragment {
     @Override
     public void onResume() {
         Log.d(TAG, "++onResume++");
-        if (mNotificationDialog.isAdded()) {
-            mNotificationDialog.dismiss();
+        if(jumpFlag==1){
+            jumpFlag=0;
+            doQuery();
         }
-        mNoFinishPileNumber = "";
-        mNoFinishState = -1;
-        mNoFinishPileId = "";
-        mProgressDialog.show();
-        doQueryPileMap(mSpUtils.getKeyLoginToken(),
-                mSpUtils.getKeyLoginUserId(),
-                mSpUtils.getKeyLoginProjectId(),
-                mSpUtils.getKeyLoginiMasterDeviceSn());
         super.onResume();
     }
 
@@ -284,185 +269,6 @@ public class PileMapFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void doQueryPileMap(String token, String userName, String projectId, final String masterSN) {
-
-        if(!Utils.stringIsEmpty(mSearchTv.getText().toString().trim())){
-            isSearch=true;
-        }else{
-            isSearch=false;
-        }
-        Log.d(TAG, "user name = " + userName);
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject();
-            jsonObject.put("projectId", projectId);
-            jsonObject.put("masterDeviceSN", masterSN);
-            jsonObject.put("pileNumber", mSearchTv.getText().toString().trim());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String url = Utils.SERVER_ADDR + "/pile/doSelectPileMapInfo/cc/" + token + "/" + userName;
-        Log.d(TAG, "url: " + url);
-        Log.d(TAG, "post: " + jsonObject.toString());
-        OkHttpUtils.post().url(url)
-                .addParams("jsonStr", jsonObject.toString())
-                .build()
-                .connTimeOut(Utils.HTTP_TIMEOUT)
-                .readTimeOut(Utils.HTTP_TIMEOUT)
-                .writeTimeOut(Utils.HTTP_TIMEOUT)
-                .execute(new Callback() {
-                    @Override
-                    public Object parseNetworkResponse(Response response, int id) throws Exception {
-                        if (response.isSuccessful()) {
-                            String rsp = response.body().string();
-                            Log.d(TAG, rsp);
-                            JSONObject object = new JSONObject(rsp);
-                            String data = object.getString("data");
-                            String message = object.getString("message");
-                            String code = object.getString("code");
-
-                            if (code.equals("1")) {
-
-                                if (!isSearch) {
-                                    Gson gson = new Gson();
-                                    mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
-                                    for (PileMapInfo.PileMap map : mPileMapInfo.pileMap) {
-                                        PileInfo info = new PileInfo();
-                                        info.constructionState = map.constructionState;
-                                        info.coordinatex = map.coordinatex;
-                                        info.coordinatey = map.coordinatey;
-                                        info.pileId = map.pileId;
-                                        info.pileNumber = map.pileNumber;
-                                        info.projectId = map.projectId;
-                                        info.state = map.state;
-                                        info.systemNumber = map.systemNumber;
-                                        mPileInfoList.add(info);
-                                    }
-
-                                    if (mPileMapInfo.noFinishPile != null) {
-                                        Log.d(TAG, "noFinishPile -> reportState: " + mPileMapInfo.noFinishPile.reportState);
-                                        Log.d(TAG, "noFinishPile -> pileNumber: " + mPileMapInfo.noFinishPile.pileNumber);
-                                        mNoFinishPileNumber = mPileMapInfo.noFinishPile.pileNumber;
-                                        mNoFinishState = Integer.valueOf(mPileMapInfo.noFinishPile.reportState);
-                                        //show no finish pile notification
-                                        mNotificationDialog.setMessage("您的" + mPileMapInfo.noFinishPile.pileNumber + "桩有未完成的任务单哦！");
-                                        mNotificationDialog.show(getFragmentManager(), "Notification");
-
-                                        boolean foundNoFinishPileId = false;
-                                        String noFinishPileNum = mNoFinishPileNumber; //= Float.valueOf(mNoFinishPileNumber);
-                                        for (PileInfo info : mPileInfoList) {
-                                            Log.d(TAG, " -> " + info.systemNumber);
-                                            if (info.systemNumber.equals(noFinishPileNum)) {
-                                                mNoFinishPileId = info.pileId;
-                                                foundNoFinishPileId = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!foundNoFinishPileId) {
-                                            Log.e(TAG, "Cannot find no finish pile id by " + mNoFinishPileNumber);
-                                        }
-
-                                    } else {
-                                        Log.d(TAG, "No no finish pile task");
-                                    }
-
-                                    if (mPileMapInfo.pileMap!=null&&mPileMapInfo.coRange != null) {
-                                        minX = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex);
-                                        maxX = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex);
-                                        minY = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey);
-                                        maxY = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey);
-
-                                        avgPileDiameter=Utils.stringToFloat(mPileMapInfo.coRange.avgPileDiameter)/10f;
-
-                                        float sacle=1;
-                                        if(avgPileDiameter!=0){
-                                            float width=Math.abs(maxX-minX)/ Constant.display.widthPixels;
-                                            float height=Math.abs(maxY-minY)/Constant.display.heightPixels;
-
-                                            sacle=Math.min(width,height);
-                                            sacle=sacle/mPileMapInfo.pileMap.size()*avgPileDiameter;
-                                        }
-
-                                        float screenScale = getActivity().getResources().getDisplayMetrics().density;
-
-                                        for(PileMapInfo.PileMap pileMap :mPileMapInfo.pileMap){
-                                            float x=Utils.stringToFloat(pileMap.coordinatex)/sacle/screenScale;
-                                            pileMap.coordinatex=x+"";
-
-                                            float y=Utils.stringToFloat(pileMap.coordinatey)/sacle/screenScale;
-                                            pileMap.coordinatey=y+"";
-                                        }
-
-                                        float minX=Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex)/sacle/screenScale;
-                                        float maxX=Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex)/sacle/screenScale;
-                                        float minY=Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey)/sacle/screenScale;
-                                        float maxY=Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey)/sacle/screenScale;
-
-                                        mPileMapInfo.coRange.minCoordinatex=minX+"";
-                                        mPileMapInfo.coRange.maxCoordinatex=maxX+"";
-                                        mPileMapInfo.coRange.minCoordinatey=minY+"";
-                                        mPileMapInfo.coRange.maxCoordinatey=maxY+"";
-
-                                        Map<String,Object> dataMap=new HashMap<String, Object>();
-                                        Map<String,Object> map=new HashMap<String, Object>();
-                                        map.put("coRange",mPileMapInfo.coRange);
-                                        map.put("pileMap",mPileMapInfo.pileMap);
-
-                                        dataMap.put("data",map);
-
-                                        String dataMapStr= GsonUtils.objectToString(dataMap);
-                                        JsonObject pileObject = GsonUtils.structureGson(dataMapStr);
-                                        String pileJsonStr =pileObject.toString();
-
-                                        Message msg = new Message();
-                                        msg.obj = pileJsonStr;
-                                        msg.what=0;
-                                        mUiHandler.sendMessage(msg);
-                                    }
-                                } else {//查询的时候
-                                    Gson gson = new Gson();
-                                    mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
-                                    if (mPileMapInfo.searchValue == null) {
-                                        showToast("您查找的桩不存在!");
-                                    } else {
-                                        Message msg = new Message();
-                                        msg.obj = mPileMapInfo.searchValue.systemNumber;
-                                        msg.what=1;
-                                        mUiHandler.sendMessage(msg);
-
-                                    }
-                                }
-                                isSearch = false;
-                                return message;
-                            } else {
-                                Log.e(TAG, "Failed to parse response");
-                            }
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Log.e(TAG, "onError!!");
-                        mProgressDialog.dismiss();
-                        e.printStackTrace();
-//                        mAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onResponse(Object response, int id) {
-                        mProgressDialog.dismiss();
-                        if (response != null) {
-//                            mAdapter.notifyDataSetChanged();
-                            showToast((String) response);
-                            mIsQueried = true;
-                        } else {
-                            showToast("查询桩位图失败!");
-                        }
-                    }
-                });
-    }
 
     private class JsInterface {
         private Context mContext;
@@ -487,12 +293,8 @@ public class PileMapFragment extends Fragment {
             intent.putExtra("projectId", map.projectId);
             intent.putExtra("noFinishState", mNoFinishState);
             intent.putExtra("noFinishPileId", mNoFinishPileId);
+            jumpFlag=1;
             startActivity(intent);
-
-//            PileStdValInfo pileStdValInfo = GsonUtils.stringToObject(jsonStr, PileStdValInfo.class);
-//            Intent intent = new Intent(context, PileDetailActivity.class);
-//            intent.putExtra("pile", pileStdValInfo);
-//            startActivity(intent);
         }
 
         @JavascriptInterface
@@ -541,19 +343,14 @@ public class PileMapFragment extends Fragment {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             Log.d(TAG, "onPageStarted");
-//            netDialog.show();
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             Log.d(TAG, "onPageFinished");
-//            if (Utils.stringIsEmpty(projectId)) {
-//                httpRequest(0);
-//            } else {
-//                searchPileStdValInfo = null;
-//                httpRequest(1);
-//            }
+            doQuery();
+
         }
     }
 
@@ -573,4 +370,191 @@ public class PileMapFragment extends Fragment {
         mToast.setText(msg);
         mToast.show();
     }
+
+
+    private void doQuery(){
+        if (mNotificationDialog.isAdded()) {
+            mNotificationDialog.dismiss();
+        }
+        mNoFinishPileNumber = "";
+        mNoFinishState = -1;
+        mNoFinishPileId = "";
+        mProgressDialog.show();
+        doQueryPileMap(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(),
+                mSpUtils.getKeyLoginProjectId(),
+                mSpUtils.getKeyLoginiMasterDeviceSn());
+    }
+
+    private void doQueryPileMap(String token, String userName, String projectId, final String masterSN) {
+        Log.d(TAG, "user name = " + userName);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject();
+            jsonObject.put("projectId", projectId);
+            jsonObject.put("masterDeviceSN", masterSN);
+            jsonObject.put("pileNumber", mSearchTv.getText().toString().trim());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String url = Utils.SERVER_ADDR + "/pile/doSelectPileMapInfo/cc/" + token + "/" + userName;
+        Log.d(TAG, "url: " + url);
+        Log.d(TAG, "post: " + jsonObject.toString());
+        OkHttpUtils.post().url(url)
+                .addParams("jsonStr", jsonObject.toString())
+                .build()
+                .connTimeOut(Utils.HTTP_TIMEOUT)
+                .readTimeOut(Utils.HTTP_TIMEOUT)
+                .writeTimeOut(Utils.HTTP_TIMEOUT)
+                .execute(new Callback() {
+                    @Override
+                    public Object parseNetworkResponse(Response response, int id) throws Exception {
+                        if (response.isSuccessful()) {
+                            String rsp = response.body().string();
+                            Log.d(TAG, rsp);
+                            JSONObject object = new JSONObject(rsp);
+                            String data = object.getString("data");
+                            String message = object.getString("message");
+                            String code = object.getString("code");
+
+                            if (code.equals("1")) {
+
+                                Gson gson = new Gson();
+                                mPileMapInfo = gson.fromJson(data, PileMapInfo.class);
+                                for (PileMapInfo.PileMap map : mPileMapInfo.pileMap) {
+                                    PileInfo info = new PileInfo();
+                                    info.constructionState = map.constructionState;
+                                    info.coordinatex = map.coordinatex;
+                                    info.coordinatey = map.coordinatey;
+                                    info.pileId = map.pileId;
+                                    info.pileNumber = map.pileNumber;
+                                    info.projectId = map.projectId;
+                                    info.state = map.state;
+                                    info.systemNumber = map.systemNumber;
+                                    mPileInfoList.add(info);
+                                }
+
+                                if (mPileMapInfo.noFinishPile != null) {
+                                    Log.d(TAG, "noFinishPile -> reportState: " + mPileMapInfo.noFinishPile.reportState);
+                                    Log.d(TAG, "noFinishPile -> pileNumber: " + mPileMapInfo.noFinishPile.pileNumber);
+                                    mNoFinishPileNumber = mPileMapInfo.noFinishPile.pileNumber;
+                                    mNoFinishState = Integer.valueOf(mPileMapInfo.noFinishPile.reportState);
+                                    //show no finish pile notification
+                                    mNotificationDialog.setMessage("您的" + mPileMapInfo.noFinishPile.pileNumber + "桩有未完成的任务单哦！");
+                                    mNotificationDialog.show(getFragmentManager(), "Notification");
+
+                                    boolean foundNoFinishPileId = false;
+                                    String noFinishPileNum = mNoFinishPileNumber; //= Float.valueOf(mNoFinishPileNumber);
+                                    for (PileInfo info : mPileInfoList) {
+                                        Log.d(TAG, " -> " + info.systemNumber);
+                                        if (info.systemNumber.equals(noFinishPileNum)) {
+                                            mNoFinishPileId = info.pileId;
+                                            foundNoFinishPileId = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!foundNoFinishPileId) {
+                                        Log.e(TAG, "Cannot find no finish pile id by " + mNoFinishPileNumber);
+                                    }
+
+                                } else {
+                                    Log.d(TAG, "No no finish pile task");
+                                }
+
+                                if (mPileMapInfo.pileMap != null && mPileMapInfo.coRange != null) {
+                                    minX = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex);
+                                    maxX = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex);
+                                    minY = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey);
+                                    maxY = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey);
+
+                                    avgPileDiameter = Utils.stringToFloat(mPileMapInfo.coRange.avgPileDiameter) / 10f;
+
+                                    float sacle = 1;
+                                    if (avgPileDiameter != 0) {
+                                        float width = Math.abs(maxX - minX) / Constant.display.widthPixels;
+                                        float height = Math.abs(maxY - minY) / Constant.display.heightPixels;
+
+                                        sacle = Math.min(width, height);
+                                        sacle = sacle / mPileMapInfo.pileMap.size() * avgPileDiameter;
+                                    }
+
+                                    float screenScale = getActivity().getResources().getDisplayMetrics().density;
+
+                                    for (PileMapInfo.PileMap pileMap : mPileMapInfo.pileMap) {
+                                        float x = Utils.stringToFloat(pileMap.coordinatex) / sacle / screenScale;
+                                        pileMap.coordinatex = x + "";
+
+                                        float y = Utils.stringToFloat(pileMap.coordinatey) / sacle / screenScale;
+                                        pileMap.coordinatey = y + "";
+                                    }
+
+                                    float minX = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatex) / sacle / screenScale;
+                                    float maxX = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatex) / sacle / screenScale;
+                                    float minY = Utils.stringToFloat(mPileMapInfo.coRange.minCoordinatey) / sacle / screenScale;
+                                    float maxY = Utils.stringToFloat(mPileMapInfo.coRange.maxCoordinatey) / sacle / screenScale;
+
+                                    mPileMapInfo.coRange.minCoordinatex = minX + "";
+                                    mPileMapInfo.coRange.maxCoordinatex = maxX + "";
+                                    mPileMapInfo.coRange.minCoordinatey = minY + "";
+                                    mPileMapInfo.coRange.maxCoordinatey = maxY + "";
+
+                                    Map<String, Object> dataMap = new HashMap<String, Object>();
+                                    Map<String, Object> map = new HashMap<String, Object>();
+                                    map.put("coRange", mPileMapInfo.coRange);
+                                    map.put("pileMap", mPileMapInfo.pileMap);
+
+                                    dataMap.put("data", map);
+
+                                    String dataMapStr = GsonUtils.objectToString(dataMap);
+                                    JsonObject pileObject = GsonUtils.structureGson(dataMapStr);
+                                    String pileJsonStr = pileObject.toString();
+
+                                    Message msg = new Message();
+                                    msg.obj = pileJsonStr;
+                                    msg.what = 0;
+                                    mUiHandler.sendMessage(msg);
+                                }
+
+                                if(!Utils.stringIsEmpty(mSearchTv.getText().toString().trim())) {
+                                    if (mPileMapInfo.searchValue == null) {
+                                        showToast("您查找的桩不存在!");
+                                    } else {
+                                        Message msg = new Message();
+                                        msg.obj = mPileMapInfo.searchValue.systemNumber;
+                                        msg.what = 1;
+                                        mUiHandler.sendMessage(msg);
+                                    }
+                                }
+
+                                return message;
+                            } else {
+                                Log.e(TAG, "Failed to parse response");
+                            }
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Log.e(TAG, "onError!!");
+                        mProgressDialog.dismiss();
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Object response, int id) {
+                        mProgressDialog.dismiss();
+                        if (response != null) {
+//                            mAdapter.notifyDataSetChanged();
+                            showToast((String) response);
+                            mIsQueried = true;
+                        } else {
+                            showToast("查询桩位图失败!");
+                        }
+                    }
+                });
+    }
+
+
 }
