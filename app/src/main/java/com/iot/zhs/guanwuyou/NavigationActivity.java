@@ -26,7 +26,6 @@ public class NavigationActivity extends BaseActivity {
     private BottomTabBar mBottomTabBar;
     private NotificationDialog mNotificationDialog;
 
-    private ISerialPort mSerialManager;
 
     @Override
     public void onBackPressed() {
@@ -68,39 +67,16 @@ public class NavigationActivity extends BaseActivity {
                     }
                 });
 
-        Intent intent = new Intent("com.iot.zhs.guanwuyou.service.SerialService");
-        intent.setPackage("com.iot.zhs.guanwuyou");
-        boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        Log.d(TAG, "bound = " + bound);
+
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
     }
 
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mSerialManager = ISerialPort.Stub.asInterface(iBinder);
-            try {
-                mSerialManager.setPowerUp();
-                mSerialManager.sendApkVersion();
-                mSerialManager.matchList();
-                mSerialManager.requestCalMac();
-                mSerialManager.requestMode();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mSerialManager = null;
-        }
-    };
 
 }

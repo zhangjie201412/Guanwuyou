@@ -63,8 +63,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
+    private ISerialPort mSerialManager;
 
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mSerialManager = ISerialPort.Stub.asInterface(iBinder);
 
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mSerialManager = null;
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,6 +140,11 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "password: " + Uri.encode(md51));
         getWidthHeight();
 
+        Intent intent = new Intent("com.iot.zhs.guanwuyou.service.SerialService");
+        intent.setPackage("com.iot.zhs.guanwuyou");
+        boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "bound = " + bound);
+
     }
 
     /**
@@ -146,6 +163,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unbindService(mServiceConnection);
 
     }
 
@@ -229,6 +247,17 @@ public class LoginActivity extends AppCompatActivity {
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
 
                     mProgressDialog.dismiss();
+
+                    try {
+                        mSerialManager.setPowerUp();
+                        mSerialManager.sendApkVersion();
+                        mSerialManager.matchList();
+                        mSerialManager.requestCalMac();
+                        mSerialManager.requestMode();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
 
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     startActivity(intent);
