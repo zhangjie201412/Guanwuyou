@@ -48,6 +48,7 @@ public class HttpClient {
     private void http( int count ){
         count++;
         Log.d(TAG, pkg.getmType() + "发送给服务器的次数：" + count);
+        Log.d(TAG, pkg.getmType() + "发送给服务器的协议：" + protocolStr);
 
         String url = Utils.SERVER_ADDR + "/protocol/doProcessProtocolInfo/cc/";
         SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");

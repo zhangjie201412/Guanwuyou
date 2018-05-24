@@ -94,6 +94,7 @@ public class FillingActivity extends BaseActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG,"最后一笔raw值--mFinalCheckData:"+Utils.listToString(mFinalCheckData,","));
                 if (mAnimationStage==2) {
                     //结束灌注
                     doEndPourInfo(mSpUtils.getKeyLoginToken(),
@@ -120,7 +121,8 @@ public class FillingActivity extends BaseActivity {
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
 
-        //alarmId=主机SN_项目id
+        mAnimationStage=Utils.stringToInt(mSpUtils.getKeyAlarmStatus());
+       /* //alarmId=主机SN_项目id
         String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
                 MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
         if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
@@ -129,7 +131,7 @@ public class FillingActivity extends BaseActivity {
             List<AlarmState> alarmStateList=DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class);//只会有一条数据
             AlarmState orgAlarmState=alarmStateList.get(0);
             mAnimationStage=Utils.stringToInt(orgAlarmState.getAlarmValue());
-        }
+        }*/
 
         mPileId = getIntent().getStringExtra("pileId");
         Log.d(TAG, "####pile id = " + mPileId);
@@ -369,7 +371,7 @@ public class FillingActivity extends BaseActivity {
             mSpUtils.setKeyEndPourInfo(response);
 
             if (code.equals(Utils.MSG_CODE_OK)) {
-                String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
+                /*String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
                         MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
                 AlarmState alarmState=new AlarmState();
                 alarmState.setAlarmValue("0");
@@ -378,7 +380,7 @@ public class FillingActivity extends BaseActivity {
                     alarmState.save();
                 } else {
                     alarmState.updateAll("alarmId = ?", alarmId);
-                }
+                }*/
 
                 //jump to report activity
                 Intent intent = new Intent(FillingActivity.this, WorkReportPreviewActivity.class);

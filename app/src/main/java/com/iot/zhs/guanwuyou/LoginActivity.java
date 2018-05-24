@@ -22,15 +22,20 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
+import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.utils.Constant;
 import com.iot.zhs.guanwuyou.utils.DisplayUtil;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
+import com.umeng.analytics.MobclickAgent;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -58,31 +63,27 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private ISerialPort mSerialManager;
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mSerialManager = ISerialPort.Stub.asInterface(iBinder);
-            try {
-                mSerialManager.setPowerUp();
-                mSerialManager.requestCalMac();
-                mSerialManager.sendApkVersion();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mSerialManager = null;
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //友盟错误统计
+        MobclickAgent.setDebugMode(true);
+        // SDK在统计Fragment时，需要关闭Activity自带的页面统计，
+        // 然后在每个页面中重新集成页面统计的代码(包括调用了 onResume 和 onPause 的Activity)。
+        MobclickAgent.openActivityDurationTrack(false);
+
+        // 设置为U-APP场景
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+
+
+        /*int a=0;
+        int b=a/0;*/
+
         loginActivity=this;
         mLoginButton = findViewById(R.id.bt_login);
         mUserEditText = findViewById(R.id.et_username);
@@ -121,10 +122,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         mProgressDialog = new WaitProgressDialog(this);
 
-        Intent intent = new Intent("com.iot.zhs.guanwuyou.service.SerialService");
-        intent.setPackage("com.iot.zhs.guanwuyou");
-        boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        Log.d(TAG, "bound = " + bound);
+
 
         String md51 = Utils.encrypt("123456");
         Log.d(TAG, "password: " + Uri.encode(md51));
@@ -148,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+
     }
 
     private void login(String username, final String password) {
@@ -210,7 +208,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(Call call, Exception e, int id) {
-                showToast("连接异常，请重试!");
+                showToast("网络连接中，请稍候");
                 e.printStackTrace();
                 if(mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
@@ -231,11 +229,7 @@ public class LoginActivity extends AppCompatActivity {
                     MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
 
                     mProgressDialog.dismiss();
-                    try {
-                        mSerialManager.matchList();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     startActivity(intent);
                 }
@@ -315,6 +309,19 @@ public class LoginActivity extends AppCompatActivity {
     private void showToast(String msg) {
         mToast.setText(msg);
         mToast.show();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
 

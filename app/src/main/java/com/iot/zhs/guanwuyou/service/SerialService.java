@@ -49,11 +49,10 @@ public class SerialService extends Service {
     private String mRecvBuffer;
     private SerialPortMonitorThread mMonitorThread;
     private HeartBeatThread mHeartBeatThread;
-    private WorkThread mWorkThread;
+    private CalTrsdThread mCalTrsdThread;
+    private MtrsdThread mMtrsdThread;
     private MyApplication mApplication;
     private SharedPreferenceUtils mSpUtils;
-
-    private boolean mIsCommFailed = true;
 
     private ISerialPort.Stub mBinder = new ISerialPort.Stub() {
         @Override
@@ -80,6 +79,7 @@ public class SerialService extends Service {
                     });
         }
 
+        //没有调用
         @Override
         public void setPowerDown() throws RemoteException {
             Log.d(TAG, "setPowerDown");
@@ -177,7 +177,7 @@ public class SerialService extends Service {
                     pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-                            pkgResponse.setUpdateVersionData(finalData, 0, processProtocolInfo.data.downloadUrl);
+                           // pkgResponse.setUpdateVersionData(finalData, 0, processProtocolInfo.data.downloadUrl);
                         }
                     });
         }
@@ -200,10 +200,16 @@ public class SerialService extends Service {
         mMonitorThread = new SerialPortMonitorThread();
         mMonitorThread.setStart();
         mMonitorThread.start();
+
+        mCalTrsdThread = new CalTrsdThread();
+        mCalTrsdThread.start();
+
+        mMtrsdThread = new MtrsdThread();
+        mMtrsdThread.start();
+
         mHeartBeatThread = new HeartBeatThread();
         mHeartBeatThread.start();
-        mWorkThread = new WorkThread();
-        mWorkThread.start();
+
         EventBus.getDefault().register(this);
     }
 
@@ -219,7 +225,6 @@ public class SerialService extends Service {
         }
         EventBus.getDefault().unregister(this);
     }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
@@ -289,80 +294,86 @@ public class SerialService extends Service {
                         mRecvBuffer += recv;
 //                        Log.d(TAG, String.format("Read %d bytes: %s", length, new String(buffer)));
                         process();
-                        mIsCommFailed = false;
                     } else {
                         Thread.sleep(100);
                     }
                 } catch (IOException e) {
+                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
+                    Log.d(TAG, "Serial port communicate failed");
+                    event.message = "1";
+                    EventBus.getDefault().post(event);
+
                     e.printStackTrace();
                 } catch (InterruptedException e) {
+                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
+                    Log.d(TAG, "Serial port communicate failed");
+                    event.message = "1";
+                    EventBus.getDefault().post(event);
+
                     e.printStackTrace();
                 }
             }
         }
     }
 
-    private class WorkThread extends Thread {
+    public class CalTrsdThread extends Thread {
         @Override
         public void run() {
             super.run();
             while (true) {
+                Log.d(TAG, "cal&trsd");
+                List<String> data = new ArrayList<>();
+                data.add("4");
+                ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
+                        "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
+                        "0", "cal&trsd", "get", 1, data);
+
+                Log.d(TAG, "-> " + pkg.toString());
+                Utils.doProcessProtocolInfo(
+                        pkg, new Utils.ResponseCallback() {
+                            @Override
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                            }
+                        });
                 try {
-                    Thread.sleep(60000 * 6);
-                    calTrsd();
-                    Thread.sleep(4000);
-                    mtrsd();
-                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
-                    if (mIsCommFailed) {
-                        Log.d(TAG, "Serial port communicate failed");
-                        event.message = "1";
-                    } else {
-                        event.message = "0";
-                    }
-                    EventBus.getDefault().post(event);
-                    mIsCommFailed = true;
+                    Thread.sleep(5 * 60 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }
+
+
+    public class MtrsdThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+                Log.d(TAG, "mtrsd");
+                List<String> data = new ArrayList<>();
+                data.add("3");
+                ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
+                        "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
+                        "0", "mtrsd", "get", 1, data);
+
+                Log.d(TAG, "-> " + pkg.toString());
+                Utils.doProcessProtocolInfo(
+                        pkg, new Utils.ResponseCallback() {
+                            @Override
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                            }
+                        });
+                try {
+                    Thread.sleep(6 * 60 * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
-    }
-
-    private void calTrsd() {
-        Log.d(TAG, "cal&trsd");
-        List<String> data = new ArrayList<>();
-        data.add("4");
-        ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
-                "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
-                "0", "cal&trsd", "get", 1, data);
-
-        Log.d(TAG, "-> " + pkg.toString());
-        Utils.doProcessProtocolInfo(
-                pkg, new Utils.ResponseCallback() {
-                    @Override
-                    public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-
-                    }
-                });
-
-    }
-
-    private void mtrsd() {
-        Log.d(TAG, "mtrsd");
-        List<String> data = new ArrayList<>();
-        data.add("3");
-        ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
-                "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
-                "0", "mtrsd", "get", 1, data);
-
-        Log.d(TAG, "-> " + pkg.toString());
-        Utils.doProcessProtocolInfo(
-                pkg, new Utils.ResponseCallback() {
-                    @Override
-                    public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-
-                    }
-                });
     }
 
     private class HeartBeatThread extends Thread {
@@ -370,27 +381,27 @@ public class SerialService extends Service {
         public void run() {
             super.run();
             while (true) {
+                Log.d(TAG, "heartb");
+                List<String> data = new ArrayList<>();
+                data.add("0");
+                ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
+                        "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
+                        "0", "heartb", "none", 1, data);
+
+                Log.d(TAG, "-> " + pkg.toString());
+                Utils.doProcessProtocolInfo(
+                        pkg, new Utils.ResponseCallback() {
+                            @Override
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                            }
+                        });
                 try {
                     Thread.sleep(5 * 60 * 1000);
-                    Log.d(TAG, "heart beat");
-                    List<String> data = new ArrayList<>();
-                    data.add("0");
-                    ProtocolPackage pkg = new ProtocolPackage(mApplication.getSyncId(),
-                            "1", mSpUtils.getKeyLoginiMasterDeviceSn(),
-                            "0", "heartb", "none", 1, data);
-
-                    Log.d(TAG, "-> " + pkg.toString());
-                    Utils.doProcessProtocolInfo(
-                            pkg, new Utils.ResponseCallback() {
-                                @Override
-                                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-
-                                }
-                            });
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
             }
         }
     }

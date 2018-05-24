@@ -117,7 +117,7 @@ public class ProtocolPackage {
             String slaveSn=mData.get(0);
             SlaveDevice device = new SlaveDevice();
             device.setSerialNumber(slaveSn);
-            device.setSlaveOrMaster(2);//2--标定仪
+            device.setSlaveOrMaster("2");//2--标定仪
             if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(slaveSn);
@@ -140,7 +140,7 @@ public class ProtocolPackage {
             MyApplication.getInstance().getSpUtils().setKeyMatchList(matchList);
 
             for(int i = 0; i < allDevices.size(); i++) {
-                if(allDevices.get(i).getSlaveOrMaster()!=2) {//2--标定仪 这里不需要处理标定仪
+                if(!allDevices.get(i).getSlaveOrMaster().equals("2")) {//2--标定仪 这里不需要处理标定仪
                     boolean isExist = false;
                     for (int j = 0; j < slaveNumber; j++) {
                         if (mData.get(j + 1).equals(allDevices.get(i).getSerialNumber())) {

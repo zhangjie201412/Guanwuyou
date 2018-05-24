@@ -61,32 +61,32 @@ public class DeviceListAdapter extends BaseAdapter {
         }
         holder.serialNumber.setText(mSlaveDeviceList.get(i).getSerialNumber());
         holder.battery.setText("" + mSlaveDeviceList.get(i).getBattery() + "%");
-        if(mSlaveDeviceList.get(i).getOnline() == 1) {
+        if(mSlaveDeviceList.get(i).getOnline() .equals("1")) {
             holder.online.setText("[在线]");
         } else {
             holder.online.setText("[离线]");
         }
-        if(mSlaveDeviceList.get(i).getAlarm() == 0) {
+        if(mSlaveDeviceList.get(i).getAlarm() .equals("0")) {
             holder.alarm.setVisibility(View.INVISIBLE);
-        } else if(mSlaveDeviceList.get(i).getAlarm() == 1) {
+        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("1")) {
             holder.alarm.setVisibility(View.VISIBLE);
             holder.alarm.setImageResource(R.mipmap.ic_red);
-        } else if(mSlaveDeviceList.get(i).getAlarm() == 2) {
+        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("2")) {
             holder.alarm.setVisibility(View.VISIBLE);
             holder.alarm.setImageResource(R.mipmap.ic_green);
         }
-        if(mSlaveDeviceList.get(i).getComm() == 1) {
+        if(mSlaveDeviceList.get(i).getComm() .equals("1") ) {
             holder.comm.setText("正常");
             holder.comm.setTextColor(Color.parseColor("#0FD2AE"));
         } else {
             holder.comm.setText("异常");
             holder.comm.setTextColor(Color.parseColor("#ED6663"));
         }
-        if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 1) {
+        if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("1")) {
             holder.title.setText("从机");
-        } else if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 0) {
+        } else if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("0")) {
             holder.title.setText("主机");
-        }else if(mSlaveDeviceList.get(i).getSlaveOrMaster() == 2) {
+        }else if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("2")) {
             holder.title.setText("标定仪");
         }
         return view;

@@ -10,38 +10,38 @@ import org.litepal.crud.DataSupport;
 public class SlaveDevice extends DataSupport {
     @Column(unique =  true, defaultValue = "snxxxx")
     private String serialNumber;
-    private int slaveOrMaster;
-    private int online;
-    private int alarm;
-    private int comm;
-    private int battery;
-    private int latestData;
+    private String slaveOrMaster;
+    private String online;
+    private String alarm;
+    private String comm;
+    private String battery;
+    private String latestData;
 
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
-    public void setSlaveOrMaster(int slaveOrMaster) {
+    public void setSlaveOrMaster(String slaveOrMaster) {
         this.slaveOrMaster = slaveOrMaster;
     }
 
-    public void setOnline(int online) {
+    public void setOnline(String online) {
         this.online = online;
     }
 
-    public void setAlarm(int alarm) {
+    public void setAlarm(String alarm) {
         this.alarm = alarm;
     }
 
-    public void setComm(int comm) {
+    public void setComm(String comm) {
         this.comm = comm;
     }
 
-    public void setLatestData(int data) {
+    public void setLatestData(String data) {
         this.latestData = data;
     }
 
-    public void setBattery(int battery) {
+    public void setBattery(String battery) {
         this.battery = battery;
     }
 
@@ -49,29 +49,29 @@ public class SlaveDevice extends DataSupport {
         return serialNumber;
     }
 
-    public int getSlaveOrMaster() {
+    public String getSlaveOrMaster() {
         return slaveOrMaster;
     }
 
-    public int getOnline() {
+    public String getOnline() {
         return online;
     }
 
-    public int getAlarm() {
+    public String getAlarm() {
         return alarm;
     }
 
-    public int getComm() {
+    public String getComm() {
         return comm;
     }
 
 
 
-    public int getBattery() {
+    public String getBattery() {
         return battery;
     }
 
-    public int getLatestData() {
+    public String getLatestData() {
          return latestData;
     }
 }

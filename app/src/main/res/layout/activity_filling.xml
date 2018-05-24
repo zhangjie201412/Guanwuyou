@@ -55,12 +55,13 @@
 
         <ImageView
             android:id="@+id/iv_animation"
-            android:layout_width="180px"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="176px"
             android:layout_marginTop="50px"
-            android:scaleType="fitXY"
-            android:src="@mipmap/ic_filling_0" />
+            android:src="@mipmap/ic_filling_0"
+            android:scaleType="fitStart"
+            android:layout_marginBottom="50px"/>
 
         <com.iot.zhs.guanwuyou.utils.OnTouchScrollView
             android:layout_width="match_parent"

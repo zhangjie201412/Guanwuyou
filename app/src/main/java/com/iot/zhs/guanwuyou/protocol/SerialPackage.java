@@ -15,6 +15,7 @@ import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
+import org.litepal.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -269,7 +270,7 @@ public class SerialPackage {
             //save slave
             String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
-            device.setLatestData(Integer.valueOf(mData.get(mDataNum - 1)));
+            device.setLatestData(mData.get(mDataNum - 1));
             if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(slaveSn);
@@ -297,7 +298,7 @@ public class SerialPackage {
             //save slave
             String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
-            device.setAlarm(1);
+            device.setAlarm("1");
             if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(slaveSn);
@@ -325,7 +326,7 @@ public class SerialPackage {
             //save slave
             String slaveSn = mDeviceId1;
             SlaveDevice device = new SlaveDevice();
-            device.setAlarm(2);
+            device.setAlarm("2");
             if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(slaveSn);
@@ -399,7 +400,10 @@ public class SerialPackage {
             Log.d(TAG, "-> " + pkg.toString());
 
             String alarm = mData.get(0);
-            String realAlarm="";
+            //不需要存储数据库，只需要存储当前的最新值
+            MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
+
+            /*String realAlarm="";
             //存入数据库
             AlarmState alarmState=new AlarmState();
             //alarmId=主机SN_项目id
@@ -426,10 +430,10 @@ public class SerialPackage {
                 }
                 alarmState.setAlarmValue(realAlarm);
                 alarmState.updateAll("alarmId = ?", alarmId);
-            }
+            }*/
 
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = realAlarm;
+            event.message = alarm;
             EventBus.getDefault().post(event);
 
             Utils.doProcessProtocolInfo(
@@ -458,18 +462,16 @@ public class SerialPackage {
                     });
         } else if (mOperation.equals("battery")) {
             ProtocolPackage pkg;
-            if (mDeviceId1.equals("0")) {
+            if (mDeviceId1.equals("0")) {//主机
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                         "0", "battery", "none", 1, mData);
                 MyApplication.getInstance().getSpUtils().setKeyMasterBattery(Integer.valueOf(mData.get(0)));
-            }
-            //send slave battery
-            else {
+            } else { //send slave battery 从机
                 //save slave
                 String slaveSn = mDeviceId1;
                 SlaveDevice device = new SlaveDevice();
-                device.setBattery(Integer.valueOf(mData.get(0)));
+                device.setBattery(mData.get(0));
                 if (DataSupport.where("serialNumber = ?", slaveSn).find(SlaveDevice.class).size() == 0) {
                     //insert new data
                     device.setSerialNumber(slaveSn);
@@ -506,11 +508,9 @@ public class SerialPackage {
 
             //save slave
             SlaveDevice device = new SlaveDevice();
-           /* device.setOnline(Integer.valueOf(mData.get(4)));
-            device.setComm(Integer.valueOf(mData.get(0)));*/
-            device.setOnline(3);
-            device.setComm(4);
-            device.setSlaveOrMaster(1);
+            device.setOnline(mData.get(4));
+            device.setComm(mData.get(0));
+            device.setSlaveOrMaster("1");
             if (DataSupport.where("serialNumber = ?", mDeviceId1).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(mDeviceId1);
@@ -518,6 +518,9 @@ public class SerialPackage {
             } else {
                 device.updateAll("serialNumber = ?", mDeviceId1);
             }
+
+            List<SlaveDevice> savedDeviceList1 = DataSupport.findAll(SlaveDevice.class);
+
 
             List<SlaveStatusList.SlaveStatus> list = MyApplication.getInstance().getSpUtils().getKeySlaveStatusList();
             if (list == null) {

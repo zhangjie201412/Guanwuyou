@@ -35,7 +35,7 @@ public class SharedPreferenceUtils {
     public static final String KEY_SLAVE_PREALARM = "key_slave_prealarm";
     public static final String KEY_CAL_CON = "key_cal_con";
     public static final String KEY_CAL_SLURRY = "key_cal_slurry";
- //   public static final String KEY_ALARM_STATUS = "key_alarm_status";
+    public static final String KEY_ALARM_STATUS = "key_alarm_status";
     public static final String KEY_USE_LIST = "key_use_list";
     public static final String KEY_USE_NODESTA = "key_use_nodesta";
     public static final String KEY_MASTER_BATTERY = "key_master_battery";
@@ -138,9 +138,9 @@ public class SharedPreferenceUtils {
         return mSp.getString(KEY_CAL_SLURRY, "");
     }
 
-   /* public String getKeyAlarmStatus() {
+    public String getKeyAlarmStatus() {
         return mSp.getString(KEY_ALARM_STATUS, "0");
-    }*/
+    }
 
     public int getKeyMasterBattery() {
         return mSp.getInt(KEY_MASTER_BATTERY, 0);
@@ -298,10 +298,10 @@ public class SharedPreferenceUtils {
         mEditor.commit();
     }
 
-  /*  public void setKeyAlarmStatus(String val) {
+    public void setKeyAlarmStatus(String val) {
         mEditor.putString(KEY_ALARM_STATUS, val);
         mEditor.commit();
-    }*/
+    }
 
     public void setKeyMasterBattery(int batt) {
         mEditor.putInt(KEY_MASTER_BATTERY, batt);

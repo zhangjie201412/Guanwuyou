@@ -15,6 +15,7 @@ import android.widget.PopupWindow;
 
 import com.iot.zhs.guanwuyou.adapter.DeviceListAdapter;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.umeng.analytics.MobclickAgent;
 
 import org.litepal.crud.DataSupport;
 
@@ -43,6 +44,16 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
+
+        //友盟错误统计
+        MobclickAgent.setDebugMode(true);
+        // SDK在统计Fragment时，需要关闭Activity自带的页面统计，
+        // 然后在每个页面中重新集成页面统计的代码(包括调用了 onResume 和 onPause 的Activity)。
+        MobclickAgent.openActivityDurationTrack(false);
+
+        // 设置为U-APP场景
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+
         ViewGroup viewGroup = (ViewGroup)getWindow().getDecorView();
         LinearLayout menuLayout = new LinearLayout(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -58,11 +69,11 @@ public class BaseActivity extends AppCompatActivity {
                 //主机
                 SlaveDevice masterDevice = new SlaveDevice();
                 masterDevice.setSerialNumber(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
-                masterDevice.setSlaveOrMaster(0);
-                masterDevice.setOnline(1);
-                masterDevice.setAlarm(0);
-                masterDevice.setComm(1);
-                masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery());
+                masterDevice.setSlaveOrMaster("0");
+                masterDevice.setOnline("1");
+                masterDevice.setAlarm("0");
+                masterDevice.setComm("1");
+                masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery()+"");
                 slaveDeviceList.add(0, masterDevice);
                 //从机
                 String[] serialNumberList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
@@ -81,11 +92,11 @@ public class BaseActivity extends AppCompatActivity {
                     } else {
                         SlaveDevice lostDevice = new SlaveDevice();
                         lostDevice.setSerialNumber(sn);
-                        lostDevice.setSlaveOrMaster(1);
-                        lostDevice.setOnline(0);
-                        lostDevice.setAlarm(0);
-                        lostDevice.setComm(0);
-                        lostDevice.setBattery(0);
+                        lostDevice.setSlaveOrMaster("1");
+                        lostDevice.setOnline("0");
+                        lostDevice.setAlarm("0");
+                        lostDevice.setComm("0");
+                        lostDevice.setBattery("0");
                         slaveDeviceList.add(lostDevice);
                     }
                 }
@@ -95,7 +106,7 @@ public class BaseActivity extends AppCompatActivity {
                     String slaveSn=savedDeviceList.get(j).getSerialNumber();
                     if(!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")){
                         if(slaveSn.equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())){//区分标定仪
-                            savedDeviceList.get(j).setSlaveOrMaster(2);
+                            savedDeviceList.get(j).setSlaveOrMaster("2");
                             slaveDeviceList.add(savedDeviceList.get(j));
                             break;
                         }
@@ -131,5 +142,17 @@ public class BaseActivity extends AppCompatActivity {
         menuLayout.setPadding(100, 0, 0, 50);
         menuLayout.addView(mMenuButton);
         viewGroup.addView(menuLayout);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }
