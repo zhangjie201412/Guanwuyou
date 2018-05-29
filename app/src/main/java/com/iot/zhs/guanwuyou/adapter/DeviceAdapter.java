@@ -123,7 +123,12 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             holder.deviceLastRunTimeTv.setText(slaveDevice.lastRunTime);
             holder.deviceLastErrorKeyTv.setText("传感器使用次数");
             holder.deviceLastErrorTv.setText(slaveDevice.runTimes);
-            holder.deviceVerTv.setText(slaveDevice.deviceVer);
+            if(!Utils.stringIsEmpty(slaveDevice.deviceVer)) {
+                holder.deviceVerTv.setText("V" + slaveDevice.deviceVer);
+            }else{
+                holder.deviceVerTv.setText("");
+            }
+
 
             holder.deviceEleTv.setText(slaveDevice.elcMany + "%");
             elec= Utils.stringToFloat(slaveDevice.elcMany);

@@ -146,7 +146,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         }
     }
 
-    private void showTips(int flag,String message,DeviceVersion deviceVersion){
+    private void showTips(int flag, String message, final DeviceVersion deviceVersion){
         mNotificationDialog = new NotificationDialog();
         mNotificationDialog.init("提醒",
                 "是",
@@ -160,6 +160,8 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
                             event.message = rsp;
                             EventBus.getDefault().post(event);*/
+
+                          //  DataSupport.deleteAll(DeviceVersion.class, "serialNumber = ?", deviceVersion.getSerialNumber());
 
                             mNotificationDialog.dismiss();
                         } else if (id == 2) {

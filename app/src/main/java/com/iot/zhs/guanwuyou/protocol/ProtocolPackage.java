@@ -208,7 +208,7 @@ public class ProtocolPackage {
         if(Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)){
            // return;
         }
-        if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致
+        if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致  不一致
             if(flag==0){//app
                 final NotificationDialog mNotificationDialog = new NotificationDialog();
                 mNotificationDialog.init("提醒",
@@ -219,13 +219,7 @@ public class ProtocolPackage {
                             public void onButtonClick(int id) {
                                 //响应左边的button
                                 if (id == 1) {
-                                     /*new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL
-                                            , new DowloadFileUtils.DownLoadFileListener() {
-                                                @Override
-                                                public void success() {
 
-                                                }
-                                            });*/
                                     updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
                                     Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
                                     intent.putExtra("updateFileURL",updateFileURL);
@@ -236,7 +230,7 @@ public class ProtocolPackage {
                                 }
                             }
                         });
-                String message = "[APP]有新版本" + Utils.listToString(mData, ".") + "可用,是否下载更新?";
+                String message = "[APP]有新版本" + Utils.listToString(mData, ".") + "可用，是否下载更新?";
                 mNotificationDialog.setMessage(message);
                 mNotificationDialog.show(MyApplication.getInstance().getCurrentActivity().getSupportFragmentManager(), "Notification");
             }else{//主机从机直接下载
@@ -262,9 +256,23 @@ public class ProtocolPackage {
                 intent.putExtra("serialNumber",serialNumber);
                 MyApplication.getInstance().getCurrentActivity().startService(intent);
 
-               // new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL);
             }
+        }else{//一致
+            //删除数据库的数据
+            if(flag==0){//app
 
+            }else {//主机、从机
+                String serialNumber;
+                if (mDevice2.equals("0")) {//主机
+                    serialNumber = mDevice1;
+                } else {//从机
+                    serialNumber = mDevice2;
+                }
+                //数据库有数据-删除
+                if (DataSupport.where("serialNumber = ?", serialNumber).find(DeviceVersion.class).size() != 0) {
+                    DataSupport.deleteAll(DeviceVersion.class, "serialNumber = ?", serialNumber);
+                }
+            }
         }
     }
 
