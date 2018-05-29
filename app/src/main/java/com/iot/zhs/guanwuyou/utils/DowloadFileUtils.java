@@ -14,10 +14,12 @@ import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.iot.zhs.guanwuyou.database.DeviceVersion;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
+import org.litepal.crud.DataSupport;
 import org.litepal.util.LogUtil;
 
 import java.io.File;
@@ -34,22 +36,24 @@ public class DowloadFileUtils {
     //文件
     private static final String FILE_FOLDER = "AndroidGZZ20";
     private static final String BASE_PATH = Environment.getExternalStorageDirectory().getPath() + "/" + FILE_FOLDER + "/";
-    private String filePath = "";
     private Context context;
-    private Toast mToast;
-    private WaitProgressDialog mProgressDialog;
+    private String serialNumber;
+   // private Toast mToast;
+  //  private WaitProgressDialog mProgressDialog;
+
 
     public DowloadFileUtils(Context context) {
         this.context = context;
-        mToast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
-        mProgressDialog = new WaitProgressDialog(context);
+      //  mToast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
+      //  mProgressDialog = new WaitProgressDialog(context);
 
     }
 
-    public void downloadFile(String token, String loginName, String url) {
-        //  url = Utils.SERVER_ADDR + "/protocol/doProcessProtocolInfo/cc/";
+    public void downloadFile(String serialNumber,String url, final DownLoadFileListener downLoadFileListener) {
+        this.downLoadFileListener=downLoadFileListener;
+        this.serialNumber=serialNumber;
 
-        mProgressDialog.show();
+      //  mProgressDialog.show();
 
         String[] urlArray=url.split("/");
         String fileName = urlArray[urlArray.length-1];
@@ -67,24 +71,28 @@ public class DowloadFileUtils {
                         @Override
                         public void onError(Call call, Exception e, int id) {
                             showToast("下载错误："+e.getMessage());
-                            if (mProgressDialog.isShowing()) {
+                           /* if (mProgressDialog.isShowing()) {
                                 mProgressDialog.dismiss();
-                            }
+                            }*/
                         }
 
                         @Override
                         public void onResponse(File response, int id) {
-                            if (mProgressDialog.isShowing()) {
+                            /*if (mProgressDialog.isShowing()) {
                                 mProgressDialog.dismiss();
-                            }
+                            }*/
                             openFileApp(response.getName());
+
+                            if(downLoadFileListener!=null){
+                                downLoadFileListener.success(response.getPath());
+                            }
 
                         }
 
                         @Override
                         public void inProgress(float progress, long total, int id) {
                             super.inProgress(progress, total, id);
-                            if(total>FileUtils.availableSize()){
+                            if(total>availableSize()){
                                 //存储空间不足
                                 showToast("存储空间不足");
                                 return;
@@ -100,6 +108,19 @@ public class DowloadFileUtils {
      * @param fileName
      */
     private void openFileApp(String fileName) {
+        //主机、从机
+        if(!Utils.stringIsEmpty(serialNumber)){
+            //存储本地地址
+            DeviceVersion deviceVersion = new DeviceVersion();
+            deviceVersion.setLocalURL(new File(BASE_PATH, fileName).getPath());
+            if (DataSupport.where("serialNumber = ?", serialNumber).find(DeviceVersion.class).size() == 0) {
+                deviceVersion.setSerialNumber(serialNumber);
+                deviceVersion.save();
+            }else{
+                deviceVersion.updateAll("serialNumber = ?", serialNumber);
+            }
+        }
+
         String endStr = fileName.split("\\.")[1];
 
         if (endStr.toLowerCase().equals("apk")) {
@@ -154,7 +175,14 @@ public class DowloadFileUtils {
 
 
     private void showToast(String msg) {
-        mToast.setText(msg);
-        mToast.show();
+       // mToast.setText(msg);
+       // mToast.show();
+    }
+
+
+    public  DownLoadFileListener downLoadFileListener;
+
+    public interface DownLoadFileListener{
+        void success(String filePath);
     }
 }

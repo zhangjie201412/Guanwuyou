@@ -69,7 +69,11 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mSerialManager = ISerialPort.Stub.asInterface(iBinder);
-
+            try {
+                mSerialManager.sendApkVersion();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -250,7 +254,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     try {
                         mSerialManager.setPowerUp();
-                        mSerialManager.sendApkVersion();
+                     //   mSerialManager.sendApkVersion();
                         mSerialManager.matchList();
                         mSerialManager.requestCalMac();
                         mSerialManager.requestMode();

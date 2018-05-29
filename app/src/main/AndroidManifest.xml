@@ -101,6 +101,12 @@
                 <action android:name="com.iot.zhs.guanwuyou.service.SerialService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".service.DownLoadService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
 
 
         <provider

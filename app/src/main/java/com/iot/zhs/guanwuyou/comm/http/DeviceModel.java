@@ -31,6 +31,7 @@ public class DeviceModel {
             public String projectState;//项目状态
             public String elcMany="0";//电量
             public String deviceVer;//版本号
+            public String isUpdate;
         }
 
 
@@ -48,6 +49,8 @@ public class DeviceModel {
             public int deviceType;//从机设备类型 0--丛机 1--标定仪
             public String remark;//备注
             public String netWorkTime;//加入组网时间
+            public String deviceVer;//版本号
+            public String isUpdate;
         }
     }
 

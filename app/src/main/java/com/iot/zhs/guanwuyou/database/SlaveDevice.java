@@ -46,29 +46,29 @@ public class SlaveDevice extends DataSupport {
     }
 
     public String getSerialNumber() {
-        return serialNumber;
+        return serialNumber==null?"":serialNumber;
     }
 
     public String getSlaveOrMaster() {
-        return slaveOrMaster;
+        return slaveOrMaster==null?"0":slaveOrMaster;
     }
 
     public String getOnline() {
-        return online;
+        return online==null?"0":online;//默认离线
     }
 
     public String getAlarm() {
-        return alarm;
+        return alarm==null?"0":alarm;
     }
 
     public String getComm() {
-        return comm;
+        return comm==null?"0":comm;
     }
 
 
 
     public String getBattery() {
-        return battery;
+        return battery==null?"0":battery;
     }
 
     public String getLatestData() {

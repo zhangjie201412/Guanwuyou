@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="100px"
     android:layout_marginBottom="3px"
-    android:layout_marginTop="3px">
+    android:layout_marginTop="3px"
+    android:id="@+id/content_layout">
 
     <RelativeLayout
         android:id="@+id/card_view"
@@ -17,16 +18,25 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/update_iv"
+                android:layout_width="20px"
+                android:layout_height="20px"
+                android:layout_marginLeft="5px"
+                android:layout_marginRight="5px"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/ic_ver_update"
+                android:visibility="invisible"/>
             <ImageView
                 android:id="@+id/device_icon_iv"
                 android:layout_width="40px"
                 android:layout_height="40px"
-                android:layout_marginLeft="30px"
+                android:layout_marginLeft="0px"
                 android:layout_marginTop="28px"
-                android:src="@mipmap/ic_device_master" />
+                android:src="@mipmap/ic_device_master"
+                android:layout_toRightOf="@+id/update_iv"/>
 
             <LinearLayout
                 android:id="@+id/device_sn_layout"

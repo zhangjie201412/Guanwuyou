@@ -57,12 +57,26 @@ public class SharedPreferenceUtils {
     public static final String KEY_MATCH_LIST = "key_match_list";
     public static final String KEY_ALMSTA = "key_almsta";
 
+    //sensorid
+    public static final String KEY_SENSORID = "key_sensorid";
+
+
     private SharedPreferences mSp;
     private SharedPreferences.Editor mEditor;
 
     public SharedPreferenceUtils(Context context, String file) {
         mSp = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         mEditor = mSp.edit();
+    }
+
+
+    public String getKeySensorid() {
+        return mSp.getString(KEY_SENSORID, "0");
+    }
+
+    public  void setKeySensorid(String keySensorid) {
+        mEditor.putString(KEY_SENSORID, keySensorid);
+        mEditor.commit();
     }
 
     public boolean getKeyKeepAccount() {

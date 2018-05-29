@@ -177,7 +177,7 @@ public class SerialService extends Service {
                     pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
-                           // pkgResponse.setUpdateVersionData(finalData, 0, processProtocolInfo.data.downloadUrl);
+                            pkgResponse.setUpdateVersionData(finalData, 0, processProtocolInfo.data.downloadUrl);
                         }
                     });
         }
@@ -203,7 +203,6 @@ public class SerialService extends Service {
 
         mCalTrsdThread = new CalTrsdThread();
         mCalTrsdThread.start();
-
         mMtrsdThread = new MtrsdThread();
         mMtrsdThread.start();
 
@@ -231,8 +230,10 @@ public class SerialService extends Service {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_SERIAL_WRITE) {
             try {
+                Log.d(TAG, "中控发送给主机的协议：" + event.message);
                 mOutput.write(event.message.getBytes());
             } catch (IOException e) {
+                Log.d(TAG,"中控发送给主机error:"+e.getMessage());
                 e.printStackTrace();
             }
         } else if (event.type == MessageEvent.EVENT_TYPE_ERROR_UART) {

@@ -127,7 +127,7 @@ public class SerialPackage {
 
     public void parse() {
         //parse the raw data
-        Log.d(TAG, "parse: " + mRawData);
+        Log.d(TAG, "SerialPackage--parse: " + mRawData);
         String[] msg = mRawData.split(",");
         if (msg.length < 10) {
             for (int i = 0; i < msg.length; i++) {
@@ -173,7 +173,7 @@ public class SerialPackage {
             //request controller's version
             ProtocolPackage pkg = null;
             if (mDeviceId1.equals("0")) {
-                Log.d(TAG, "####MASTER VER");
+                 Log.d(TAG, "####MASTER VER");
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                         "0", "ver", "get", 3, mData);
@@ -464,7 +464,7 @@ public class SerialPackage {
             ProtocolPackage pkg;
             if (mDeviceId1.equals("0")) {//主机
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                        "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                        "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                         "0", "battery", "none", 1, mData);
                 MyApplication.getInstance().getSpUtils().setKeyMasterBattery(Integer.valueOf(mData.get(0)));
             } else { //send slave battery 从机
@@ -639,6 +639,14 @@ public class SerialPackage {
             event.message = rsp;
             EventBus.getDefault().post(event);
         } else if (mOperation.equals("sensorid")) {
+            List<String> dataList =new ArrayList<>();
+            dataList.add("0");
+            dataList.add(MyApplication.getInstance().getSpUtils().getKeySensorid());//上一次的
+            String rsp = makeResponse("sensorid", dataList);
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+            event.message = rsp;
+            EventBus.getDefault().post(event);
+
             ProtocolPackage pkg;
             pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
@@ -648,7 +656,9 @@ public class SerialPackage {
                     pkg, new Utils.ResponseCallback() {
                         @Override
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+                            //{"clientType":"cc","code":"1","data":{"protocol":">>cssp,608,0,SN0301201304260001,SN0303201504230001,sensorid,1,0,6\n"},"message":"操作成功！","msgCode":1}
                             List<String> dataList = pkgResponse.getData();
+                            dataList.add(0,"1");
                             String rsp = makeResponse("sensorid", dataList);
                             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
                             event.message = rsp;

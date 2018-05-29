@@ -1,5 +1,6 @@
 package com.iot.zhs.guanwuyou.adapter;
 
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,10 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.comm.http.DeviceModel;
+import com.iot.zhs.guanwuyou.database.DeviceVersion;
+import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.item.DeviceItem;
 import com.iot.zhs.guanwuyou.utils.Utils;
 
@@ -32,11 +36,16 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     private Context mContext;
 
     public DeviceModel.Data.MasterDevice masterDevice;
-
     public List<DeviceModel.Data.SlaveDevice> slaveDevices = new ArrayList<>();
+    private List<DeviceVersion> deviceVersionList=new ArrayList<>();//数据库
+
 
     public DeviceAdapter(Context context) {
         mContext = context;
+    }
+
+    public void setDeviceVersionList(List<DeviceVersion> deviceVersionList) {
+        this.deviceVersionList = deviceVersionList;
     }
 
     @Override
@@ -55,9 +64,25 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         this.slaveDevices = slaveDevices;
     }
 
+    private boolean hasInDataBase(String sn){
+        if(Utils.stringIsEmpty(sn)){
+            return false;
+        }
+        for(DeviceVersion deviceVersion:deviceVersionList){
+            if(deviceVersion.getSerialNumber().equals(sn)){
+                if(!Utils.stringIsEmpty(deviceVersion.getVersion())
+                        &&!Utils.stringIsEmpty(deviceVersion.getLocalURL())) {//版本号和下载后存储的地址 都有
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
-    public void onBindViewHolder(DeviceViewHolder holder, int position) {
+    public void onBindViewHolder(DeviceViewHolder holder, final int position) {
         Float elec;
+        DeviceModel.Data.SlaveDevice slaveDevice = null;
         if (position == 0) {
             holder.deviceIocnIv.setImageResource(R.mipmap.ic_device_master);
             holder.deviceTypeTv.setText("[主机]");
@@ -72,9 +97,16 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             }
             holder.deviceEleTv.setText(masterDevice.elcMany + "%");
             elec= Utils.stringToFloat(masterDevice.elcMany);
+            if(hasInDataBase(masterDevice.masterDeviceSN)){
+                masterDevice.isUpdate="0";
+                holder.updateIv.setVisibility(View.VISIBLE);
+            }else{
+                holder.updateIv.setVisibility(View.INVISIBLE);
+                masterDevice.isUpdate="1";
+            }
         } else {
 
-            DeviceModel.Data.SlaveDevice slaveDevice = slaveDevices.get(position - 1);
+            slaveDevice = slaveDevices.get(position - 1);
             switch (slaveDevice.deviceType) {
                 case DEVICE_TYPE_CALIBRATOR:
                     holder.deviceIocnIv.setImageResource(R.mipmap.ic_device_calibrator);
@@ -91,10 +123,18 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             holder.deviceLastRunTimeTv.setText(slaveDevice.lastRunTime);
             holder.deviceLastErrorKeyTv.setText("传感器使用次数");
             holder.deviceLastErrorTv.setText(slaveDevice.runTimes);
-            holder.deviceVerTv.setText("");
+            holder.deviceVerTv.setText(slaveDevice.deviceVer);
 
             holder.deviceEleTv.setText(slaveDevice.elcMany + "%");
             elec= Utils.stringToFloat(slaveDevice.elcMany);
+
+            if(hasInDataBase(slaveDevice.slaveDeviceSN)){
+                slaveDevice.isUpdate="0";
+                holder.updateIv.setVisibility(View.VISIBLE);
+            }else{
+                holder.updateIv.setVisibility(View.INVISIBLE);
+                slaveDevice.isUpdate="1";
+            }
         }
 
 
@@ -122,6 +162,16 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             holder.elecForeIv.setVisibility(View.VISIBLE);
         }
 
+        final DeviceModel.Data.SlaveDevice finalSlaveDevice = slaveDevice;
+        holder.contentLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onItemClickListener!=null){
+                    onItemClickListener.onItemClick(position,masterDevice, finalSlaveDevice);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -134,6 +184,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     }
 
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
+        RelativeLayout contentLayout;
+        ImageView updateIv;
         ImageView deviceIocnIv;
         TextView deviceTypeTv;
         TextView deviceSNTv;
@@ -157,6 +209,18 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             elecBgIv = itemView.findViewById(R.id.electric_bg_iv);
             elecForeIv = itemView.findViewById(R.id.electric_fore_iv);
             deviceEleTv = itemView.findViewById(R.id.device_ele_tv);
+            contentLayout=itemView.findViewById(R.id.content_layout);
+            updateIv=itemView.findViewById(R.id.update_iv);
         }
+    }
+
+    public interface OnItemClickListener{
+        public void onItemClick(int position, DeviceModel.Data.MasterDevice masterDevice, DeviceModel.Data.SlaveDevice slaveDevice);
+    }
+
+    public  OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 }

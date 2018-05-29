@@ -1,13 +1,16 @@
 package com.iot.zhs.guanwuyou.protocol;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 
 import com.iot.zhs.guanwuyou.LoginActivity;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.database.DeviceVersion;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.iot.zhs.guanwuyou.service.DownLoadService;
 import com.iot.zhs.guanwuyou.utils.DowloadFileUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.NotificationDialog;
@@ -79,7 +82,7 @@ public class ProtocolPackage {
     }
 
     public boolean parse() {
-        Log.d(TAG, "parse: " + mRawData);
+        Log.d(TAG, "ProtocolPackage--parse: " + mRawData);
         if(mRawData == null) {
             Log.e(TAG, "mRawData is null!!!!");
             return false;
@@ -167,6 +170,8 @@ public class ProtocolPackage {
         } else if(mType.equals("mode")) {
             MyApplication.getInstance().getSpUtils().setKeyMode(mData.get(0));
         } else if(mType.equals("ver")) {
+        } else if(mType.equals("sensorid")) {
+            MyApplication.getInstance().getSpUtils().setKeySensorid(mData.get(0));
         }
         return true;
     }
@@ -201,31 +206,63 @@ public class ProtocolPackage {
      */
     public void updateVersion(){
         if(Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)){
-            return;
+           // return;
         }
         if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致
             if(flag==0){//app
                 final NotificationDialog mNotificationDialog = new NotificationDialog();
                 mNotificationDialog.init("提醒",
-                        "取消",
-                        "更新",
+                        "是",
+                        "否",
                         new NotificationDialog.NotificationDialogListener() {
                             @Override
                             public void onButtonClick(int id) {
                                 //响应左边的button
                                 if (id == 1) {
+                                     /*new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL
+                                            , new DowloadFileUtils.DownLoadFileListener() {
+                                                @Override
+                                                public void success() {
+
+                                                }
+                                            });*/
+                                    updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
+                                    Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
+                                    intent.putExtra("updateFileURL",updateFileURL);
+                                    MyApplication.getInstance().getCurrentActivity().startService(intent);
                                     mNotificationDialog.dismiss();
                                 } else if (id == 2) {
-                                    new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL);
                                     mNotificationDialog.dismiss();
                                 }
                             }
                         });
-                String message = "app发现新版本(" + Utils.listToString(mData, ".") + ")，是否需要下载更新?";
+                String message = "[APP]有新版本" + Utils.listToString(mData, ".") + "可用,是否下载更新?";
                 mNotificationDialog.setMessage(message);
                 mNotificationDialog.show(MyApplication.getInstance().getCurrentActivity().getSupportFragmentManager(), "Notification");
             }else{//主机从机直接下载
-                new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL);
+                String serialNumber;
+                if (mDevice2.equals("0")) {//主机
+                    serialNumber=mDevice1;
+                }else{//从机
+                    serialNumber=mDevice2;
+                }
+
+                DeviceVersion deviceVersion = new DeviceVersion();
+                deviceVersion.setVersion(Utils.listToString(mData, "."));
+                if (DataSupport.where("serialNumber = ?", serialNumber).find(DeviceVersion.class).size() == 0) {
+                    deviceVersion.setSerialNumber(serialNumber);
+                    deviceVersion.save();
+                }else{
+                    deviceVersion.updateAll("serialNumber = ?", serialNumber);
+                }
+
+                updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/2.0.0.txt";
+                Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
+                intent.putExtra("updateFileURL",updateFileURL);
+                intent.putExtra("serialNumber",serialNumber);
+                MyApplication.getInstance().getCurrentActivity().startService(intent);
+
+               // new DowloadFileUtils(LoginActivity.getIntance()).downloadFile("", "", updateFileURL);
             }
 
         }
