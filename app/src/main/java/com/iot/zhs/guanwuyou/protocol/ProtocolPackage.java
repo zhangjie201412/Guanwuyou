@@ -206,7 +206,7 @@ public class ProtocolPackage {
      */
     public void updateVersion(){
         if(Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)){
-           // return;
+            return;
         }
         if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致  不一致
             if(flag==0){//app
@@ -220,7 +220,7 @@ public class ProtocolPackage {
                                 //响应左边的button
                                 if (id == 1) {
 
-                                    updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
+                                   // updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
                                     Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
                                     intent.putExtra("updateFileURL",updateFileURL);
                                     MyApplication.getInstance().getCurrentActivity().startService(intent);
@@ -250,7 +250,7 @@ public class ProtocolPackage {
                     deviceVersion.updateAll("serialNumber = ?", serialNumber);
                 }
 
-                updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/2.0.0.txt";
+              //  updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/2.0.0.txt";
                 Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
                 intent.putExtra("updateFileURL",updateFileURL);
                 intent.putExtra("serialNumber",serialNumber);

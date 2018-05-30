@@ -100,6 +100,9 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);
         }else{
+            mAdapter.setSlaveDevices(info.data.slaveDevices);
+            mAdapter.setMasterDevice(info.data.masterDevice);
+            mAdapter.setDeviceVersionList(deviceVersionList);
             mAdapter.notifyDataSetChanged();
         }
 
