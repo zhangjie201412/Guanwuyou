@@ -42,6 +42,15 @@
                 android:text="设备"
                 android:textColor="#ffffff"
                 android:textSize="24px" />
+
+            <ImageView
+                android:id="@+id/login_out_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@mipmap/ic_login_out"
+                android:layout_alignParentRight="true"
+                android:paddingRight="30px"
+                android:paddingLeft="30px"/>
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 

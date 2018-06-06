@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Guanwuyou</string>
+    <string name="app_name">桩顶卫士</string>
 
     <string-array name="array_pile_type">
         <item>施工桩</item>

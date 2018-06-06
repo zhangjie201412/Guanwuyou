@@ -16,9 +16,13 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.EndPourData;
 import com.iot.zhs.guanwuyou.comm.http.EndPourInfo;
+import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
 import com.iot.zhs.guanwuyou.comm.http.ViewPileInfo;
 import com.iot.zhs.guanwuyou.database.AlarmState;
+import com.iot.zhs.guanwuyou.database.PileCalValue;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
+import com.iot.zhs.guanwuyou.protocol.SerialPackage;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
@@ -33,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,22 +125,15 @@ public class FillingActivity extends BaseActivity {
 
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
-
-        mAnimationStage=Utils.stringToInt(mSpUtils.getKeyAlarmStatus());
-       /* //alarmId=主机SN_项目id
-        String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
-                MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
-        if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
-            mAnimationStage=0;
-        } else {
-            List<AlarmState> alarmStateList=DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class);//只会有一条数据
-            AlarmState orgAlarmState=alarmStateList.get(0);
-            mAnimationStage=Utils.stringToInt(orgAlarmState.getAlarmValue());
-        }*/
-
         mPileId = getIntent().getStringExtra("pileId");
         Log.d(TAG, "####pile id = " + mPileId);
-//        mFinalCheckData = mSpUtils.getKeyLatestRaw();
+
+       // mAnimationStage=Utils.stringToInt(mSpUtils.getKeyAlarmStatus());
+        //和pileId进行绑定，查询
+        if (DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).size() != 0) {
+            AlarmState alarmState=DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).get(0);
+            mAnimationStage=Utils.stringToInt(alarmState.getAlarmValue());
+        }
 
         mFinalCheckData = new ArrayList<>();
         mFinalCheckData.clear();
@@ -371,16 +369,22 @@ public class FillingActivity extends BaseActivity {
             mSpUtils.setKeyEndPourInfo(response);
 
             if (code.equals(Utils.MSG_CODE_OK)) {
-                /*String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
-                        MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
-                AlarmState alarmState=new AlarmState();
-                alarmState.setAlarmValue("0");
-                if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
-                    alarmState.setAlarmId(alarmId);
-                    alarmState.save();
-                } else {
-                    alarmState.updateAll("alarmId = ?", alarmId);
-                }*/
+                //结束灌注后清空该桩的信息
+                DataSupport.deleteAll(AlarmState.class, "pileId = ?", mPileId);
+                //结束灌注时发送关闭蜂鸣器的指令
+                // >>cssp,0,SN0302201709230001,0,beep,1，index,checksum
+                //index值为0和1  1表示关闭蜂鸣器。这条指令只在告警的时候使用，一旦从告警状态退出到其他状态，重新回到告警状态的话，蜂鸣器还是会响，此时需要再次发送该指令。
+                SerialPackage serialPackage=new SerialPackage();
+                serialPackage.setSyncId(myApplication.getSyncId());
+                serialPackage.setDeviceId0(mSpUtils.getKeyLoginiMasterDeviceSn());
+                serialPackage.setDeviceId1("0");
+                List<String> dataList = new ArrayList<>();
+                dataList.add("1");
+                String rsp=serialPackage.makeResponse("beep",dataList);
+
+                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+                event.message = rsp;
+                EventBus.getDefault().post(event);
 
                 //jump to report activity
                 Intent intent = new Intent(FillingActivity.this, WorkReportPreviewActivity.class);
@@ -470,6 +474,17 @@ public class FillingActivity extends BaseActivity {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
             mAnimationStage = Utils.stringToInt(event.message);
+
+            //和pileId进行绑定，存储于数据库
+            AlarmState alarmState=new AlarmState();
+            alarmState.setAlarmValue(event.message);
+            if (DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).size() == 0) {
+                //insert new data
+                alarmState.setPileId(mPileId);
+                alarmState.save();
+            } else {
+                alarmState.updateAll("pileId = ?", mPileId);
+            }
         }
     }
 

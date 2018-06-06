@@ -9,15 +9,15 @@ import org.litepal.crud.DataSupport;
  */
 
 public class AlarmState extends DataSupport {
-    private String alarmId;//主机SN_项目id
-    private String alarmValue;//0--黄灯闪烁  1--绿灯闪烁  2--绿灯常亮
+    private String pileId;//
+    private String alarmValue="";//0--黄灯闪烁  1--绿灯闪烁  2--绿灯常亮
 
-    public String getAlarmId() {
-        return alarmId;
+    public String getPileId() {
+        return pileId;
     }
 
-    public void setAlarmId(String alarmId) {
-        this.alarmId = alarmId;
+    public void setPileId(String pileId) {
+        this.pileId = pileId;
     }
 
     public String getAlarmValue() {

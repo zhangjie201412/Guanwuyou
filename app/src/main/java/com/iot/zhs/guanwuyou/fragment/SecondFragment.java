@@ -130,7 +130,7 @@ public class SecondFragment extends Fragment {
         ll.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         ll.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         ll.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        ll.setDrawInside(true);
+        ll.setDrawInside(false);
         ll.setForm(Legend.LegendForm.NONE);
         ll.setTextSize(18f);
         ll.setXEntrySpace(0f);

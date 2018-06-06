@@ -18,6 +18,7 @@ import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.NotificationDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -45,6 +46,7 @@ public class StatisticsFragment extends Fragment {
     private TextView mSwitchTextView;
     private ImageView mSwitchImageView;
     private TextView mProjectNameTv;
+    private ImageView loginOutIv;
 
     @Nullable
     @Override
@@ -77,6 +79,30 @@ public class StatisticsFragment extends Fragment {
                     mPager.setCurrentItem(0);
                 }
 
+            }
+        });
+        loginOutIv=view.findViewById(R.id.login_out_iv);
+        loginOutIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final NotificationDialog loginOutDialog = new NotificationDialog();
+                loginOutDialog.init("提醒",
+                        "是",
+                        "否",
+                        new NotificationDialog.NotificationDialogListener() {
+                            @Override
+                            public void onButtonClick(int id) {
+                                //响应左边的button
+                                if (id == 1) {
+                                    loginOutDialog.dismiss();
+                                    StatisticsFragment.this.getActivity().finish();
+                                } else if (id == 2) {
+                                    loginOutDialog.dismiss();
+                                }
+                            }
+                        });
+                loginOutDialog.setMessage("是否确认退出登录?");
+                loginOutDialog.show(StatisticsFragment.this.getActivity().getSupportFragmentManager(), "Notification");
             }
         });
 

@@ -262,4 +262,20 @@ public class Utils {
         String value = buffer.substring(0, buffer.length() - 1);
         return value;
     }
+    /**
+     * 获取app的版本号
+     * @param context
+     * @return
+     */
+    public static String getAppVersionName(Context context) {
+        try {
+            String pkName = context.getPackageName();
+            String versionName = context.getPackageManager().getPackageInfo(
+                    pkName, 0).versionName;
+            return  versionName ;
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
 }

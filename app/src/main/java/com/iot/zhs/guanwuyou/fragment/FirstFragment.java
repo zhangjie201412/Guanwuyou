@@ -127,11 +127,12 @@ public class FirstFragment extends Fragment {
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
         l.setDrawInside(true);
-        l.setXEntrySpace(5f);
-        l.setYEntrySpace(5f);
+        l.setXEntrySpace(0f);
+        l.setYEntrySpace(0f);
         l.setTextSize(14f);
         l.setTextColor(Color.parseColor("#696969"));
         l.setYOffset(0f);
+        l.setXOffset(0f);
 
         /*------------------柱状图----------------------*/
         mBarChart = view.findViewById(R.id.chart_bar);
@@ -180,7 +181,7 @@ public class FirstFragment extends Fragment {
         ll.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         ll.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         ll.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        ll.setDrawInside(true);
+        ll.setDrawInside(false);
         ll.setForm(Legend.LegendForm.NONE);
         ll.setTextSize(18);
         ll.setXEntrySpace(0f);
@@ -307,14 +308,14 @@ public class FirstFragment extends Fragment {
             mPieChart.setData(null);
         }else {
             ArrayList<PieEntry> entries = new ArrayList<>();
-            entries.add(new PieEntry(constructing, "施工中桩数", null));
-            entries.add(new PieEntry(unconstruct, "未施工桩数", null));
-            entries.add(new PieEntry(calFinish, "检测完成桩数", null));
-            entries.add(new PieEntry(otherFinish, "非检测完成桩数", null));
+            entries.add(new PieEntry(constructing, "灌注中桩数["+constructing+"]", null));
+            entries.add(new PieEntry(unconstruct, "未施工桩数["+unconstruct+"]", null));
+            entries.add(new PieEntry(calFinish, "检测完成桩数["+calFinish+"]", null));
+            entries.add(new PieEntry(otherFinish, "非检测完成桩数["+otherFinish+"]", null));
 
             PieDataSet dataSet = new PieDataSet(entries, "");
             dataSet.setDrawIcons(false);
-            dataSet.setSliceSpace(3f);
+            dataSet.setSliceSpace(1f);
 //        dataSet.setIconsOffset(new MPPointF(0, 40));
             dataSet.setSelectionShift(5f);
 

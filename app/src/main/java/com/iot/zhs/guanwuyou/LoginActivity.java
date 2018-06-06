@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -54,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordEditText;
     private Button mLoginButton;
     private CheckBox mRememberCheckBox;
+    private TextView versionTv;
     private Toast mToast;
     private WaitProgressDialog mProgressDialog;
     public static LoginActivity loginActivity;
@@ -149,6 +152,13 @@ public class LoginActivity extends AppCompatActivity {
         boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "bound = " + bound);
 
+        versionTv=findViewById(R.id.version_tv);
+        String version = Utils.getAppVersionName(this);
+        if (!TextUtils.isEmpty(version)) {
+            versionTv.setText("©江苏中海昇物联科技有限公司 版本号: V" + version);
+        } else {
+            versionTv.setText("©江苏中海昇物联科技有限公司 版本号: V1.0.0");
+        }
     }
 
     /**

@@ -35,6 +35,7 @@
         <mapping class="com.iot.zhs.guanwuyou.database.SlaveDevice" />
         <mapping class="com.iot.zhs.guanwuyou.database.AlarmState" />
         <mapping class="com.iot.zhs.guanwuyou.database.DeviceVersion" />
+        <mapping class="com.iot.zhs.guanwuyou.database.PileCalValue" />
 
     </list>
 

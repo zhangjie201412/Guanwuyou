@@ -103,6 +103,7 @@ public class PileMapFragment extends Fragment {
     private float avgPileDiameter;
 
     private int jumpFlag=0;
+    private ImageView loginOutIv;
 
     @SuppressLint("HandlerLeak")
     private Handler mUiHandler = new Handler() {
@@ -233,6 +234,33 @@ public class PileMapFragment extends Fragment {
         mCurScale = mInitScale;
         jumpFlag=0;
         mPileMapWebView.loadUrl(mPoliceUrl);
+
+        loginOutIv=view.findViewById(R.id.login_out_iv);
+        loginOutIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final NotificationDialog loginOutDialog = new NotificationDialog();
+                loginOutDialog.init("提醒",
+                        "是",
+                        "否",
+                        new NotificationDialog.NotificationDialogListener() {
+                            @Override
+                            public void onButtonClick(int id) {
+                                //响应左边的button
+                                if (id == 1) {
+                                    loginOutDialog.dismiss();
+                                    PileMapFragment.this.getActivity().finish();
+                                } else if (id == 2) {
+                                    loginOutDialog.dismiss();
+                                }
+                            }
+                        });
+                loginOutDialog.setMessage("是否确认退出登录?");
+                loginOutDialog.show(PileMapFragment.this.getActivity().getSupportFragmentManager(), "Notification");
+            }
+        });
+
+
         return view;
     }
 

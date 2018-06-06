@@ -17,6 +17,8 @@ import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
 import com.iot.zhs.guanwuyou.comm.http.SaveAccountReportInfo;
 import com.iot.zhs.guanwuyou.comm.http.StartPourInfo;
+import com.iot.zhs.guanwuyou.database.PileCalValue;
+import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
@@ -30,6 +32,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,12 +65,15 @@ public class CalibrationActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             int what = msg.what;
-            if(what == Utils.UI_SHOW_TOAST) {
+            if (what == Utils.UI_SHOW_TOAST) {
                 showToast(msg.getData().getString("message"));
             }
             Bundle data = msg.getData();
             String code = data.getString("code");
-            if(code.equals(Utils.MSG_CODE_OK)) {
+            if (code.equals(Utils.MSG_CODE_OK)) {
+                //开始灌注成功后，删除数据库pileId的数据
+                DataSupport.deleteAll(PileCalValue.class, "pileId = ?", mPileId);
+
                 Intent intent = new Intent(CalibrationActivity.this, FillingActivity.class);
                 intent.putExtra("pileId", mPileId);
                 startActivity(intent);
@@ -80,6 +86,22 @@ public class CalibrationActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
+
+        //标定成功后弹框提示成功
+        mNotificationDialog = new NotificationDialog();
+        mNotificationDialog.init("提醒",
+                "确定",
+                "",
+                new NotificationDialog.NotificationDialogListener() {
+                    @Override
+                    public void onButtonClick(int id) {
+                        //响应左边的button
+                        mNotificationDialog.dismiss();
+
+                    }
+                });
+
+
         mConGradeCalEditText = findViewById(R.id.et_con_grade_calibration);
         mSlurryEditText = findViewById(R.id.et_slurry_calibration);
 
@@ -88,7 +110,7 @@ public class CalibrationActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                if(mConGradeCalEditText.getText().toString().isEmpty()) {
+                if (mConGradeCalEditText.getText().toString().isEmpty()) {
                     showToast("请先进行砼标定!");
                     return;
                 }
@@ -125,34 +147,52 @@ public class CalibrationActivity extends BaseActivity {
     }
 
     private void updateView() {
-        mConGradeCalEditText.setText(mSpUtils.getKeyCalCon());
-        mSlurryEditText.setText(mSpUtils.getKeyCalSlurry());
+        if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() != 0) {
+            PileCalValue pileCalValue=DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).get(0);
+            mConGradeCalEditText.setText(pileCalValue.getCalCon());
+            mSlurryEditText.setText(pileCalValue.getCalSlurry());
+        }else{
+            mConGradeCalEditText.setText("");
+            mSlurryEditText.setText("");
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
-        if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION) {
-            updateView();
+        if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_CON) {//砼标定值
+            mConGradeCalEditText.setText(event.message);
 
-            //标定成功后弹框提示成功
-            if(mNotificationDialog==null) {
-                mNotificationDialog = new NotificationDialog();
-                mNotificationDialog.init("提醒",
-                        "确定",
-                        "",
-                        new NotificationDialog.NotificationDialogListener() {
-                            @Override
-                            public void onButtonClick(int id) {
-                                //响应左边的button
-                                mNotificationDialog.dismiss();
-
-                            }
-                        });
+            PileCalValue pileCalValue=new PileCalValue();
+            pileCalValue.setCalCon(event.message);
+            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                //insert new data
+                pileCalValue.setPileId(mPileId);
+                pileCalValue.save();
+            } else {
+                pileCalValue.updateAll("pileId = ?", mPileId);
             }
-            if(mNotificationDialog!=null &&  mNotificationDialog.getDialog()!=null
-                    && !mNotificationDialog.getDialog().isShowing()) {
-                mNotificationDialog.setMessage("恭喜您,标定成功!");
+
+            if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                mNotificationDialog.setMessage("恭喜您,砼标定成功!");
+                mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+            }
+
+        }
+        if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_SLURRY) {//泥浆标定值
+            mSlurryEditText.setText(event.message);
+            PileCalValue pileCalValue=new PileCalValue();
+            pileCalValue.setCalSlurry(event.message);
+            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                //insert new data
+                pileCalValue.setPileId(mPileId);
+                pileCalValue.save();
+            } else {
+                pileCalValue.updateAll("pileId = ?", mPileId);
+            }
+
+            if (mNotificationDialog != null &&!mNotificationDialog.isAdded()) {
+                mNotificationDialog.setMessage("恭喜您,泥浆标定成功!");
                 mNotificationDialog.show(getSupportFragmentManager(), "Notification");
             }
         }

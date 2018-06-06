@@ -120,6 +120,9 @@ public class SerialPackage {
         mChecksum = cs;
     }
 
+    public SerialPackage() {
+    }
+
     public SerialPackage(String rawData) {
         mRawData = rawData.replaceAll("\r", "").replaceAll("\n", "").trim();
         mData = new ArrayList<>();
@@ -361,9 +364,11 @@ public class SerialPackage {
 
         } else if (mOperation.equals("cal.con")) {
             Log.d(TAG, "set cal con: " + mData.get(0));
-            MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION);
+         //   MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CAL_CON);
+            event.message=mData.get(0);
             EventBus.getDefault().post(event);
+
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "cal.con", "set", mDataNum, mData);
@@ -378,9 +383,11 @@ public class SerialPackage {
 
         } else if (mOperation.equals("cal.slurry")) {
             Log.d(TAG, "set cal slurry: " + mData.get(0));
-            MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION);
+          //  MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CAL_SLURRY);
+            event.message=mData.get(0);
             EventBus.getDefault().post(event);
+
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "cal.slurry", "set", mDataNum, mData);
@@ -398,42 +405,10 @@ public class SerialPackage {
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     "0", "almsta", "none", 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
-
-            String alarm = mData.get(0);
             //不需要存储数据库，只需要存储当前的最新值
-            MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
-
-            /*String realAlarm="";
-            //存入数据库
-            AlarmState alarmState=new AlarmState();
-            //alarmId=主机SN_项目id
-            String alarmId=MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn()+"_"+
-                    MyApplication.getInstance().getSpUtils().getKeyLoginProjectId();
-
-            if (DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class).size() == 0) {
-                //insert new data
-                realAlarm=alarm;
-                alarmState.setAlarmValue(realAlarm);
-                alarmState.setAlarmId(alarmId);
-                alarmState.save();
-            } else {
-                List<AlarmState> alarmStateList=DataSupport.where("alarmId = ?", alarmId).find(AlarmState.class);//只会有一条数据
-                AlarmState orgAlarmState=alarmStateList.get(0);
-                String orgAlarm = orgAlarmState.getAlarmValue();
-
-                int alarmInt=Utils.stringToInt(alarm);//（0,1,2）数值大的可以覆盖小的
-                int orgAlarmInt=Utils.stringToInt(orgAlarm);
-                if(orgAlarmInt<alarmInt){
-                    realAlarm=alarm;
-                }else{
-                    realAlarm=orgAlarm;
-                }
-                alarmState.setAlarmValue(realAlarm);
-                alarmState.updateAll("alarmId = ?", alarmId);
-            }*/
-
+           // MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
-            event.message = alarm;
+            event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
             Utils.doProcessProtocolInfo(

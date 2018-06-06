@@ -46,11 +46,22 @@
                 android:id="@+id/iv_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:paddingRight="20px"
+                android:paddingLeft="30px"
+                android:src="@mipmap/ic_switch"
+                android:layout_toLeftOf="@+id/login_out_iv"/>
+
+            <ImageView
+                android:id="@+id/login_out_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@mipmap/ic_login_out"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:paddingRight="30px"
-                android:paddingLeft="30px"
-                android:src="@mipmap/ic_switch" />
+                android:paddingLeft="20px"/>
+
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 

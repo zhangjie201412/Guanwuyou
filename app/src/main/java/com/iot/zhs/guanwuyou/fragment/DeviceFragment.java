@@ -10,10 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
+import com.iot.zhs.guanwuyou.NavigationActivity;
 import com.iot.zhs.guanwuyou.PileListActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.adapter.DeviceAdapter;
@@ -58,6 +60,8 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     private com.iot.zhs.guanwuyou.comm.http.DeviceModel info;
     private List<DeviceVersion> deviceVersionList=new ArrayList<>();//数据库
     private NotificationDialog mNotificationDialog;
+
+    private ImageView loginOutIv;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +84,32 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
 
         deviceVersionList = DataSupport.findAll(DeviceVersion.class);
+
+        loginOutIv=view.findViewById(R.id.login_out_iv);
+        loginOutIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final NotificationDialog loginOutDialog = new NotificationDialog();
+                loginOutDialog.init("提醒",
+                        "是",
+                        "否",
+                        new NotificationDialog.NotificationDialogListener() {
+                            @Override
+                            public void onButtonClick(int id) {
+                                //响应左边的button
+                                if (id == 1) {
+                                    loginOutDialog.dismiss();
+                                        DeviceFragment.this.getActivity().finish();
+                                } else if (id == 2) {
+                                    loginOutDialog.dismiss();
+                                }
+                            }
+                        });
+                loginOutDialog.setMessage("是否确认退出登录?");
+                loginOutDialog.show(DeviceFragment.this.getActivity().getSupportFragmentManager(), "Notification");
+            }
+        });
+
         return view;
     }
 
