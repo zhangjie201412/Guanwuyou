@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.iot.zhs.guanwuyou.R;
+import com.iot.zhs.guanwuyou.utils.Utils;
 
 /**
  * Created by H151136 on 1/27/2018.
@@ -71,6 +72,11 @@ public class NotificationDialog extends DialogFragment {
             }
         });
 
+        if(Utils.stringIsEmpty(mButtonText2)){
+            mButton2.setVisibility(View.GONE);
+        }else{
+            mButton2.setVisibility(View.VISIBLE);
+        }
         return view;
     }
 

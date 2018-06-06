@@ -21,6 +21,7 @@ import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.NotificationDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -54,6 +55,7 @@ public class CalibrationActivity extends BaseActivity {
     private SharedPreferenceUtils mSpUtils;
     private Toast mToast;
     private String mPileId;
+    private NotificationDialog mNotificationDialog;
 
     private Handler mUiHandler = new Handler() {
         @Override
@@ -132,6 +134,27 @@ public class CalibrationActivity extends BaseActivity {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CALIBRATION) {
             updateView();
+
+            //标定成功后弹框提示成功
+            if(mNotificationDialog==null) {
+                mNotificationDialog = new NotificationDialog();
+                mNotificationDialog.init("提醒",
+                        "确定",
+                        "",
+                        new NotificationDialog.NotificationDialogListener() {
+                            @Override
+                            public void onButtonClick(int id) {
+                                //响应左边的button
+                                mNotificationDialog.dismiss();
+
+                            }
+                        });
+            }
+            if(mNotificationDialog!=null &&  mNotificationDialog.getDialog()!=null
+                    && !mNotificationDialog.getDialog().isShowing()) {
+                mNotificationDialog.setMessage("恭喜您,标定成功!");
+                mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+            }
         }
     }
 
