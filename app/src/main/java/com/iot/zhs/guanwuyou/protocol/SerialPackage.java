@@ -20,6 +20,7 @@ import org.litepal.util.LogUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import okhttp3.Call;
 
@@ -653,6 +654,16 @@ public class SerialPackage {
 
                 }
             });
+        } else  if(mOperation.equals("lorafreq")){//信道处理
+            int number = new Random().nextInt(4);//[0-3]的随机数
+            number=number+1;//产生[1,4]的随机数
+            List<String> dataList =new ArrayList<>();
+            dataList.add(number+"");
+            String rsp = makeResponse("lorafreq", dataList);
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+            event.message = rsp;
+            EventBus.getDefault().post(event);
+
         }
     }
 
