@@ -38,7 +38,9 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
@@ -214,6 +216,10 @@ public class FillingActivity extends BaseActivity {
             int what = msg.what;
             if (!mAnimationRunning)
                 return;
+
+            String dateStr=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Log.d(TAG,"almsta--灌注界面动画开始执行时间--"+dateStr+",mAnimationStage="+mAnimationStage);
+
             switch (what) {
                 case STAGE0_ON:
                     mAnimationImageView.setImageResource(R.mipmap.ic_filling_1);
@@ -474,6 +480,10 @@ public class FillingActivity extends BaseActivity {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
             mAnimationStage = Utils.stringToInt(event.message);
+
+            String dateStr=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Log.d(TAG,"almsta--灌注界面接受的时间--"+dateStr);
+
 
             //和pileId进行绑定，存储于数据库
             AlarmState alarmState=new AlarmState();

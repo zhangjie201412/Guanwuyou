@@ -296,7 +296,8 @@ public class SerialService extends Service {
 //                        Log.d(TAG, String.format("Read %d bytes: %s", length, new String(buffer)));
                         process();
                     } else {
-                        Thread.sleep(100);
+                       // Log.d(TAG,"休眠");
+                       // Thread.sleep(100);
                     }
                 } catch (IOException e) {
                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
@@ -305,14 +306,14 @@ public class SerialService extends Service {
                     EventBus.getDefault().post(event);
 
                     e.printStackTrace();
-                } catch (InterruptedException e) {
+                } /*catch (InterruptedException e) {
                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
                     Log.d(TAG, "Serial port communicate failed");
                     event.message = "1";
                     EventBus.getDefault().post(event);
 
                     e.printStackTrace();
-                }
+                }*/
             }
         }
     }

@@ -17,8 +17,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 import org.litepal.util.LogUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -140,12 +142,20 @@ public class SerialPackage {
             Log.e(TAG, "#### parse raw data invalid");
             return;
         }
-        mSyncId = Integer.valueOf(msg[1]);
+        try {
+            mSyncId = Integer.valueOf(msg[1]);
+        } catch (Exception e) {
+            return;
+        }
         mDeviceId0 = msg[2];
 //        mDeviceId0 = "SN0301201601010001";
 //        mDeviceId0 = "SN0303201611091873";
         mDeviceId1 = msg[3];
-        mHandle = Integer.valueOf(msg[4]);
+        try {
+            mHandle = Integer.valueOf(msg[4]);
+        } catch (Exception e) {
+            return;
+        }
         mOperation = msg[5];
         if (msg[6].equals("none"))
             mType = TYPE_NONE;
@@ -153,9 +163,18 @@ public class SerialPackage {
             mType = TYPE_GET;
         else if (msg[6].equals("set"))
             mType = TYPE_SET;
-        mDataNum = Integer.valueOf(msg[7]);
+        try {
+            mDataNum = Integer.valueOf(msg[7]);
+        } catch (Exception e) {
+            return;
+        }
+
         for (int i = 0; i < mDataNum; i++) {
-            mData.add(msg[8 + i]);
+            try {
+                mData.add(msg[8 + i]);
+            } catch (Exception e) {
+                return;
+            }
         }
 
         MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(mDeviceId0);
@@ -177,7 +196,7 @@ public class SerialPackage {
             //request controller's version
             ProtocolPackage pkg = null;
             if (mDeviceId1.equals("0")) {
-                 Log.d(TAG, "####MASTER VER");
+                Log.d(TAG, "####MASTER VER");
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                         "0", "ver", "get", 3, mData);
@@ -325,7 +344,7 @@ public class SerialPackage {
                         }
                     });
         } else if (mOperation.equals("alarm")) {
-           // MyApplication.getInstance().getSpUtils().setKeySlaveAlarm(true);
+            // MyApplication.getInstance().getSpUtils().setKeySlaveAlarm(true);
             Log.d(TAG, "######alarm#######");
             //save slave
             String slaveSn = mDeviceId1;
@@ -365,9 +384,9 @@ public class SerialPackage {
 
         } else if (mOperation.equals("cal.con")) {
             Log.d(TAG, "set cal con: " + mData.get(0));
-         //   MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
+            //   MyApplication.getInstance().getSpUtils().setKeyCalCon(mData.get(0));
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CAL_CON);
-            event.message=mData.get(0);
+            event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
@@ -384,9 +403,9 @@ public class SerialPackage {
 
         } else if (mOperation.equals("cal.slurry")) {
             Log.d(TAG, "set cal slurry: " + mData.get(0));
-          //  MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
+            //  MyApplication.getInstance().getSpUtils().setKeyCalSlurry(mData.get(0));
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_UPDATE_CAL_SLURRY);
-            event.message=mData.get(0);
+            event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
@@ -407,10 +426,13 @@ public class SerialPackage {
                     "0", "almsta", "none", 1, mData);
             Log.d(TAG, "-> " + pkg.toString());
             //不需要存储数据库，只需要存储当前的最新值
-           // MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
+            // MyApplication.getInstance().getSpUtils().setKeyAlarmStatus(alarm);
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ALARM_STATUS);
             event.message = mData.get(0);
             EventBus.getDefault().post(event);
+
+            String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Log.d(TAG, "almsta--接收到主机的时间--" + dateStr);
 
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -479,7 +501,7 @@ public class SerialPackage {
             status.networkStatus = mData.get(0);
 
             for (int i = 0; i < mDataNum; i++) {
-                Log.d(TAG, "### useno " + mDeviceId1 + " -> i="+i+" -> " + mData.get(i));
+                Log.d(TAG, "### useno " + mDeviceId1 + " -> i=" + i + " -> " + mData.get(i));
             }
 
             //save slave
@@ -615,7 +637,7 @@ public class SerialPackage {
             event.message = rsp;
             EventBus.getDefault().post(event);
         } else if (mOperation.equals("sensorid")) {
-            List<String> dataList =new ArrayList<>();
+            List<String> dataList = new ArrayList<>();
             dataList.add("0");
             dataList.add(MyApplication.getInstance().getSpUtils().getKeySensorid());//上一次的
             String rsp = makeResponse("sensorid", dataList);
@@ -634,7 +656,7 @@ public class SerialPackage {
                         public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
                             //{"clientType":"cc","code":"1","data":{"protocol":">>cssp,608,0,SN0301201304260001,SN0303201504230001,sensorid,1,0,6\n"},"message":"操作成功！","msgCode":1}
                             List<String> dataList = pkgResponse.getData();
-                            dataList.add(0,"1");
+                            dataList.add(0, "1");
                             String rsp = makeResponse("sensorid", dataList);
                             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
                             event.message = rsp;
@@ -654,11 +676,12 @@ public class SerialPackage {
 
                 }
             });
-        } else  if(mOperation.equals("lorafreq")){//信道处理
-            int number = new Random().nextInt(4);//[0-3]的随机数
-            number=number+1;//产生[1,4]的随机数
-            List<String> dataList =new ArrayList<>();
-            dataList.add(number+"");
+        } else if (mOperation.equals("lorafreq")) {//信道处理
+           /* int number = new Random().nextInt(4);//[0-3]的随机数
+            number=number+1;//产生[1,4]的随机数*/
+            int number = 2;
+            List<String> dataList = new ArrayList<>();
+            dataList.add(number + "");
             String rsp = makeResponse("lorafreq", dataList);
             MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
             event.message = rsp;
