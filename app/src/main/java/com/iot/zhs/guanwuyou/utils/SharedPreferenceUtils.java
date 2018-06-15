@@ -60,6 +60,8 @@ public class SharedPreferenceUtils {
     //sensorid
     public static final String KEY_SENSORID = "key_sensorid";
 
+    public static final String KEY_MASTER_CHANNEL="key_master_channel";
+
 
     private SharedPreferences mSp;
     private SharedPreferences.Editor mEditor;
@@ -69,6 +71,13 @@ public class SharedPreferenceUtils {
         mEditor = mSp.edit();
     }
 
+    public String getKeyMasterChannel() {
+        return mSp.getString(KEY_MASTER_CHANNEL, "");
+    }
+    public  void setKeyMasterChannel(String KeyMasterChannel) {
+        mEditor.putString(KEY_MASTER_CHANNEL, KeyMasterChannel);
+        mEditor.commit();
+    }
 
     public String getKeySensorid() {
         return mSp.getString(KEY_SENSORID, "0");

@@ -104,6 +104,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                 holder.updateIv.setVisibility(View.INVISIBLE);
                 masterDevice.isUpdate="1";
             }
+            holder.channelTv.setText(masterDevice.channel);
         } else {
 
             slaveDevice = slaveDevices.get(position - 1);
@@ -140,6 +141,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                 holder.updateIv.setVisibility(View.INVISIBLE);
                 slaveDevice.isUpdate="1";
             }
+            holder.channelTv.setText("");
+
         }
 
 
@@ -201,6 +204,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         ImageView elecBgIv;
         ImageView elecForeIv;
         TextView deviceEleTv;
+        TextView channelTv;
 
         public DeviceViewHolder(final View itemView) {
             super(itemView);
@@ -216,6 +220,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             deviceEleTv = itemView.findViewById(R.id.device_ele_tv);
             contentLayout=itemView.findViewById(R.id.content_layout);
             updateIv=itemView.findViewById(R.id.update_iv);
+            channelTv=itemView.findViewById(R.id.channel_tv);
         }
     }
 

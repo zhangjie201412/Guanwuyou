@@ -32,6 +32,7 @@ public class DeviceModel {
             public String elcMany="0";//电量
             public String deviceVer;//版本号
             public String isUpdate;
+            public String channel;//信道值
         }
 
 

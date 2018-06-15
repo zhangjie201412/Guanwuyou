@@ -74,9 +74,20 @@
                 android:layout_alignLeft="@+id/device_sn_layout"
                 android:layout_below="@+id/device_sn_layout"
                 android:layout_marginTop="0px"
-                android:text=""
+                android:text="v1.0.0"
                 android:textColor="#4e585c"
                 android:textSize="22px" />
+            <TextView
+                android:id="@+id/channel_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/device_sn_layout"
+                android:layout_toRightOf="@+id/device_ver_tv"
+                android:layout_marginTop="0px"
+                android:text="信道1"
+                android:textColor="#4e585c"
+                android:textSize="22px"
+                android:layout_marginLeft="30px"/>
 
             <TextView
                 android:id="@+id/last_run_time_key_tv"

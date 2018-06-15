@@ -11,9 +11,12 @@ import com.iot.zhs.guanwuyou.item.SlaveDeviceItem;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SlaveStatusList;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 import org.litepal.util.LogUtil;
 
@@ -677,16 +680,58 @@ public class SerialPackage {
                 }
             });
         } else if (mOperation.equals("lorafreq")) {//信道处理
-           /* int number = new Random().nextInt(4);//[0-3]的随机数
-            number=number+1;//产生[1,4]的随机数*/
-            int number = 2;
-            List<String> dataList = new ArrayList<>();
-            dataList.add(number + "");
-            String rsp = makeResponse("lorafreq", dataList);
-            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
-            event.message = rsp;
-            EventBus.getDefault().post(event);
+            //信道 [1,4]
+            String url = Utils.SERVER_ADDR + "/device/doGetMasterDeviceChannel/cc";
+            OkHttpUtils.post().url(url)
+                    .addParams("masterDeviceSN", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn())
+                    .build()
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+                            //如果失败，则获取上一次的信道值，如果上次也没有，则默认给出1
+                            String channel=MyApplication.getInstance().getSpUtils().getKeyMasterChannel();
+                            List<String> dataList = new ArrayList<>();
+                            if(!Utils.stringIsEmpty(channel)){
+                                dataList.add(channel);
+                            }else{
+                                dataList.add("1");
+                            }
+                            String rsp = makeResponse("lorafreq", dataList);
+                            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+                            event.message = rsp;
+                            EventBus.getDefault().post(event);
 
+                        }
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            Log.d(TAG, "信道返回：" + response);
+                            if (!Utils.stringIsEmpty(response)) {
+                                JSONObject object = null;
+                                try {
+                                    object = new JSONObject(response);
+                                    String code = object.getString("code");
+                                    if (code.equals(Utils.MSG_CODE_OK)) {
+                                        if (object.has("data")) {
+                                            String channel = object.getString("data");
+                                            if(!Utils.stringIsEmpty(channel)){
+                                                MyApplication.getInstance().getSpUtils().setKeyMasterChannel(channel);
+
+                                                List<String> dataList = new ArrayList<>();
+                                                dataList.add(channel);
+                                                String rsp = makeResponse("lorafreq", dataList);
+                                                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
+                                                event.message = rsp;
+                                                EventBus.getDefault().post(event);
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
     }
 

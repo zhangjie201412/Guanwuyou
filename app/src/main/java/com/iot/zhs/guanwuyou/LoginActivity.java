@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -32,6 +33,7 @@ import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.umeng.analytics.MobclickAgent;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     private WaitProgressDialog mProgressDialog;
     public static LoginActivity loginActivity;
 
-    public static LoginActivity getIntance(){
+    public static LoginActivity getIntance() {
         return loginActivity;
     }
 
@@ -103,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         /*int a=0;
         int b=a/0;*/
 
-        loginActivity=this;
+        loginActivity = this;
         mLoginButton = findViewById(R.id.bt_login);
         mUserEditText = findViewById(R.id.et_username);
         mPasswordEditText = findViewById(R.id.et_password);
@@ -113,13 +115,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String username = mUserEditText.getText().toString();
                 String password = mPasswordEditText.getText().toString();
-                if(username.isEmpty() || password.isEmpty()) {
+                if (username.isEmpty() || password.isEmpty()) {
                     showToast("请输入正确的用户名和密码");
                     return;
                 }
 
                 MyApplication.getInstance().getSpUtils().setKeyUsername(username);
-                if(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn().isEmpty()) {
+                if (MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn().isEmpty()) {
                     showToast("还未得到master设备号");
                 } else {
                     Log.d(TAG, "mamster sn: " + MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
@@ -135,12 +137,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         mRememberCheckBox.setChecked(MyApplication.getInstance().getSpUtils().getKeyKeepAccount());
-        if(mRememberCheckBox.isChecked()) {
+        if (mRememberCheckBox.isChecked()) {
             mUserEditText.setText(MyApplication.getInstance().getSpUtils().getKeyUsername());
             mPasswordEditText.setText(MyApplication.getInstance().getSpUtils().getKeyPassword());
         }
         mProgressDialog = new WaitProgressDialog(this);
-
 
 
         String md51 = Utils.encrypt("123456");
@@ -152,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
         boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "bound = " + bound);
 
-        versionTv=findViewById(R.id.version_tv);
+        versionTv = findViewById(R.id.version_tv);
         String version = Utils.getAppVersionName(this);
         if (!TextUtils.isEmpty(version)) {
             versionTv.setText("©江苏中海昇物联科技有限公司 版本号: V" + version);
@@ -165,13 +166,13 @@ public class LoginActivity extends AppCompatActivity {
      * 获取屏幕的宽高
      */
     private void getWidthHeight() {
-        DisplayMetrics dm =getResources().getDisplayMetrics();
+        DisplayMetrics dm = getResources().getDisplayMetrics();
         Constant.display.widthPixels = dm.widthPixels;//宽度
-        Constant.display.heightPixels =dm.heightPixels;//高度
+        Constant.display.heightPixels = dm.heightPixels;//高度
         Constant.display.statusBarHeightPixels = DisplayUtil.getStatusBarHeight(this);//顶部状态栏
-        Constant.display.bottomBarHeightPixels= DisplayUtil.getDaoHangHeight(this);//底部导航栏
-        Log.d("aa","宽="+ Constant.display.widthPixels +",高="+ Constant.display.heightPixels
-                +",顶部状态栏="+ Constant.display.statusBarHeightPixels+",底部导航栏="+ Constant.display.bottomBarHeightPixels);
+        Constant.display.bottomBarHeightPixels = DisplayUtil.getDaoHangHeight(this);//底部导航栏
+        Log.d("aa", "宽=" + Constant.display.widthPixels + ",高=" + Constant.display.heightPixels
+                + ",顶部状态栏=" + Constant.display.statusBarHeightPixels + ",底部导航栏=" + Constant.display.bottomBarHeightPixels);
     }
 
     @Override
@@ -186,10 +187,6 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "encode password: " + encodePassword);
         mProgressDialog.show();
         OkHttpUtils.post().url(Utils.SERVER_ADDR + "/login/login/cc/")
-//                .addParams("mobileNo", "12345678999")
-//                .addParams("mobileNo", "18000000001")
-//                .addParams("mobileNo", "13300001111")
-//                .addParams("password", md51"14e1b600b1fd579f47433b88e8d85291")
                 .addParams("mobileNo", username)
                 .addParams("password", encodePassword)
                 .addParams("masterDeviceSN", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn())
@@ -198,156 +195,91 @@ public class LoginActivity extends AppCompatActivity {
                 .readTimeOut(Utils.HTTP_TIMEOUT)
                 .writeTimeOut(Utils.HTTP_TIMEOUT)
                 .execute(new Callback() {
-            @Override
-            public Object parseNetworkResponse(Response response, int id) throws Exception {
-                if (response.isSuccessful()) {
-                    String rsp = response.body().string();
-                    Log.d(TAG, "RSP: " + rsp);
-                    JSONObject object = new JSONObject(rsp);
-                    String clientType = object.getString("clientType");
-                    String code = object.getString("code");
-                    String message = object.getString("message");
-                    if(!code.equals(Utils.MSG_CODE_OK)) {
-                        showToast(message);
-                    }
-                    Log.d(TAG, "clientType: " + clientType);
-                    Log.d(TAG, "code: " + code);
-                    Log.d(TAG, "message: " + message);
-
-                    if(object.has("token")) {
-                        String token = object.getString("token");
-                        Log.d(TAG, "token: " + token);
-                        MyApplication.getInstance().getSpUtils().setKeyLoginToken(token);
-                    }
-
-                    LoginUserModel userModel=null;
-                    if(object.has("data")) {
-                        String data = object.getString("data");
-                        Log.d(TAG, "data: " + data);
-
-                        Gson gson = new Gson();
-                        JSONObject userObject = new JSONObject(data);
-                        userModel = gson.fromJson(userObject.getString("loginUserModel"), LoginUserModel.class);
-                        showToast(message);
-                        MyApplication.getInstance().getSpUtils().setKeyPassword(password);
-                    }
-                    return userModel;
-                } else {
-                    Log.e(TAG, "Failed to parse response");
-                    return null;
-                }
-            }
-
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                showToast("网络连接中，请稍候");
-                e.printStackTrace();
-                if(mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onResponse(Object response, int id) {
-                LoginUserModel userModel = (LoginUserModel) response;
-                if (userModel != null) {
-                    Constant.curUser=userModel;
-                    MyApplication.getInstance().getSpUtils().setKeyLoginCompanyId(userModel.companyId);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(userModel.masterDeviceSN);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginProjectId(userModel.projectId);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginProjectName(userModel.projectName);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginUserId(userModel.userId);
-                    MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
-
-                    mProgressDialog.dismiss();
-
-                    try {
-                        mSerialManager.setPowerUp();
-                     //   mSerialManager.sendApkVersion();
-                        mSerialManager.matchList();
-                        mSerialManager.requestCalMac();
-                        mSerialManager.requestMode();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-                    startActivity(intent);
-                }
-                if(mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-            }
-        });
-    }
-
-    private void queryPileMap(String token, String userName, String projectId, final String masterSN) {
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject();
-            jsonObject.put("projectId", projectId);
-//            jsonObject.put("pileNumber", pileNumber);
-            jsonObject.put("masterDeviceSN", masterSN);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        RequestBody body = RequestBody.create(JSON, jsonObject.toString());
-        String url = Utils.SERVER_ADDR + "/pile/doSelectPileMapInfo/cc/" + token + "/" + userName;
-        Log.d(TAG, "url: " + url);
-        Log.d(TAG, "post: " + jsonObject.toString());
-        OkHttpUtils.post().url(url)
-//                .content(jsonObject.toString())
-//                .mediaType(JSON)
-                .addParams("jsonStr", jsonObject.toString())
-                .build()
-                .execute(new Callback() {
                     @Override
                     public Object parseNetworkResponse(Response response, int id) throws Exception {
                         if (response.isSuccessful()) {
-//                            Log.d(TAG, response.body().string());
-                            JSONObject object = new JSONObject(response.body().string());
+                            String rsp = response.body().string();
+                            Log.d(TAG, "RSP: " + rsp);
+                            JSONObject object = new JSONObject(rsp);
                             String clientType = object.getString("clientType");
                             String code = object.getString("code");
-                            String data = object.getString("data");
-                            String token = object.getString("token");
-                            Gson gson = new Gson();
-                            JSONObject userObject = new JSONObject(data);
-                            PileMapInfo mapInfo = gson.fromJson(data, PileMapInfo.class);
-                            Log.d(TAG, "max x = " + mapInfo.coRange.maxCoordinatex);
-                            Log.d(TAG, "max y = " + mapInfo.coRange.maxCoordinatey);
-                            Log.d(TAG, "map size = " + mapInfo.pileMap.size());
-                            for (PileMapInfo.PileMap map : mapInfo.pileMap) {
-                                Log.d(TAG, "=====================================");
-//                                Log.d(TAG, "constructionState: " + map.constructionState);
-//                                Log.d(TAG, "coordinatex: " + map.coordinatex);
-//                                Log.d(TAG, "coordinatey: " + map.coordinatey);
-                                Log.d(TAG, "pileId: " + map.pileId);
-                                Log.d(TAG, "pileNumber: " + map.pileNumber);
-                                Log.d(TAG, "projectId: " + map.projectId);
-//                                Log.d(TAG, "state: " + map.state);
-//                                Log.d(TAG, "systemNumber: " + map.systemNumber);
-                                Log.d(TAG, "=====================================");
+                            String message = object.getString("message");
+                            if (!code.equals(Utils.MSG_CODE_OK)) {
+                                showToast(message);
                             }
+                            Log.d(TAG, "clientType: " + clientType);
+                            Log.d(TAG, "code: " + code);
+                            Log.d(TAG, "message: " + message);
+
+                            if (object.has("token")) {
+                                String token = object.getString("token");
+                                Log.d(TAG, "token: " + token);
+                                MyApplication.getInstance().getSpUtils().setKeyLoginToken(token);
+                            }
+
+                            LoginUserModel userModel = null;
+                            if (object.has("data")) {
+                                String data = object.getString("data");
+                                Log.d(TAG, "data: " + data);
+
+                                Gson gson = new Gson();
+                                JSONObject userObject = new JSONObject(data);
+                                userModel = gson.fromJson(userObject.getString("loginUserModel"), LoginUserModel.class);
+                                showToast(message);
+                                MyApplication.getInstance().getSpUtils().setKeyPassword(password);
+                            }
+                            return userModel;
                         } else {
                             Log.e(TAG, "Failed to parse response");
+                            return null;
                         }
-                        return null;
-
                     }
 
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        Log.e(TAG, "onError!!");
+                        showToast("网络连接中，请稍候");
+                        e.printStackTrace();
+                        if (mProgressDialog.isShowing()) {
+                            mProgressDialog.dismiss();
+                        }
                     }
 
                     @Override
                     public void onResponse(Object response, int id) {
+                        LoginUserModel userModel = (LoginUserModel) response;
+                        if (userModel != null) {
+                            Constant.curUser = userModel;
+                            MyApplication.getInstance().getSpUtils().setKeyLoginCompanyId(userModel.companyId);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginCompanyName(userModel.companyName);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(userModel.masterDeviceSN);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginProjectId(userModel.projectId);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginProjectName(userModel.projectName);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginUserId(userModel.userId);
+                            MyApplication.getInstance().getSpUtils().setKeyLoginUserName(userModel.userName);
 
+                            mProgressDialog.dismiss();
+
+                            try {
+                                mSerialManager.setPowerUp();
+                                //   mSerialManager.sendApkVersion();
+                                mSerialManager.matchList();
+                                mSerialManager.requestCalMac();
+                                mSerialManager.requestMode();
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+                            startActivity(intent);
+                        }
+                        if (mProgressDialog.isShowing()) {
+                            mProgressDialog.dismiss();
+                        }
                     }
                 });
     }
+
 
     private void showToast(String msg) {
         mToast.setText(msg);
