@@ -42,6 +42,25 @@
                 android:textColor="#ffffff"
                 android:textSize="24px" />
 
+            <TextView
+                android:id="@+id/search_tv"
+                android:layout_width="400px"
+                android:layout_height="50px"
+                android:layout_marginTop="14px"
+                android:layout_marginLeft="24px"
+                android:background="@drawable/com_ffffff_solid_bg"
+                android:hint="请输入桩号/系统编号"
+                android:paddingLeft="10px"
+                android:paddingRight="10px"
+                android:drawablePadding="10px"
+                android:textSize="22px"
+                android:singleLine="true"
+                android:drawableRight="@mipmap/icon_search"
+                android:layout_toLeftOf="@+id/iv_switch"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"></TextView>
+
+
             <ImageView
                 android:id="@+id/iv_switch"
                 android:layout_width="wrap_content"
@@ -72,22 +91,7 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@id/tb_top"></WebView>
 
-    <TextView
-        android:id="@+id/search_tv"
-        android:layout_width="400px"
-        android:layout_height="50px"
-        android:layout_marginTop="14px"
-        android:layout_marginLeft="24px"
-        android:layout_below="@id/tb_top"
-        android:background="@drawable/com_ffffff_solid_bg"
-        android:hint="请输入桩号/系统编号"
-        android:paddingLeft="10px"
-        android:paddingRight="10px"
-        android:drawablePadding="10px"
-        android:textSize="22px"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:drawableRight="@mipmap/icon_search"></TextView>
+
 
     <LinearLayout
         android:layout_width="wrap_content"

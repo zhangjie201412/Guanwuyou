@@ -504,7 +504,11 @@ public class PileMapFragment extends Fragment {
                                         float height = Math.abs(maxY - minY) / Constant.display.heightPixels;
 
                                         sacle = Math.min(width, height);
-                                        sacle = sacle / mPileMapInfo.pileMap.size() * avgPileDiameter;
+                                        if(sacle<=0){
+                                            sacle=1;
+                                        }else {
+                                            sacle = sacle / mPileMapInfo.pileMap.size() * avgPileDiameter;
+                                        }
                                     }
 
                                     float screenScale = getActivity().getResources().getDisplayMetrics().density;

@@ -308,17 +308,16 @@ public class FirstFragment extends Fragment {
             mPieChart.setData(null);
         }else {
             ArrayList<PieEntry> entries = new ArrayList<>();
-            entries.add(new PieEntry(constructing, "灌注中桩数["+constructing+"]", null));
-            entries.add(new PieEntry(unconstruct, "未施工桩数["+unconstruct+"]", null));
-            entries.add(new PieEntry(calFinish, "检测完成桩数["+calFinish+"]", null));
-            entries.add(new PieEntry(otherFinish, "非检测完成桩数["+otherFinish+"]", null));
+            entries.add(new PieEntry(constructing, "灌注中桩数 "+constructing+"根", null));
+            entries.add(new PieEntry(unconstruct, "未施工桩数 "+unconstruct+"根", null));
+            entries.add(new PieEntry(calFinish, "检测完成桩数 "+calFinish+"根", null));
+            entries.add(new PieEntry(otherFinish, "非检测完成桩数 "+otherFinish+"根", null));
 
             PieDataSet dataSet = new PieDataSet(entries, "");
             dataSet.setDrawIcons(false);
             dataSet.setSliceSpace(1f);
 //        dataSet.setIconsOffset(new MPPointF(0, 40));
             dataSet.setSelectionShift(5f);
-
             ArrayList<Integer> colors = new ArrayList<Integer>();
             colors.add(Color.parseColor("#6369d8"));
             colors.add(Color.parseColor("#ed6663"));
