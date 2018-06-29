@@ -10,6 +10,8 @@
         android:id="@+id/lv_popup"
         android:layout_width="600px"
         android:layout_height="450px"
-        android:layout_weight="1"></ListView>
+        android:layout_weight="1"
+        android:paddingLeft="10px"
+        android:paddingRight="10px"></ListView>
 
 </LinearLayout>

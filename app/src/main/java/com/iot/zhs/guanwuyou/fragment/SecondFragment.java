@@ -64,11 +64,17 @@ public class SecondFragment extends Fragment {
 
     private String[] yearArray;
 
+    public static  SecondFragment secondFragment;
+
+    public static SecondFragment getIntance() {
+        return secondFragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_second, container, false);
-
+        secondFragment=this;
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
         mBarChart=view.findViewById(R.id.chart_bar);
@@ -136,9 +142,18 @@ public class SecondFragment extends Fragment {
         ll.setXEntrySpace(0f);
         ll.setTextColor(Color.parseColor("#696969"));
 
-       /* doSelectPileFinishedByPeriodInfo(mSpUtils.getKeyLoginToken(),
-                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginProjectId(), mYearSpinner.getSelectedItem().toString());*/
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG,"--onStart--");
+    }
+
+    public void  doQuery(){
+        doSelectPileFinishedByPeriodInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginProjectId(), mYearSpinner.getSelectedItem().toString());
     }
 
     private class SelectPileFinishedByPeriodInfo extends StringCallback {

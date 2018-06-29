@@ -495,23 +495,17 @@ public class SerialPackage {
                     });
 
         } else if (mOperation.equals("usenodesta")) {
-            SlaveStatusList.SlaveStatus status = new SlaveStatusList.SlaveStatus();
-            status.slaveSerialNumber = mDeviceId1;
-            status.online = mData.get(4);
-            status.versionStatus = mData.get(1);
-            status.sensorStatus = mData.get(2);
-            status.motorStatus = mData.get(3);
-            status.networkStatus = mData.get(0);
-
             for (int i = 0; i < mDataNum; i++) {
                 Log.d(TAG, "### useno " + mDeviceId1 + " -> i=" + i + " -> " + mData.get(i));
             }
-
             //save slave
             SlaveDevice device = new SlaveDevice();
-            device.setOnline(mData.get(4));
-            device.setComm(mData.get(0));
             device.setSlaveOrMaster("1");
+            device.setComm(mData.get(0));
+            device.setVersionStatus(mData.get(1));
+            device.setSensorStatus(mData.get(2));
+            device.setMotorStatus(mData.get(3));
+            device.setOnline(mData.get(4));
             if (DataSupport.where("serialNumber = ?", mDeviceId1).find(SlaveDevice.class).size() == 0) {
                 //insert new data
                 device.setSerialNumber(mDeviceId1);
@@ -520,21 +514,6 @@ public class SerialPackage {
                 device.updateAll("serialNumber = ?", mDeviceId1);
             }
 
-            List<SlaveDevice> savedDeviceList1 = DataSupport.findAll(SlaveDevice.class);
-
-
-            List<SlaveStatusList.SlaveStatus> list = MyApplication.getInstance().getSpUtils().getKeySlaveStatusList();
-            if (list == null) {
-                list = new ArrayList<>();
-            } else {
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).slaveSerialNumber.equals(status.slaveSerialNumber)) {
-                        list.remove(i);
-                    }
-                }
-            }
-            list.add(status);
-            MyApplication.getInstance().getSpUtils().setKeySlaveStatusList(list);
             mData.add(0, mDeviceId1);
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),

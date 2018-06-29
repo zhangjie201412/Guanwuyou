@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.ViewPileInfo;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
+import com.iot.zhs.guanwuyou.view.NotificationDialog;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -59,11 +60,15 @@ public class PileDetailActivity extends BaseActivity {
     private static final int BUTTON_EVENT_NEW_TASK = 0;
     private static final int BUTTON_EVENT_CONTINUE = 1;
     private static final int BUTTON_EVENT_REPORT = 2;
+    private static final int BUTTON_EVENT_REPORT2 = 3;
 
     private int mButtonEvent = -1;
   //  private int mNoFinishState;
     private String pileId;
     private int constructionState;
+
+    private NotificationDialog mNotificationDialog;
+    private String noFinishPile;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,8 +121,28 @@ public class PileDetailActivity extends BaseActivity {
                         intent.putExtra("pileId", pileId);
                         startActivity(intent);
                     }
-                }
+                }else if(mButtonEvent==BUTTON_EVENT_REPORT2){//显示新建工作单，但其实有灌注中的桩，是不可以做后续操作的
+                    if(mNotificationDialog==null) {
+                        mNotificationDialog = new NotificationDialog();
+                        mNotificationDialog.init("提醒",
+                                "确定",
+                                "",
+                                new NotificationDialog.NotificationDialogListener() {
+                                    @Override
+                                    public void onButtonClick(int id) {
+                                        //响应左边的button
+                                        mNotificationDialog.dismiss();
 
+                                    }
+                                });
+                    }
+                    if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                        if(noFinishPile!=null&&!noFinishPile.equals("")) {
+                            mNotificationDialog.setMessage("本设备有"+noFinishPile+"桩未灌注完成,请先结束灌注！");
+                            mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                        }
+                    }
+                }
             }
         });
 
@@ -179,7 +204,7 @@ public class PileDetailActivity extends BaseActivity {
             mFillEndTimeTextView.setText(info.data.pile.fillEndTime);
 
             constructionState = Integer.valueOf(info.data.pile.constructionState);
-
+            noFinishPile=info.data.pile.noFinishPile;
             mHasReport = Integer.valueOf(info.data.pile.isHasMasterDeviceRep);
             Log.d(TAG, "has report = " + mHasReport);
             if (mHasReport == Utils.MASTER_HAS_REPORT_CHECK_REPORT1) {
@@ -198,7 +223,9 @@ public class PileDetailActivity extends BaseActivity {
                 mNewTaskButton.setText("新建任务单");
                 mButtonEvent = BUTTON_EVENT_NEW_TASK;
             } else if (mHasReport == Utils.MASTER_HAS_REPORT_CHECK_REPORT2) {
-                mNewTaskButton.setVisibility(View.INVISIBLE);
+                mNewTaskButton.setVisibility(View.VISIBLE);
+                mNewTaskButton.setText("新建任务单");
+                mButtonEvent = BUTTON_EVENT_REPORT2;
             }
 
         }

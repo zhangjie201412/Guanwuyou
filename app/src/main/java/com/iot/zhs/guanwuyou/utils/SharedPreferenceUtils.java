@@ -37,7 +37,7 @@ public class SharedPreferenceUtils {
     public static final String KEY_CAL_SLURRY = "key_cal_slurry";
     public static final String KEY_ALARM_STATUS = "key_alarm_status";
     public static final String KEY_USE_LIST = "key_use_list";
-    public static final String KEY_USE_NODESTA = "key_use_nodesta";
+  //  public static final String KEY_USE_NODESTA = "key_use_nodesta";
     public static final String KEY_MASTER_BATTERY = "key_master_battery";
     //mtrsd 3 data
     public static final String KEY_MTRSD0 = "key_trsd0";
@@ -174,7 +174,7 @@ public class SharedPreferenceUtils {
         return listString.split(",");
     }
 
-    public List<SlaveStatusList.SlaveStatus> getKeySlaveStatusList() {
+    /*public List<SlaveStatusList.SlaveStatus> getKeySlaveStatusList() {
         String slaveStatusString = mSp.getString(KEY_USE_NODESTA, "");
         if (slaveStatusString.isEmpty())
             return null;
@@ -182,7 +182,7 @@ public class SharedPreferenceUtils {
         SlaveStatusList statusList = gson.fromJson(slaveStatusString, SlaveStatusList.class);
 
         return statusList.slaveStatusList;
-    }
+    }*/
 
     public String getKeyMtrsd0() {
         return mSp.getString(KEY_MTRSD0, "");
@@ -341,14 +341,14 @@ public class SharedPreferenceUtils {
         mEditor.commit();
     }
 
-    public void setKeySlaveStatusList(List<SlaveStatusList.SlaveStatus> statusList) {
+   /* public void setKeySlaveStatusList(List<SlaveStatusList.SlaveStatus> statusList) {
         Gson gson = new Gson();
         SlaveStatusList slaveStatusList = new SlaveStatusList();
         slaveStatusList.slaveStatusList = statusList;
         String slaveListString = gson.toJson(slaveStatusList, SlaveStatusList.class);
         mEditor.putString(KEY_USE_NODESTA, slaveListString);
         mEditor.commit();
-    }
+    }*/
 
     public void setKeyMtrsd0(String val) {
         mEditor.putString(KEY_MTRSD0, val);

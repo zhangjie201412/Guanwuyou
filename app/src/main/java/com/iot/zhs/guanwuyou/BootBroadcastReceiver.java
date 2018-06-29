@@ -12,6 +12,7 @@ import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * Created by H151136 on 11/24/2016.
@@ -30,6 +31,9 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         for(SlaveDevice slaveDevice:savedDeviceList){
             slaveDevice.setOnline("0");//离线
             slaveDevice.setComm("0");//异常
+            slaveDevice.setVersionStatus("0");
+            slaveDevice.setSensorStatus("0");
+            slaveDevice.setMotorStatus("0");
             slaveDevice.updateAll("serialNumber = ?", slaveDevice.getSerialNumber());
         }
         Log.d(TAG,"开机更新成功");

@@ -97,6 +97,9 @@ public class BaseActivity extends AppCompatActivity {
                         lostDevice.setAlarm("0");
                         lostDevice.setComm("0");
                         lostDevice.setBattery("0");
+                        lostDevice.setVersionStatus("0");
+                        lostDevice.setSensorStatus("0");
+                        lostDevice.setMotorStatus("0");
                         slaveDeviceList.add(lostDevice);
                     }
                 }

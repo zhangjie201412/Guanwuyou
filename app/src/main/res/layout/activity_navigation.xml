@@ -9,16 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
+        hjm:tab_bar_background="#fcfafa"
+        hjm:tab_divider_background="#e5e5e5"
+        hjm:tab_font_size="20px"
+        hjm:tab_img_font_padding="0px"
+        hjm:tab_img_height="40px"
+        hjm:tab_img_width="40px"
+        hjm:tab_isshow_divider="true"
+        hjm:tab_padding_bottom="8px"
+        hjm:tab_padding_top="8px"
         hjm:tab_selected_color="#b489e7"
-        hjm:tab_unselected_color="#908f8f"></com.hjm.bottomtabbar.BottomTabBar>
+        hjm:tab_unselected_color="#908f8f">
 
-    <!--<ImageView-->
-        <!--android:id="@+id/iv_menu"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginBottom="100px"-->
-        <!--android:layout_marginLeft="50px"-->
-        <!--android:src="@mipmap/ic_menu" />-->
+    </com.hjm.bottomtabbar.BottomTabBar>
+
+    <!--<ImageView--><!--android:id="@+id/iv_menu"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_alignParentBottom="true"--><!--android:layout_marginBottom="100px"--><!--android:layout_marginLeft="50px"--><!--android:src="@mipmap/ic_menu" />-->
 
 </RelativeLayout>

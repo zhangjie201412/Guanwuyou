@@ -33,7 +33,8 @@
             android:layout_below="@id/tv_username_title"
             android:layout_marginTop="22px"
             android:hint="请输入您的用户名"
-            android:textColorHint="#b0b3c1" />
+            android:textColorHint="#b0b3c1"
+            android:maxLength="11" />
 
         <TextView
             android:id="@+id/tv_password_title"
@@ -43,7 +44,7 @@
             android:layout_marginTop="24px"
             android:text="密码 Password"
             android:textColor="#4e585c"
-            android:textSize="22px" />
+            android:textSize="22px"/>
 
         <EditText
             android:id="@+id/et_password"

@@ -11,11 +11,38 @@ public class SlaveDevice extends DataSupport {
     @Column(unique =  true, defaultValue = "snxxxx")
     private String serialNumber;
     private String slaveOrMaster;
-    private String online;
-    private String alarm;
-    private String comm;
-    private String battery;
-    private String latestData;
+    private String online;//通讯状态-在线、离线
+    private String alarm;//报警
+    private String comm;//设备状态
+    private String battery;//电量
+    private String latestData;//raw最后一笔
+    private String versionStatus;//版本号状况
+    private String sensorStatus;//传感器
+    private String motorStatus;//问六七
+
+    public String getVersionStatus() {
+        return versionStatus==null?"0":versionStatus;
+    }
+
+    public void setVersionStatus(String versionStatus) {
+        this.versionStatus = versionStatus;
+    }
+
+    public String getSensorStatus() {
+        return sensorStatus==null?"0":sensorStatus;
+    }
+
+    public void setSensorStatus(String sensorStatus) {
+        this.sensorStatus = sensorStatus;
+    }
+
+    public String getMotorStatus() {
+        return motorStatus==null?"0":motorStatus;
+    }
+
+    public void setMotorStatus(String motorStatus) {
+        this.motorStatus = motorStatus;
+    }
 
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;

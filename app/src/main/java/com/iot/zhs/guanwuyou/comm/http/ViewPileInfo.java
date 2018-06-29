@@ -36,6 +36,7 @@ public class ViewPileInfo {
             public String state;
             public String systemNumber;
             public String reporter;
+            public String noFinishPile;
         }
     }
 }

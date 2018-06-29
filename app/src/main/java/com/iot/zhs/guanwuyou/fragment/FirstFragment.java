@@ -45,6 +45,8 @@ import com.iot.zhs.guanwuyou.utils.Utils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.litepal.util.LogUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,11 +70,17 @@ public class FirstFragment extends Fragment {
     private int visibleXMax = 6;
     private com.iot.zhs.guanwuyou.comm.http.SelectProgressAndDiffGradeInfo info;
 
+    public static FirstFragment firstFragment;
+    public static FirstFragment getIntance(){
+        return firstFragment;
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
-
+        firstFragment=this;
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
 
@@ -191,6 +199,12 @@ public class FirstFragment extends Fragment {
                 mSpUtils.getKeyLoginUserId(),
                 mSpUtils.getKeyLoginProjectId());
         return view;
+    }
+
+    public void doQuery(){
+        doSelectProgressAndDiffGradeInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(),
+                mSpUtils.getKeyLoginProjectId());
     }
 
 

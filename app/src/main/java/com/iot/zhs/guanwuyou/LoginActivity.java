@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressDialog.show();
         OkHttpUtils.post().url(Utils.SERVER_ADDR + "/login/login/cc/")
                 .addParams("mobileNo", username)
-                .addParams("password", encodePassword)
+                .addParams("password", encodePassword)//14e1b600b1fd579f47433b88e8d85291
                 .addParams("masterDeviceSN", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn())
                 .build()
                 .connTimeOut(Utils.HTTP_TIMEOUT)

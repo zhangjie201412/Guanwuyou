@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.iot.zhs.guanwuyou.R;
@@ -74,6 +75,10 @@ public class NotificationDialog extends DialogFragment {
 
         if(Utils.stringIsEmpty(mButtonText2)){
             mButton2.setVisibility(View.GONE);
+
+            LinearLayout.LayoutParams layoutParams= (LinearLayout.LayoutParams) mButton1.getLayoutParams();
+            layoutParams.rightMargin=70;
+            mButton1.setLayoutParams(layoutParams);
         }else{
             mButton2.setVisibility(View.VISIBLE);
         }

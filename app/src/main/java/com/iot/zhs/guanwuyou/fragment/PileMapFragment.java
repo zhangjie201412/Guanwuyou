@@ -104,6 +104,11 @@ public class PileMapFragment extends Fragment {
 
     private int jumpFlag=0;
     private ImageView loginOutIv;
+    public static PileMapFragment pileMapFragment;
+    public static PileMapFragment getIntance(){
+        return pileMapFragment;
+    }
+
 
     @SuppressLint("HandlerLeak")
     private Handler mUiHandler = new Handler() {
@@ -126,10 +131,20 @@ public class PileMapFragment extends Fragment {
         }
     };
 
+    public static PileMapFragment newInstance() {
+
+        Bundle args = new Bundle();
+
+        PileMapFragment fragment = new PileMapFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pile_map, container, false);
+        pileMapFragment=this;
         mToast = Toast.makeText(getContext(), "", Toast.LENGTH_SHORT);
         mApplication = MyApplication.getInstance();
         mSpUtils = mApplication.getSpUtils();
@@ -277,13 +292,13 @@ public class PileMapFragment extends Fragment {
 
 
     @Override
-    public void onResume() {
-        Log.d(TAG, "++onResume++");
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "++onStart++");
         if(jumpFlag==1){
             jumpFlag=0;
             doQuery();
         }
-        super.onResume();
     }
 
     @Override
@@ -400,7 +415,7 @@ public class PileMapFragment extends Fragment {
     }
 
 
-    private void doQuery(){
+    public void doQuery(){
         if (mNotificationDialog.isAdded()) {
             mNotificationDialog.dismiss();
         }

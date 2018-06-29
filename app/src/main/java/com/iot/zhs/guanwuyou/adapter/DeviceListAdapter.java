@@ -55,6 +55,7 @@ public class DeviceListAdapter extends BaseAdapter {
             holder.alarm = view.findViewById(R.id.item_iv_alarm);
             holder.comm = view.findViewById(R.id.item_tv_comm_status);
             holder.battery = view.findViewById(R.id.item_tv_battery);
+            holder.commDetail=view.findViewById(R.id.item_tv_comm_status_detail);
             view.setTag(holder);
         } else {
             holder = (ViewHolder)view.getTag();
@@ -75,13 +76,35 @@ public class DeviceListAdapter extends BaseAdapter {
             holder.alarm.setVisibility(View.VISIBLE);
             holder.alarm.setImageResource(R.mipmap.ic_green);
         }
-        if(mSlaveDeviceList.get(i).getComm() .equals("1") ) {
+        if(mSlaveDeviceList.get(i).getComm().equals("1") ) {
             holder.comm.setText("正常");
             holder.comm.setTextColor(Color.parseColor("#0FD2AE"));
+            holder.commDetail.setVisibility(View.GONE);
         } else {
             holder.comm.setText("异常");
             holder.comm.setTextColor(Color.parseColor("#ED6663"));
+            holder.commDetail.setVisibility(View.VISIBLE);
+            //(主从机版本不一致,传感器异常,稳流器异常)
+            String detailStr="";
+            if(mSlaveDeviceList.get(i).getVersionStatus().equals("0")){//异常
+                detailStr="主从机版本不一致,";
+            }
+            if(mSlaveDeviceList.get(i).getSensorStatus().equals("0")){//异常
+                detailStr=detailStr+"传感器异常,";
+            }
+            if(mSlaveDeviceList.get(i).getMotorStatus().equals("0")){//异常
+                detailStr=detailStr+"稳流器异常,";
+            }
+            if(detailStr.endsWith(",")){
+                detailStr=detailStr.substring(0,detailStr.length()-1);
+            }
+            if(!detailStr.equals("")){
+                holder.commDetail.setText("("+detailStr+")");
+            }else{
+                holder.commDetail.setText(detailStr);
+            }
         }
+
         if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("1")) {
             holder.title.setText("从机");
         } else if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("0")) {
@@ -99,5 +122,6 @@ public class DeviceListAdapter extends BaseAdapter {
         ImageView alarm;
         TextView comm;
         TextView battery;
+        TextView commDetail;
     }
 }

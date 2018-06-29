@@ -62,10 +62,16 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     private NotificationDialog mNotificationDialog;
 
     private ImageView loginOutIv;
+
+    public static  DeviceFragment deviceFragment;
+    public static  DeviceFragment getIntance(){
+        return  deviceFragment;
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_device, container, false);
+        deviceFragment=this;
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
 
@@ -79,9 +85,6 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         bgaRefreshLayout = view.findViewById(R.id.refreshLayout);
         bgaRefreshLayout.setDelegate(this);
         bgaRefreshLayout.setRefreshViewHolder(new BGANormalRefreshViewHolder(this.getContext(), false));
-
-        doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
-                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
 
         deviceVersionList = DataSupport.findAll(DeviceVersion.class);
 
@@ -110,10 +113,22 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
             }
         });
 
+        doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
+
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG,"--onStart--");
+    }
 
+    public void doQuery(){
+        doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
+                mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
+    }
 
     @Override
     public void onDestroyView() {
