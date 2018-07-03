@@ -88,14 +88,16 @@ public class HttpClient {
                                     ProtocolPackage pkgResponse = new ProtocolPackage(info.data.protocol);
                                     if (pkgResponse.parse()) {
                                         //重发数据
-                                        if (pkgResponse.getData().get(0) != null && pkgResponse.getData().get(0).equals("reject")) {
-                                            int syncid = pkgResponse.getSyncId();
-                                            MyApplication.getInstance().setSyncId(syncid);
-                                            Log.d(TAG, "count="+ finalCount +","+pkg.getmType()+"---reject 无反应重发");
+                                        if (pkgResponse.getData().get(0) != null ) {
+                                            if (pkgResponse.getData().get(0).equals("reject")) {
+                                                int syncid = pkgResponse.getSyncId();
+                                                MyApplication.getInstance().setSyncId(syncid);
+                                                Log.d(TAG, "count=" + finalCount + "," + pkg.getmType() + "---reject 无反应重发");
 
-                                            pkg.setmSyncId(MyApplication.getInstance().getSyncId());
-                                            protocolStr=pkg.toString();
-                                            http(finalCount);
+                                                pkg.setmSyncId(MyApplication.getInstance().getSyncId());
+                                                protocolStr = pkg.toString();
+                                                http(finalCount);
+                                            }
                                         }
                                     }
 

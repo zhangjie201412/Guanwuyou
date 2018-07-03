@@ -392,17 +392,19 @@ public class SerialPackage {
             event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
-            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "cal.con", "set", mDataNum, mData);
-            Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(
-                    pkg, new Utils.ResponseCallback() {
-                        @Override
-                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+            if(!mData.get(0).equals("0")){//标定失败
+                ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
+                        "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                        mDeviceId1, "cal.con", "set", mDataNum, mData);
+                Log.d(TAG, "-> " + pkg.toString());
+                Utils.doProcessProtocolInfo(
+                        pkg, new Utils.ResponseCallback() {
+                            @Override
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        }
-                    });
+                            }
+                        });
+            }
 
         } else if (mOperation.equals("cal.slurry")) {
             Log.d(TAG, "set cal slurry: " + mData.get(0));
@@ -411,17 +413,19 @@ public class SerialPackage {
             event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
-            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
-                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "cal.slurry", "set", mDataNum, mData);
-            Log.d(TAG, "-> " + pkg.toString());
-            Utils.doProcessProtocolInfo(
-                    pkg, new Utils.ResponseCallback() {
-                        @Override
-                        public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+            if(!mData.get(0).equals(0)) {//标定失败
+                ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
+                        "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                        mDeviceId1, "cal.slurry", "set", mDataNum, mData);
+                Log.d(TAG, "-> " + pkg.toString());
+                Utils.doProcessProtocolInfo(
+                        pkg, new Utils.ResponseCallback() {
+                            @Override
+                            public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
 
-                        }
-                    });
+                            }
+                        });
+            }
 
         } else if (mOperation.equals("almsta")) {
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.iot.zhs.guanwuyou.database.PileCalValue;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.iot.zhs.guanwuyou.service.NetworkMonitorService;
 
 import org.litepal.crud.DataSupport;
 
@@ -36,6 +37,10 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
             slaveDevice.setMotorStatus("0");
             slaveDevice.updateAll("serialNumber = ?", slaveDevice.getSerialNumber());
         }
+
+        Intent service = new Intent(context, NetworkMonitorService.class);
+        context.startService(service);
+
         Log.d(TAG,"开机更新成功");
     }
 }

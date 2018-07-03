@@ -46,6 +46,9 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".service.NetworkMonitorService" />
+
+
         <activity
             android:name=".LoginActivity"
             android:configChanges="orientation|keyboardHidden"

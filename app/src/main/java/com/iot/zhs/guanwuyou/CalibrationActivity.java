@@ -161,39 +161,53 @@ public class CalibrationActivity extends BaseActivity {
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_CON) {//砼标定值
-            mConGradeCalEditText.setText(event.message);
+            if(event.message.equals("0")){//标定失败
+                if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                    mNotificationDialog.setMessage("砼标定失败,请重新标定!");
+                    mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                }
+            }else {
+                mConGradeCalEditText.setText(event.message);
 
-            PileCalValue pileCalValue=new PileCalValue();
-            pileCalValue.setCalCon(event.message);
-            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
-                //insert new data
-                pileCalValue.setPileId(mPileId);
-                pileCalValue.save();
-            } else {
-                pileCalValue.updateAll("pileId = ?", mPileId);
-            }
+                PileCalValue pileCalValue = new PileCalValue();
+                pileCalValue.setCalCon(event.message);
+                if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                    //insert new data
+                    pileCalValue.setPileId(mPileId);
+                    pileCalValue.save();
+                } else {
+                    pileCalValue.updateAll("pileId = ?", mPileId);
+                }
 
-            if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
-                mNotificationDialog.setMessage("恭喜您,砼标定成功!");
-                mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                    mNotificationDialog.setMessage("恭喜您,砼标定成功!");
+                    mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                }
             }
 
         }
         if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_SLURRY) {//泥浆标定值
-            mSlurryEditText.setText(event.message);
-            PileCalValue pileCalValue=new PileCalValue();
-            pileCalValue.setCalSlurry(event.message);
-            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
-                //insert new data
-                pileCalValue.setPileId(mPileId);
-                pileCalValue.save();
-            } else {
-                pileCalValue.updateAll("pileId = ?", mPileId);
-            }
+            if(event.message.equals("0")){
+                if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                    mNotificationDialog.setMessage("泥浆标定失败,请重新标定!");
+                    mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                }
+            }else {
+                mSlurryEditText.setText(event.message);
+                PileCalValue pileCalValue = new PileCalValue();
+                pileCalValue.setCalSlurry(event.message);
+                if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                    //insert new data
+                    pileCalValue.setPileId(mPileId);
+                    pileCalValue.save();
+                } else {
+                    pileCalValue.updateAll("pileId = ?", mPileId);
+                }
 
-            if (mNotificationDialog != null &&!mNotificationDialog.isAdded()) {
-                mNotificationDialog.setMessage("恭喜您,泥浆标定成功!");
-                mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
+                    mNotificationDialog.setMessage("恭喜您,泥浆标定成功!");
+                    mNotificationDialog.show(getSupportFragmentManager(), "Notification");
+                }
             }
         }
     }
