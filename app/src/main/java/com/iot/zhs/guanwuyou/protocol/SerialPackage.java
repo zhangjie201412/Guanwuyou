@@ -202,12 +202,12 @@ public class SerialPackage {
                 Log.d(TAG, "####MASTER VER");
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                        "0", "ver", "get", 3, mData);
+                        "0", "ver", "get", mData.size(), mData);
             } else {
                 Log.d(TAG, "####SLAVER VER");
                 pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                        mDeviceId1, "ver", "get", 3, mData);
+                        mDeviceId1, "ver", "get", mData.size(), mData);
             }
 
             Log.d(TAG, "-> " + pkg.toString());
@@ -252,7 +252,7 @@ public class SerialPackage {
         } else if (mOperation.equals("calmac")) {
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    "0", "calmac", "get", 1, mData);
+                    "0", "calmac", "get", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -337,7 +337,7 @@ public class SerialPackage {
 //            EventBus.getDefault().post(event);
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "prealarm", "none", 3, mData);
+                    mDeviceId1, "prealarm", "none", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -375,7 +375,7 @@ public class SerialPackage {
 //            }
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "alarm", "none", 3, mData);
+                    mDeviceId1, "alarm", "none", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -413,7 +413,7 @@ public class SerialPackage {
             event.message = mData.get(0);
             EventBus.getDefault().post(event);
 
-            if(!mData.get(0).equals(0)) {//标定失败
+            if(!mData.get(0).equals("0")) {//标定失败
                 ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                         "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                         mDeviceId1, "cal.slurry", "set", mDataNum, mData);
@@ -518,10 +518,9 @@ public class SerialPackage {
                 device.updateAll("serialNumber = ?", mDeviceId1);
             }
 
-            mData.add(0, mDeviceId1);
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    "0", "usenodesta", "none", mDataNum + 1, mData);
+                    mDeviceId1, "usenodesta", "none", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -598,7 +597,7 @@ public class SerialPackage {
             //send to server
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "1", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    "0", "mode", "get", 1, modeData);
+                    "0", "mode", "get", modeData.size(), modeData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -634,7 +633,7 @@ public class SerialPackage {
             ProtocolPackage pkg;
             pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "sensorid", "get", mDataNum, mData);
+                    mDeviceId1, "sensorid", "get", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(
                     pkg, new Utils.ResponseCallback() {
@@ -654,7 +653,7 @@ public class SerialPackage {
             ProtocolPackage pkg;
             pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
-                    mDeviceId1, "fin", "none", mDataNum, mData);
+                    mDeviceId1, "fin", "none", mData.size(), mData);
             Log.d(TAG, "-> " + pkg.toString());
             Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
                 @Override

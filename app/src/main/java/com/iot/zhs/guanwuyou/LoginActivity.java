@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
 import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.iot.zhs.guanwuyou.service.NetworkMonitorService;
 import com.iot.zhs.guanwuyou.utils.Constant;
 import com.iot.zhs.guanwuyou.utils.DisplayUtil;
 import com.iot.zhs.guanwuyou.utils.Utils;
@@ -160,6 +161,9 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             versionTv.setText("©江苏中海昇物联科技有限公司 版本号: V1.0.0");
         }
+
+        Intent service = new Intent(this, NetworkMonitorService.class);
+        startService(service);
     }
 
     /**

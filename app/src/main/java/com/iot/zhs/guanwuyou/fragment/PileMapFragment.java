@@ -484,7 +484,7 @@ public class PileMapFragment extends Fragment {
                                     mNoFinishPileNumber = mPileMapInfo.noFinishPile.pileNumber;
                                     mNoFinishState = Integer.valueOf(mPileMapInfo.noFinishPile.reportState);
                                     //show no finish pile notification
-                                    mNotificationDialog.setMessage("您的" + mPileMapInfo.noFinishPile.pileNumber + "桩有未完成的任务单哦！");
+                                    mNotificationDialog.setMessage("本设备有" + mPileMapInfo.noFinishPile.pileNumber + "桩未灌注完成,请先结束灌注！");
                                     mNotificationDialog.show(getFragmentManager(), "Notification");
 
                                     boolean foundNoFinishPileId = false;

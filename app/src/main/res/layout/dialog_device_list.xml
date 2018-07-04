@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="600px"
     android:layout_height="450px"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@mipmap/bg_popupwindow">
 
     <ListView
         android:id="@+id/lv_popup"
@@ -12,6 +13,7 @@
         android:layout_weight="1"
         android:paddingLeft="10px"
         android:paddingRight="10px"
-        android:background="@mipmap/bg_popupwindow"></ListView>
+        android:paddingBottom="30px"
+        android:paddingTop="10px"></ListView>
 
 </LinearLayout>

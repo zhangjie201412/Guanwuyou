@@ -155,6 +155,8 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
 
     @Override
     public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+        deviceVersionList.clear();
+        deviceVersionList = DataSupport.findAll(DeviceVersion.class);
 
         doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());

@@ -149,8 +149,22 @@ public class CalibrationActivity extends BaseActivity {
     private void updateView() {
         if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() != 0) {
             PileCalValue pileCalValue=DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).get(0);
-            mConGradeCalEditText.setText(pileCalValue.getCalCon());
-            mSlurryEditText.setText(pileCalValue.getCalSlurry());
+            //砼标定
+            if(pileCalValue.getCalCon()!=null){
+                if(pileCalValue.getCalCon().equals("0")){//失败
+                    mConGradeCalEditText.setText("");
+                }else{
+                    mConGradeCalEditText.setText(pileCalValue.getCalCon());
+                }
+            }
+            //泥浆标定
+            if(pileCalValue.getCalSlurry()!=null){
+                if(pileCalValue.getCalSlurry().equals("0")){//失败
+                    mSlurryEditText.setText("");
+                }else{
+                    mSlurryEditText.setText(pileCalValue.getCalSlurry());
+                }
+            }
         }else{
             mConGradeCalEditText.setText("");
             mSlurryEditText.setText("");
@@ -162,6 +176,7 @@ public class CalibrationActivity extends BaseActivity {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
         if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_CON) {//砼标定值
             if(event.message.equals("0")){//标定失败
+                mConGradeCalEditText.setText("");
                 if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
                     mNotificationDialog.setMessage("砼标定失败,请重新标定!");
                     mNotificationDialog.show(getSupportFragmentManager(), "Notification");
@@ -169,45 +184,45 @@ public class CalibrationActivity extends BaseActivity {
             }else {
                 mConGradeCalEditText.setText(event.message);
 
-                PileCalValue pileCalValue = new PileCalValue();
-                pileCalValue.setCalCon(event.message);
-                if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
-                    //insert new data
-                    pileCalValue.setPileId(mPileId);
-                    pileCalValue.save();
-                } else {
-                    pileCalValue.updateAll("pileId = ?", mPileId);
-                }
-
                 if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
                     mNotificationDialog.setMessage("恭喜您,砼标定成功!");
                     mNotificationDialog.show(getSupportFragmentManager(), "Notification");
                 }
             }
 
+            PileCalValue pileCalValue = new PileCalValue();
+            pileCalValue.setCalCon(event.message);
+            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                //insert new data
+                pileCalValue.setPileId(mPileId);
+                pileCalValue.save();
+            } else {
+                pileCalValue.updateAll("pileId = ?", mPileId);
+            }
+
         }
         if (event.type == MessageEvent.EVENT_TYPE_UPDATE_CAL_SLURRY) {//泥浆标定值
             if(event.message.equals("0")){
+                mSlurryEditText.setText("");
                 if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
                     mNotificationDialog.setMessage("泥浆标定失败,请重新标定!");
                     mNotificationDialog.show(getSupportFragmentManager(), "Notification");
                 }
             }else {
                 mSlurryEditText.setText(event.message);
-                PileCalValue pileCalValue = new PileCalValue();
-                pileCalValue.setCalSlurry(event.message);
-                if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
-                    //insert new data
-                    pileCalValue.setPileId(mPileId);
-                    pileCalValue.save();
-                } else {
-                    pileCalValue.updateAll("pileId = ?", mPileId);
-                }
-
                 if (mNotificationDialog != null && !mNotificationDialog.isAdded()) {
                     mNotificationDialog.setMessage("恭喜您,泥浆标定成功!");
                     mNotificationDialog.show(getSupportFragmentManager(), "Notification");
                 }
+            }
+            PileCalValue pileCalValue = new PileCalValue();
+            pileCalValue.setCalSlurry(event.message);
+            if (DataSupport.where("pileId = ?", mPileId).find(PileCalValue.class).size() == 0) {
+                //insert new data
+                pileCalValue.setPileId(mPileId);
+                pileCalValue.save();
+            } else {
+                pileCalValue.updateAll("pileId = ?", mPileId);
             }
         }
     }

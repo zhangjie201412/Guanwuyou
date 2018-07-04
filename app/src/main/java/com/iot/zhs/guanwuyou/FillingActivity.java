@@ -95,14 +95,14 @@ public class FillingActivity extends BaseActivity {
         mConGradeTextView = findViewById(R.id.tv_con_grade);
         mButton = findViewById(R.id.bt_end_filling);
         mAnimationImageView = findViewById(R.id.iv_animation);
-        mReporterTextView=findViewById(R.id.tv_last_user);
+        mReporterTextView = findViewById(R.id.tv_last_user);
 
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG,"最后一笔raw值--mFinalCheckData:"+Utils.listToString(mFinalCheckData,","));
-                if (mAnimationStage==2) {
+                Log.d(TAG, "最后一笔raw值--mFinalCheckData:" + Utils.listToString(mFinalCheckData, ","));
+                if (mAnimationStage == 2) {
                     //结束灌注
                     doEndPourInfo(mSpUtils.getKeyLoginToken(),
                             mSpUtils.getKeyLoginUserId(),
@@ -130,24 +130,24 @@ public class FillingActivity extends BaseActivity {
         mPileId = getIntent().getStringExtra("pileId");
         Log.d(TAG, "####pile id = " + mPileId);
 
-       // mAnimationStage=Utils.stringToInt(mSpUtils.getKeyAlarmStatus());
+        // mAnimationStage=Utils.stringToInt(mSpUtils.getKeyAlarmStatus());
         //和pileId进行绑定，查询
         if (DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).size() != 0) {
-            AlarmState alarmState=DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).get(0);
-            mAnimationStage=Utils.stringToInt(alarmState.getAlarmValue());
+            AlarmState alarmState = DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).get(0);
+            mAnimationStage = Utils.stringToInt(alarmState.getAlarmValue());
         }
 
         mFinalCheckData = new ArrayList<>();
         mFinalCheckData.clear();
         List<SlaveDevice> slaveDeviceList = DataSupport.findAll(SlaveDevice.class);
-        String[] useList= MyApplication.getInstance().getSpUtils().getKeyUseList();//uselist协议的值
+        String[] useList = MyApplication.getInstance().getSpUtils().getKeyUseList();//uselist协议的值
 
         for (SlaveDevice device : slaveDeviceList) {//取在线从机的最后一笔
-            if(useList!=null&&useList.length>0) {
+            if (useList != null && useList.length > 0) {
                 for (int i = 0; i < useList.length; i++) {
-                    if (device.getSerialNumber().equals(useList[i])){
+                    if (device.getSerialNumber().equals(useList[i])) {
                         mFinalCheckData.add("" + device.getLatestData());
-                        Log.d(TAG,"mFinalCheckData:"+device.getLatestData());
+                        Log.d(TAG, "mFinalCheckData:" + device.getLatestData());
                     }
                 }
             }
@@ -217,8 +217,8 @@ public class FillingActivity extends BaseActivity {
             if (!mAnimationRunning)
                 return;
 
-            String dateStr=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            Log.d(TAG,"almsta--灌注界面动画开始执行时间--"+dateStr+",mAnimationStage="+mAnimationStage);
+            String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Log.d(TAG, "almsta--灌注界面动画开始执行时间--" + dateStr + ",mAnimationStage=" + mAnimationStage);
 
             switch (what) {
                 case STAGE0_ON:
@@ -276,6 +276,7 @@ public class FillingActivity extends BaseActivity {
 
     /**
      * 初始化
+     *
      * @param token
      * @param loginName
      * @param pileId
@@ -299,6 +300,7 @@ public class FillingActivity extends BaseActivity {
                 .writeTimeOut(Utils.HTTP_TIMEOUT)
                 .execute(new DoViewPileInfoCallback());
     }
+
     private class DoViewPileInfoCallback extends StringCallback {
 
         @Override
@@ -331,6 +333,7 @@ public class FillingActivity extends BaseActivity {
 
     /**
      * 结束灌注
+     *
      * @param token
      * @param loginName
      * @param pileId
@@ -380,13 +383,13 @@ public class FillingActivity extends BaseActivity {
                 //结束灌注时发送关闭蜂鸣器的指令
                 // >>cssp,0,SN0302201709230001,0,beep,1，index,checksum
                 //index值为0和1  1表示关闭蜂鸣器。这条指令只在告警的时候使用，一旦从告警状态退出到其他状态，重新回到告警状态的话，蜂鸣器还是会响，此时需要再次发送该指令。
-                SerialPackage serialPackage=new SerialPackage();
+                SerialPackage serialPackage = new SerialPackage();
                 serialPackage.setSyncId(myApplication.getSyncId());
                 serialPackage.setDeviceId0(mSpUtils.getKeyLoginiMasterDeviceSn());
                 serialPackage.setDeviceId1("0");
                 List<String> dataList = new ArrayList<>();
                 dataList.add("1");
-                String rsp=serialPackage.makeResponse("beep",dataList);
+                String rsp = serialPackage.makeResponse("beep", dataList);
 
                 MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
                 event.message = rsp;
@@ -405,9 +408,9 @@ public class FillingActivity extends BaseActivity {
     }
 
 
-
     /**
      * 计算差异等级
+     *
      * @param token
      * @param loginName
      * @param pileId
@@ -446,12 +449,13 @@ public class FillingActivity extends BaseActivity {
             Log.d(TAG, response);
             Gson gson = new Gson();
             EndPourData data = gson.fromJson(response, EndPourData.class);
-            Log.d(TAG, "code: " + data.code);
-            Log.d(TAG, "diffGrade: " + data.data.diffGrade);
             if (data.code.equals(Utils.MSG_CODE_OK)) {
-                    mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
-                            + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
-                    mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
+                Log.d(TAG, "code: " + data.code);
+                Log.d(TAG, "diffGrade: " + data.data.diffGrade);
+
+                mNotificationDialog.setMessage("当前差异等级为: " + data.data.diffGrade + "\n"
+                        + "当前混凝土与新鲜砼差异较大，可能会达不到预设强度，是否确认结束灌注！");
+                mNotificationDialog.show(getSupportFragmentManager(), "diffGrade");
             }
             showToast(data.message);
         }
@@ -481,12 +485,12 @@ public class FillingActivity extends BaseActivity {
         if (event.type == MessageEvent.EVENT_TYPE_ALARM_STATUS) {
             mAnimationStage = Utils.stringToInt(event.message);
 
-            String dateStr=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            Log.d(TAG,"almsta--灌注界面接受的时间--"+dateStr);
+            String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Log.d(TAG, "almsta--灌注界面接受的时间--" + dateStr);
 
 
             //和pileId进行绑定，存储于数据库
-            AlarmState alarmState=new AlarmState();
+            AlarmState alarmState = new AlarmState();
             alarmState.setAlarmValue(event.message);
             if (DataSupport.where("pileId = ?", mPileId).find(AlarmState.class).size() == 0) {
                 //insert new data
