@@ -504,7 +504,6 @@ public class SerialPackage {
             }
             //save slave
             SlaveDevice device = new SlaveDevice();
-            device.setSlaveOrMaster("1");
             device.setComm(mData.get(0));
             device.setVersionStatus(mData.get(1));
             device.setSensorStatus(mData.get(2));

@@ -37,11 +37,11 @@ public class NetworkMonitorService extends Service {
                             NetworkInfo woin = mConnectivityManager.getActiveNetworkInfo();
                             if (woin != null) {
                                 //有网络的状态表进行设置有网络的状态
-                                Log.d(TAG, "Network OK");
+                              //  Log.d(TAG, "Network OK");
                                 setNetworkLedOn();
                             } else {
                                 //有网络的状态表进行设置有网络的状态
-                                Log.d(TAG, "Network NG");
+                             //   Log.d(TAG, "Network NG");
                                 setNetworkLedOff();
                             }
                         } catch (Exception e) {

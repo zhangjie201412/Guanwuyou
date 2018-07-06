@@ -21,6 +21,7 @@ import java.util.ServiceLoader;
 
 public class BootBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "ZHS.IOT";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "ACTION: " + intent.getAction());
@@ -29,18 +30,25 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         context.startActivity(appIntent);
         //开机默认主从机在线状态为离线,是否异常为正常,待收到usenodesta时及时更新状态
         List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
-        for(SlaveDevice slaveDevice:savedDeviceList){
+        for (SlaveDevice slaveDevice : savedDeviceList) {
             slaveDevice.setOnline("0");//离线
             slaveDevice.setComm("0");//异常
             slaveDevice.setVersionStatus("0");
             slaveDevice.setSensorStatus("0");
             slaveDevice.setMotorStatus("0");
+            slaveDevice.setSlaveOrMaster("1");
+            if (!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")) {//区分标定仪
+                if (slaveDevice.getSerialNumber().equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())) {
+                    slaveDevice.setSlaveOrMaster("2");
+                    slaveDevice.setMotorStatus("1");
+                }
+            }
             slaveDevice.updateAll("serialNumber = ?", slaveDevice.getSerialNumber());
         }
 
         Intent service = new Intent(context, NetworkMonitorService.class);
         context.startService(service);
 
-        Log.d(TAG,"开机更新成功");
+        Log.d(TAG, "开机更新成功");
     }
 }

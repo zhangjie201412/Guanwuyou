@@ -83,7 +83,7 @@ public class ProtocolPackage {
 
     public boolean parse() {
         Log.d(TAG, "ProtocolPackage--parse: " + mRawData);
-        if(mRawData == null) {
+        if (mRawData == null) {
             Log.e(TAG, "mRawData is null!!!!");
             return false;
         }
@@ -113,11 +113,11 @@ public class ProtocolPackage {
             MyApplication.getInstance().getSpUtils().setKeyCalTrsd1(mData.get(1));
             MyApplication.getInstance().getSpUtils().setKeyCalTrsd2(mData.get(2));
             MyApplication.getInstance().getSpUtils().setKeyCalTrsd3(mData.get(3));
-        } else if(mType.equals("calmac")) {
+        } else if (mType.equals("calmac")) {
             Log.d(TAG, "calmac: " + mData.get(0));
-            MyApplication.getInstance().getSpUtils().setKeyCalMac(mData.get(0));
 
-            String slaveSn=mData.get(0);
+            MyApplication.getInstance().getSpUtils().setKeyCalMac(mData.get(0));
+            String slaveSn = mData.get(0);
             SlaveDevice device = new SlaveDevice();
             device.setSerialNumber(slaveSn);
             device.setSlaveOrMaster("2");//2--标定仪
@@ -133,17 +133,17 @@ public class ProtocolPackage {
 
             List<SlaveDevice> allDevices = DataSupport.findAll(SlaveDevice.class);
             int slaveNumber = Integer.parseInt(mData.get(0));
-            for(int i = 0; i < mDatNum; i++) {
+            for (int i = 0; i < mDatNum; i++) {
                 Log.d(TAG, String.format("### [%d] => %s", i, mData.get(i)));
             }
             String[] matchList = new String[slaveNumber];
-            for(int i = 0; i < slaveNumber; i++) {
+            for (int i = 0; i < slaveNumber; i++) {
                 matchList[i] = mData.get(i + 1);
             }
             MyApplication.getInstance().getSpUtils().setKeyMatchList(matchList);
 
-            for(int i = 0; i < allDevices.size(); i++) {
-                if(!allDevices.get(i).getSlaveOrMaster().equals("2")) {//2--标定仪 这里不需要处理标定仪
+            for (int i = 0; i < allDevices.size(); i++) {
+                if (!allDevices.get(i).getSlaveOrMaster().equals("2")) {//2--标定仪 这里不需要处理标定仪
                     boolean isExist = false;
                     for (int j = 0; j < slaveNumber; j++) {
                         if (mData.get(j + 1).equals(allDevices.get(i).getSerialNumber())) {
@@ -157,20 +157,20 @@ public class ProtocolPackage {
                     }
                 }
             }
-        } else if(mType.equals("raw")) {
+        } else if (mType.equals("raw")) {
 
-        } else if(mType.equals("mtrsd")) {
-            if(mDatNum == 3) {
+        } else if (mType.equals("mtrsd")) {
+            if (mDatNum == 3) {
                 MyApplication.getInstance().getSpUtils().setKeyMtrsd0(mData.get(0));
                 MyApplication.getInstance().getSpUtils().setKeyMtrsd1(mData.get(1));
                 MyApplication.getInstance().getSpUtils().setKeyMtrsd2(mData.get(2));
             } else {
                 Log.e(TAG, "mtrsd response data size: " + mDatNum);
             }
-        } else if(mType.equals("mode")) {
+        } else if (mType.equals("mode")) {
             MyApplication.getInstance().getSpUtils().setKeyMode(mData.get(0));
-        } else if(mType.equals("ver")) {
-        } else if(mType.equals("sensorid")) {
+        } else if (mType.equals("ver")) {
+        } else if (mType.equals("sensorid")) {
             MyApplication.getInstance().getSpUtils().setKeySensorid(mData.get(0));
         }
         return true;
@@ -202,14 +202,15 @@ public class ProtocolPackage {
 
     /**
      * 更新
+     *
      * @return
      */
-    public void updateVersion(){
-        if(Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)){
+    public void updateVersion() {
+        if (Utils.stringIsEmpty(updateFileURL) || Utils.listIsEmpty(localVerData)) {
             return;
         }
         if (!Utils.compare(mData, localVerData)) {//对比本地版本和服务器版本是否一致  不一致
-            if(flag==0){//app
+            if (flag == 0) {//app
                 final NotificationDialog mNotificationDialog = new NotificationDialog();
                 mNotificationDialog.init("提醒",
                         "是",
@@ -220,9 +221,9 @@ public class ProtocolPackage {
                                 //响应左边的button
                                 if (id == 1) {
 
-                                   // updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
-                                    Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
-                                    intent.putExtra("updateFileURL",updateFileURL);
+                                    // updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/0511.apk";
+                                    Intent intent = new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
+                                    intent.putExtra("updateFileURL", updateFileURL);
                                     MyApplication.getInstance().getCurrentActivity().startService(intent);
                                     mNotificationDialog.dismiss();
                                 } else if (id == 2) {
@@ -233,12 +234,12 @@ public class ProtocolPackage {
                 String message = "[APP]有新版本" + Utils.listToString(mData, ".") + "可用，是否下载更新?";
                 mNotificationDialog.setMessage(message);
                 mNotificationDialog.show(MyApplication.getInstance().getCurrentActivity().getSupportFragmentManager(), "Notification");
-            }else{//主机从机直接下载
+            } else {//主机从机直接下载
                 String serialNumber;
                 if (mDevice2.equals("0")) {//主机
-                    serialNumber=mDevice1;
-                }else{//从机
-                    serialNumber=mDevice2;
+                    serialNumber = mDevice1;
+                } else {//从机
+                    serialNumber = mDevice2;
                 }
 
                 DeviceVersion deviceVersion = new DeviceVersion();
@@ -246,22 +247,22 @@ public class ProtocolPackage {
                 if (DataSupport.where("serialNumber = ?", serialNumber).find(DeviceVersion.class).size() == 0) {
                     deviceVersion.setSerialNumber(serialNumber);
                     deviceVersion.save();
-                }else{
+                } else {
                     deviceVersion.updateAll("serialNumber = ?", serialNumber);
                 }
 
-              //  updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/2.0.0.txt";
-                Intent intent=new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
-                intent.putExtra("updateFileURL",updateFileURL);
-                intent.putExtra("serialNumber",serialNumber);
+                //  updateFileURL="http://10.10.58.252:8080/cssiot-gzz02/2.0.0.txt";
+                Intent intent = new Intent(MyApplication.getInstance().getCurrentActivity(), DownLoadService.class);
+                intent.putExtra("updateFileURL", updateFileURL);
+                intent.putExtra("serialNumber", serialNumber);
                 MyApplication.getInstance().getCurrentActivity().startService(intent);
 
             }
-        }else{//一致
+        } else {//一致
             //删除数据库的数据
-            if(flag==0){//app
+            if (flag == 0) {//app
 
-            }else {//主机、从机
+            } else {//主机、从机
                 String serialNumber;
                 if (mDevice2.equals("0")) {//主机
                     serialNumber = mDevice1;
@@ -276,10 +277,10 @@ public class ProtocolPackage {
         }
     }
 
-    public void setUpdateVersionData(List<String> localVerData, int flag, String  updateFileURL){
-        this.localVerData=localVerData;
-        this.flag=flag;
-        this.updateFileURL=updateFileURL;
+    public void setUpdateVersionData(List<String> localVerData, int flag, String updateFileURL) {
+        this.localVerData = localVerData;
+        this.flag = flag;
+        this.updateFileURL = updateFileURL;
         updateVersion();
     }
 

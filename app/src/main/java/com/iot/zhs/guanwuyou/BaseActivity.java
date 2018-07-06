@@ -20,6 +20,7 @@ import com.umeng.analytics.MobclickAgent;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class BaseActivity extends AppCompatActivity {
         // 设置为U-APP场景
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
 
-        ViewGroup viewGroup = (ViewGroup)getWindow().getDecorView();
+        ViewGroup viewGroup = (ViewGroup) getWindow().getDecorView();
         LinearLayout menuLayout = new LinearLayout(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
@@ -66,6 +67,17 @@ public class BaseActivity extends AppCompatActivity {
 
                 List<SlaveDevice> slaveDeviceList = new ArrayList<>();
                 List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
+
+                Iterator<SlaveDevice> it = savedDeviceList.iterator();
+                while (it.hasNext()) {
+                    SlaveDevice slaveDevice = it.next();
+                    if (slaveDevice.getSerialNumber().equals("") || slaveDevice.getSerialNumber().equals("0")) {
+                        it.remove();//remove the current item
+                        //删除数据库里面的
+                        DataSupport.deleteAll(SlaveDevice.class, "serialNumber = ?", slaveDevice.getSerialNumber());
+                    }
+                }
+
                 //主机
                 SlaveDevice masterDevice = new SlaveDevice();
                 masterDevice.setSerialNumber(MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn());
@@ -73,21 +85,21 @@ public class BaseActivity extends AppCompatActivity {
                 masterDevice.setOnline("1");
                 masterDevice.setAlarm("0");
                 masterDevice.setComm("1");
-                masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery()+"");
+                masterDevice.setBattery(MyApplication.getInstance().getSpUtils().getKeyMasterBattery() + "");
                 slaveDeviceList.add(0, masterDevice);
                 //从机
                 String[] serialNumberList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
-                for(String sn: serialNumberList) {
+                for (String sn : serialNumberList) {
                     Log.d(TAG, "### saved serial list " + sn);
                     boolean isExist = false;
                     int i;
-                    for(i = 0; i < savedDeviceList.size(); i++) {
-                        if(sn.equals(savedDeviceList.get(i).getSerialNumber())) {
+                    for (i = 0; i < savedDeviceList.size(); i++) {
+                        if (sn.equals(savedDeviceList.get(i).getSerialNumber())) {
                             isExist = true;
                             break;
                         }
                     }
-                    if(isExist) {
+                    if (isExist) {
                         slaveDeviceList.add(savedDeviceList.get(i));
                     } else {
                         SlaveDevice lostDevice = new SlaveDevice();
@@ -104,19 +116,21 @@ public class BaseActivity extends AppCompatActivity {
                     }
                 }
                 //标定仪
-                int j=0;
-                for(j = 0; j < savedDeviceList.size(); j++) {
-                    String slaveSn=savedDeviceList.get(j).getSerialNumber();
-                    if(!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")){
-                        if(slaveSn.equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())){//区分标定仪
+                int j = 0;
+                for (j = 0; j < savedDeviceList.size(); j++) {
+                    String slaveSn = savedDeviceList.get(j).getSerialNumber();
+                    if (!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")
+                            &&!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("0")) {
+                        if (slaveSn.equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())) {//区分标定仪
                             savedDeviceList.get(j).setSlaveOrMaster("2");
+                            savedDeviceList.get(j).setMotorStatus("1");//标定仪没有稳流器
                             slaveDeviceList.add(savedDeviceList.get(j));
                             break;
                         }
                     }
                 }
 
-                for(SlaveDevice device: slaveDeviceList) {
+                for (SlaveDevice device : slaveDeviceList) {
                     Log.d(TAG, "### serialNumber: " + device.getSerialNumber());
                     Log.d(TAG, "### online: " + device.getOnline());
                     Log.d(TAG, "### alarm: " + device.getAlarm());
