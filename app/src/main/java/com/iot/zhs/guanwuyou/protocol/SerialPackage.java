@@ -713,6 +713,28 @@ public class SerialPackage {
                             }
                         }
                     });
+        }else if(mOperation.equals("motor0")||mOperation.equals("motor1")||mOperation.equals("motor2")){
+            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
+                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                    mDeviceId1, mOperation, "none", mData.size(), mData);
+            Log.d(TAG, "-> " + pkg.toString());
+            Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
+                @Override
+                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                }
+            });
+        } else if(mOperation.equals("err")){
+            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
+                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                    mDeviceId1, "err", "none", mData.size(), mData);
+            Log.d(TAG, "-> " + pkg.toString());
+            Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
+                @Override
+                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                }
+            });
         }
     }
 

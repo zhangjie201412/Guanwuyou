@@ -405,6 +405,9 @@ public class SharedPreferenceUtils {
             val=val.substring(0,val.length()-1);//star--去除最后一个,
             mEditor.putString(KEY_MATCH_LIST, val);
             mEditor.commit();
+        }else{
+            mEditor.putString(KEY_MATCH_LIST, "");
+            mEditor.commit();
         }
     }
 

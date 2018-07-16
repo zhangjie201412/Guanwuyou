@@ -32,15 +32,15 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
         for (SlaveDevice slaveDevice : savedDeviceList) {
             slaveDevice.setOnline("0");//离线
-            slaveDevice.setComm("0");//异常
-            slaveDevice.setVersionStatus("0");
-            slaveDevice.setSensorStatus("0");
-            slaveDevice.setMotorStatus("0");
+            slaveDevice.setComm("2");//异常--未获取
+            slaveDevice.setVersionStatus("2");
+            slaveDevice.setSensorStatus("2");
+            slaveDevice.setMotorStatus("2");
             slaveDevice.setSlaveOrMaster("1");
             if (!MyApplication.getInstance().getSpUtils().getKeyCalMac().equals("")) {//区分标定仪
                 if (slaveDevice.getSerialNumber().equals(MyApplication.getInstance().getSpUtils().getKeyCalMac())) {
                     slaveDevice.setSlaveOrMaster("2");
-                    slaveDevice.setMotorStatus("1");
+                    slaveDevice.setMotorStatus("2");
                 }
             }
             slaveDevice.updateAll("serialNumber = ?", slaveDevice.getSerialNumber());

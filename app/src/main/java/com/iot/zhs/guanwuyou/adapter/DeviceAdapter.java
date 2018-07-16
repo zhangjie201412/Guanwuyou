@@ -90,6 +90,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             holder.deviceLastRunTimeTv.setText(masterDevice.lastRunTime);
             holder.deviceLastErrorKeyTv.setText("最后的错误代码");
             holder.deviceLastErrorTv.setText(masterDevice.errCode);
+            holder.deviceLastErrorKeyTv.setVisibility(View.VISIBLE);
+            holder.deviceLastErrorTv.setVisibility(View.VISIBLE);
             if(!Utils.stringIsEmpty(masterDevice.deviceVer)) {
                 holder.deviceVerTv.setText("V" + masterDevice.deviceVer);
             }else{
@@ -122,8 +124,10 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             }
             holder.deviceSNTv.setText(slaveDevice.slaveDeviceSN);
             holder.deviceLastRunTimeTv.setText(slaveDevice.lastRunTime);
-            holder.deviceLastErrorKeyTv.setText("传感器使用次数");
-            holder.deviceLastErrorTv.setText(slaveDevice.runTimes);
+            /*holder.deviceLastErrorKeyTv.setText("传感器使用次数");
+            holder.deviceLastErrorTv.setText(slaveDevice.runTimes);*/
+            holder.deviceLastErrorKeyTv.setVisibility(View.INVISIBLE);
+            holder.deviceLastErrorTv.setVisibility(View.INVISIBLE);
             if(!Utils.stringIsEmpty(slaveDevice.deviceVer)) {
                 holder.deviceVerTv.setText("V" + slaveDevice.deviceVer);
             }else{
@@ -187,6 +191,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         int count = 0;
         if (masterDevice != null && !Utils.listIsEmpty(slaveDevices)) {
             count = slaveDevices.size() + 1;
+        }
+        if(masterDevice!=null && Utils.listIsEmpty(slaveDevices)){
+            count=1;
         }
         return count;
     }

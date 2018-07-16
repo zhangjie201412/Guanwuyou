@@ -90,29 +90,31 @@ public class BaseActivity extends AppCompatActivity {
                 //从机
                 String[] serialNumberList = MyApplication.getInstance().getSpUtils().getKeyMatchList();
                 for (String sn : serialNumberList) {
-                    Log.d(TAG, "### saved serial list " + sn);
-                    boolean isExist = false;
-                    int i;
-                    for (i = 0; i < savedDeviceList.size(); i++) {
-                        if (sn.equals(savedDeviceList.get(i).getSerialNumber())) {
-                            isExist = true;
-                            break;
+                    if(!sn.equals("")) {
+                        Log.d(TAG, "### saved serial list " + sn);
+                        boolean isExist = false;
+                        int i;
+                        for (i = 0; i < savedDeviceList.size(); i++) {
+                            if (sn.equals(savedDeviceList.get(i).getSerialNumber())) {
+                                isExist = true;
+                                break;
+                            }
                         }
-                    }
-                    if (isExist) {
-                        slaveDeviceList.add(savedDeviceList.get(i));
-                    } else {
-                        SlaveDevice lostDevice = new SlaveDevice();
-                        lostDevice.setSerialNumber(sn);
-                        lostDevice.setSlaveOrMaster("1");
-                        lostDevice.setOnline("0");
-                        lostDevice.setAlarm("0");
-                        lostDevice.setComm("0");
-                        lostDevice.setBattery("0");
-                        lostDevice.setVersionStatus("0");
-                        lostDevice.setSensorStatus("0");
-                        lostDevice.setMotorStatus("0");
-                        slaveDeviceList.add(lostDevice);
+                        if (isExist) {
+                            slaveDeviceList.add(savedDeviceList.get(i));
+                        } else {
+                            SlaveDevice lostDevice = new SlaveDevice();
+                            lostDevice.setSerialNumber(sn);
+                            lostDevice.setSlaveOrMaster("1");
+                            lostDevice.setOnline("0");
+                            lostDevice.setAlarm("0");
+                            lostDevice.setComm("2");//未获取
+                            lostDevice.setBattery("0");
+                            lostDevice.setVersionStatus("2");
+                            lostDevice.setSensorStatus("2");
+                            lostDevice.setMotorStatus("2");
+                            slaveDeviceList.add(lostDevice);
+                        }
                     }
                 }
                 //标定仪

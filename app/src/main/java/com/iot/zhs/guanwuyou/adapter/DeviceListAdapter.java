@@ -62,6 +62,8 @@ public class DeviceListAdapter extends BaseAdapter {
         }
         holder.serialNumber.setText(mSlaveDeviceList.get(i).getSerialNumber());
         holder.battery.setText("" + mSlaveDeviceList.get(i).getBattery() + "%");
+        holder.battery.setTextColor(Color.parseColor("#0FD2AE"));
+
         if(mSlaveDeviceList.get(i).getOnline() .equals("1")) {
             holder.online.setText("[在线]");
         } else {
@@ -80,7 +82,7 @@ public class DeviceListAdapter extends BaseAdapter {
             holder.comm.setText("正常");
             holder.comm.setTextColor(Color.parseColor("#0FD2AE"));
             holder.commDetail.setVisibility(View.GONE);
-        } else {
+        } else  if(mSlaveDeviceList.get(i).getComm().equals("0")){
             holder.comm.setText("异常");
             holder.comm.setTextColor(Color.parseColor("#ED6663"));
             holder.commDetail.setVisibility(View.VISIBLE);
@@ -103,6 +105,12 @@ public class DeviceListAdapter extends BaseAdapter {
             }else{
                 holder.commDetail.setText(detailStr);
             }
+        } else if(mSlaveDeviceList.get(i).getComm().equals("2")){//未获取
+            holder.comm.setText("未获取");
+            holder.comm.setTextColor(Color.parseColor("#ED6663"));
+            holder.commDetail.setVisibility(View.GONE);
+            holder.battery.setText("未获取");
+            holder.battery.setTextColor(Color.parseColor("#ED6663"));
         }
 
         if(mSlaveDeviceList.get(i).getSlaveOrMaster() .equals("1")) {
