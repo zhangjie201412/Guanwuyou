@@ -47,6 +47,7 @@
         </receiver>
 
         <service android:name=".service.NetworkMonitorService" />
+        <service android:name=".service.GPIOService" />
 
 
         <activity

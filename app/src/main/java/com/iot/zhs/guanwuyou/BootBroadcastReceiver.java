@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.os.UserHandle;
 import android.util.Log;
 
+import com.iot.jnitest.JNITest;
 import com.iot.zhs.guanwuyou.database.PileCalValue;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
+import com.iot.zhs.guanwuyou.service.GPIOService;
 import com.iot.zhs.guanwuyou.service.NetworkMonitorService;
 
 import org.litepal.crud.DataSupport;
@@ -48,6 +50,15 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 
         Intent service = new Intent(context, NetworkMonitorService.class);
         context.startService(service);
+
+        JNITest jniTest=new JNITest();
+        int powerOnPin=jniTest.getPowerOnPinValue();//检测到开机
+        if(powerOnPin==1){
+            jniTest.setCpuAndLoraValue(1,1);
+        }
+
+        Intent gpioService = new Intent(context, GPIOService.class);
+        context.startService(gpioService);
 
         Log.d(TAG, "开机更新成功");
     }

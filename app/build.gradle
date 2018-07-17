@@ -9,6 +9,14 @@ android {
         versionCode 1
         versionName "3.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk{
+            moduleName "iot_sample"
+        }
+        sourceSets.main{
+            jni.srcDirs = []
+            jniLibs.srcDir "src/main/libs"
+        }
     }
     buildTypes {
         release {
@@ -21,6 +29,7 @@ android {
             path "CMakeLists.txt"
         }
     }
+    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jni/'] } }
 }
 
 dependencies {
