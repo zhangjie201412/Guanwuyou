@@ -517,6 +517,8 @@ public class SerialPackage {
                 device.updateAll("serialNumber = ?", mDeviceId1);
             }
 
+           // List<SlaveDevice> savedDeviceList = DataSupport.findAll(SlaveDevice.class);
+
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "usenodesta", "none", mData.size(), mData);
@@ -717,7 +719,7 @@ public class SerialPackage {
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, mOperation, "none", mData.size(), mData);
-            Log.d(TAG, "-> " + pkg.toString());
+            Log.d(TAG, "-> " + pkg.toString());//cssp,4516,0,SN0301201304260001,SN0302201504230003,motor0,none,3,0,0,93,63
             Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
                 @Override
                 public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
@@ -728,7 +730,7 @@ public class SerialPackage {
             ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
                     "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
                     mDeviceId1, "err", "none", mData.size(), mData);
-            Log.d(TAG, "-> " + pkg.toString());
+            Log.d(TAG, "-> " + pkg.toString());//>>cssp,2596,0,SN0301201304260001,SN0302201504230003,err,none,1,15,5f
             Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
                 @Override
                 public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {

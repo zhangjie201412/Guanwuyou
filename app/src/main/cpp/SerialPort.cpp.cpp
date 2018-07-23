@@ -19,6 +19,22 @@
 #define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, TAG, fmt, ##args)
 #define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##args)
 
+
+#define IOT_POWER_ON_PIN    171
+#define IOT_CPU_ON_PIN      103
+#define IOT_LORA_EN_PIN     38
+
+struct iot_gpio_cmd {
+    int gpio;
+    int value;
+};
+
+#define IOT_MAGIC 'I'
+#define IOT_SET_GPIO        _IOR(IOT_MAGIC, 0x01, struct iot_gpio_cmd)
+#define IOT_GET_GPIO        _IOWR(IOT_MAGIC, 0x02, struct iot_gpio_cmd)
+
+#define IOT_DEV_PATH        "/dev/iot"
+
 static speed_t getBaudrate(jint baudrate) {
     switch (baudrate) {
         case 0:
@@ -173,4 +189,68 @@ JNIEXPORT void JNICALL Java_com_iot_serialport_SerialPort_close
 
     LOGD("close(fd = %d)", descriptor);
     close(descriptor);
+}
+
+
+
+int gpio_set_value(int fd, struct iot_gpio_cmd *cmd)
+{
+    return ioctl(fd, IOT_SET_GPIO, cmd);
+}
+
+int gpio_get_value(int fd, struct iot_gpio_cmd *cmd)
+{
+    return ioctl(fd, IOT_GET_GPIO, cmd);
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_iot_serialport_SerialPort_setCpuAndLoraValue(JNIEnv *env, jobject instance, jint cpu,
+                                                jint lora) {
+
+    // TODO
+    int fd = -1;
+    struct iot_gpio_cmd cmd;
+
+    fd = open(IOT_DEV_PATH, O_RDWR);
+    if(fd < 0) {
+        printf("failed to open %s\n", IOT_DEV_PATH);
+        return -1;
+    }
+
+    cmd.gpio = IOT_LORA_EN_PIN;
+    cmd.value = cpu;
+    int a=gpio_set_value(fd, &cmd);
+
+
+    cmd.gpio = IOT_CPU_ON_PIN;
+    cmd.value = lora;
+    int b=gpio_set_value(fd, &cmd);
+
+    close(fd);
+    return 0;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_iot_serialport_SerialPort_getPowerOnPinValue(JNIEnv *env, jobject instance) {
+
+    // TODO
+    int fd = -1;
+    struct iot_gpio_cmd cmd;
+
+    fd = open(IOT_DEV_PATH, O_RDWR);
+    if(fd < 0) {
+        printf("failed to open %s\n", IOT_DEV_PATH);
+        return -1;
+    }
+
+    cmd.gpio = IOT_POWER_ON_PIN;
+    cmd.value = 0;
+    gpio_get_value(fd, &cmd);
+    printf("power on pin get value: %d\n", cmd.value);
+
+    close(fd);
+    return cmd.value;
+
 }

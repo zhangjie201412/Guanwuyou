@@ -26,6 +26,7 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.litepal.util.LogUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,8 @@ public class SerialService extends Service {
     private MtrsdThread mMtrsdThread;
     private MyApplication mApplication;
     private SharedPreferenceUtils mSpUtils;
+
+    private int gpioCount = 0;
 
     private ISerialPort.Stub mBinder = new ISerialPort.Stub() {
         @Override
@@ -209,6 +212,9 @@ public class SerialService extends Service {
         mHeartBeatThread = new HeartBeatThread();
         mHeartBeatThread.start();
 
+       /* GPIOThread gpioThread = new GPIOThread();
+        gpioThread.start();*/
+
         EventBus.getDefault().register(this);
     }
 
@@ -233,7 +239,7 @@ public class SerialService extends Service {
                 Log.d(TAG, "中控发送给主机的协议：" + event.message);
                 mOutput.write(event.message.getBytes());
             } catch (IOException e) {
-                Log.d(TAG,"中控发送给主机error:"+e.getMessage());
+                Log.d(TAG, "中控发送给主机error:" + e.getMessage());
                 e.printStackTrace();
             }
         } else if (event.type == MessageEvent.EVENT_TYPE_ERROR_UART) {
@@ -296,8 +302,8 @@ public class SerialService extends Service {
 //                        Log.d(TAG, String.format("Read %d bytes: %s", length, new String(buffer)));
                         process();
                     } else {
-                       // Log.d(TAG,"休眠");
-                       // Thread.sleep(100);
+                        // Log.d(TAG,"休眠");
+                        // Thread.sleep(100);
                     }
                 } catch (IOException e) {
                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
@@ -407,4 +413,29 @@ public class SerialService extends Service {
             }
         }
     }
+
+
+    private class GPIOThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+               // Log.d(TAG, "GPIO");
+
+                //int powerOnPin = mSerialPort.getPowerOnPinValue();//检测
+                /*Log.d("powerOnPin", "powerOnPin=" + powerOnPin);
+
+                if (gpioCount == 0) {
+                    gpioCount = -1;
+                    if (powerOnPin == 1) {//用户关机
+                        mSerialPort.setCpuAndLoraValue(1, 1);
+                    }
+                }
+                if (powerOnPin == 0) {//用户开机
+                    mSerialPort.setCpuAndLoraValue(0, 0);
+                }*/
+            }
+        }
+    }
+
 }

@@ -46,8 +46,8 @@ public class Utils {
     public static final int MASTER_HAS_REPORT_CHECK_REPORT1 = 1;
     public static final int MASTER_HAS_REPORT_CHECK_REPORT2 = 2;
 
-    public static final String SERVER_ADDR = "http://61.177.48.122:8181";
-    // public static final String SERVER_ADDR = "http://10.10.18.128:8081";//星星
+    //public static final String SERVER_ADDR = "http://61.177.48.122:8181";
+     public static final String SERVER_ADDR = "http://10.10.18.128:8081";//星星
     // public static final String SERVER_ADDR = "http://10.10.58.242:8081";//小童
 
 

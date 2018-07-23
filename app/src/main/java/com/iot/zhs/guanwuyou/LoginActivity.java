@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -24,8 +23,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
-import com.iot.zhs.guanwuyou.comm.http.PileMapInfo;
-import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.service.NetworkMonitorService;
 import com.iot.zhs.guanwuyou.utils.Constant;
 import com.iot.zhs.guanwuyou.utils.DisplayUtil;
@@ -34,17 +31,11 @@ import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.umeng.analytics.MobclickAgent;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
-import com.zhy.http.okhttp.callback.StringCallback;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.litepal.crud.DataSupport;
-
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -164,6 +155,14 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent service = new Intent(this, NetworkMonitorService.class);
         startService(service);
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //SlaveUtils.resetSlave();
     }
 
     /**

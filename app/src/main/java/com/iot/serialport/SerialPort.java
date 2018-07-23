@@ -51,4 +51,8 @@ public class SerialPort {
     static {
         System.loadLibrary("serial_port");
     }
+
+
+    public native int getPowerOnPinValue();
+    public native int setCpuAndLoraValue(int cpu,int lora);
 }
