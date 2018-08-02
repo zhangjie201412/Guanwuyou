@@ -35,7 +35,10 @@
             android:layout_marginTop="22px"
             android:hint="请输入您的用户名"
             android:textColorHint="#b0b3c1"
-            android:maxLength="11" />
+            android:maxLength="11"
+            android:inputType="number"
+            android:singleLine="true"
+            android:imeOptions="actionDone" />
 
         <TextView
             android:id="@+id/tv_password_title"
@@ -50,12 +53,14 @@
         <EditText
             android:id="@+id/et_password"
             android:layout_width="400px"
-            android:inputType="numberPassword"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_password_title"
             android:layout_marginTop="22px"
             android:hint="请输入您的用户名密码"
-            android:textColorHint="#b0b3c1" />
+            android:textColorHint="#b0b3c1"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:imeOptions="actionDone" />
 
         <Button
             android:id="@+id/bt_login"

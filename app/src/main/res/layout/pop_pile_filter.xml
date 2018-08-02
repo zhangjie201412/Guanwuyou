@@ -97,7 +97,10 @@
                             android:background="@null"
                             android:hint="请输入"
                             android:textColorHint="#b0b3c1"
-                            android:textColor="#4e585c"                            android:textSize="22px" />
+                            android:textColor="#4e585c"
+                            android:textSize="22px"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone"/>
 
                         <TextView
                             android:id="@+id/center_divider_tv"
@@ -126,7 +129,9 @@
                             android:background="@null"
                             android:hint="请输入"
                             android:textColor="#b0b3c1"
-                            android:textSize="22px" />
+                            android:textSize="22px"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone"/>
                     </RelativeLayout>
 
 

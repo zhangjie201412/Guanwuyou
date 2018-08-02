@@ -40,28 +40,30 @@ public class DownLoadService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent.getStringExtra("updateFileURL")!=null) {
-            updateFileURL = intent.getStringExtra("updateFileURL");
-        }
-        if (intent.getStringExtra("serialNumber") != null) {
-            serialNumber = intent.getStringExtra("serialNumber");
-        }
+        if (intent != null) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                new DowloadFileUtils(MyApplication.getInstance().getCurrentActivity()).downloadFile(serialNumber ,updateFileURL,
-                        new DowloadFileUtils.DownLoadFileListener() {
-                            @Override
-                            public void success(String filePath) {
-                                DownLoadService.this.stopSelf();
-                            }
-                        });
+            if (intent.getStringExtra("updateFileURL") != null) {
+                updateFileURL = intent.getStringExtra("updateFileURL");
             }
-        }).start();
+            if (intent.getStringExtra("serialNumber") != null) {
+                serialNumber = intent.getStringExtra("serialNumber");
+            }
 
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
 
+                    new DowloadFileUtils(MyApplication.getInstance().getCurrentActivity()).downloadFile(serialNumber, updateFileURL,
+                            new DowloadFileUtils.DownLoadFileListener() {
+                                @Override
+                                public void success(String filePath) {
+                                    DownLoadService.this.stopSelf();
+                                }
+                            });
+                }
+            }).start();
+
+        }
         return super.onStartCommand(intent, flags, startId);
 
     }

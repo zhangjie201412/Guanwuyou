@@ -1,5 +1,6 @@
 package com.iot.zhs.guanwuyou.view;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -85,8 +86,12 @@ public class PileListFilterPopupWindow extends PopupWindow implements View.OnCli
         // 设置SelectPicPopupWindow弹出窗体的高
         //this.setHeight(LinearLayout.LayoutParams.MATCH_PARENT);
         //popup的高度 = 屏幕高度-系统状态栏高度-app的标题栏高度
-        int height = Constant.display.heightPixels - Constant.display.statusBarHeightPixels - 70;
+      //  int height = Constant.display.heightPixels - Constant.display.statusBarHeightPixels - 70;
+        int height = Constant.display.heightPixels - 70;
+
+
         this.setHeight(height);
+
 
         // 设置SelectPicPopupWindow弹出窗体可点击
         this.setFocusable(true);

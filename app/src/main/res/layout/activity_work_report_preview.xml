@@ -149,7 +149,9 @@
                 android:enabled="false"
                 android:inputType="number"
                 android:textColor="#818181"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -177,7 +179,9 @@
                 android:enabled="false"
                 android:inputType="number"
                 android:textColor="#818181"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -206,7 +210,9 @@
                 android:inputType="number"
                 android:textColor="#818181"
                 android:textColorHint="#b0b3c1"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -235,7 +241,9 @@
                 android:inputType="numberDecimal"
                 android:textColor="#818181"
                 android:textColorHint="#b0b3c1"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -292,7 +300,9 @@
                 android:inputType="numberDecimal"
                 android:textColor="#818181"
                 android:textColorHint="#b0b3c1"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -348,7 +358,9 @@
                 android:inputType="number"
                 android:textColor="#818181"
                 android:textColorHint="#b0b3c1"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -377,7 +389,9 @@
                 android:inputType="number"
                 android:textColor="#818181"
                 android:textColorHint="#b0b3c1"
-                android:textSize="22px" />
+                android:textSize="22px"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </RelativeLayout>
 
     </LinearLayout>

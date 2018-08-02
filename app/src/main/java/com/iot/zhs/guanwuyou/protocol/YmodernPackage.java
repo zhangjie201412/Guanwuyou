@@ -242,8 +242,9 @@ public class YmodernPackage {
         long fileLength = getFileSize(file);
         count = (int) (fileLength / STX_PACKET_SIZE);
         lastPackageSize = (int) (fileLength % STX_PACKET_SIZE);
-        char[] fileSizeChar = Long.toHexString(fileLength).toCharArray();//400
-        byte[] fileSizeByte = new String(fileSizeChar).getBytes();
+       /* char[] fileSizeChar = Long.toHexString(fileLength).toCharArray();//400
+        byte[] fileSizeByte = new String(fileSizeChar).getBytes();*/ //先转成16进制，在转ascii
+        byte[] fileSizeByte=(fileLength+"").getBytes();
         int fileSizeLength = fileSizeByte.length;
         System.arraycopy(fileSizeByte, 0, m_package, PACKET_HEADER + fileNameLength + 1, fileSizeLength);
         m_package[PACKET_HEADER + fileNameLength + 1 + fileSizeLength] = 0x00;
