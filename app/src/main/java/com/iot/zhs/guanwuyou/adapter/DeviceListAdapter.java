@@ -71,10 +71,10 @@ public class DeviceListAdapter extends BaseAdapter {
         }
         if(mSlaveDeviceList.get(i).getAlarm() .equals("0")) {
             holder.alarm.setVisibility(View.INVISIBLE);
-        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("1")) {
+        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("1")) {//预警
             holder.alarm.setVisibility(View.VISIBLE);
-            holder.alarm.setImageResource(R.mipmap.ic_red);
-        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("2")) {
+            holder.alarm.setImageResource(R.mipmap.ic_yello);
+        } else if(mSlaveDeviceList.get(i).getAlarm() .equals("2")) {//报喜
             holder.alarm.setVisibility(View.VISIBLE);
             holder.alarm.setImageResource(R.mipmap.ic_green);
         }
