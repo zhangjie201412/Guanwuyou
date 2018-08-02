@@ -55,8 +55,17 @@ public class DowloadFileUtils {
 
       //  mProgressDialog.show();
 
-        String[] urlArray=url.split("/");
-        String fileName = urlArray[urlArray.length-1];
+        if(Utils.stringIsEmpty(url)){
+            return;
+        }
+        String fileName = null;
+        if(url.contains("/")) {
+            String[] urlArray = url.split("/");
+            fileName = urlArray[urlArray.length-1];
+        }
+        if(Utils.stringIsEmpty(fileName)){
+            return;
+        }
         File file = new File(BASE_PATH);
         if (!file.exists()) {
             file.mkdir();

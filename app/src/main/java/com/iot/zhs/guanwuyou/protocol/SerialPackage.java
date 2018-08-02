@@ -137,49 +137,50 @@ public class SerialPackage {
     public void parse() {
         //parse the raw data
         Log.d(TAG, "SerialPackage--parse: " + mRawData);
-        String[] msg = mRawData.split(",");
-        if (msg.length < 10) {
-            for (int i = 0; i < msg.length; i++) {
-                Log.d(TAG, String.format("[%d] = %s", i, msg[i]));
+        if(mRawData.contains(",")) {
+            String[] msg = mRawData.split(",");
+            if (msg.length < 10) {
+                for (int i = 0; i < msg.length; i++) {
+                    Log.d(TAG, String.format("[%d] = %s", i, msg[i]));
+                }
+                Log.e(TAG, "#### parse raw data invalid");
+                return;
             }
-            Log.e(TAG, "#### parse raw data invalid");
-            return;
-        }
-        try {
-            mSyncId = Integer.valueOf(msg[1]);
-        } catch (Exception e) {
-            return;
-        }
-        mDeviceId0 = msg[2];
-//        mDeviceId0 = "SN0301201601010001";
-//        mDeviceId0 = "SN0303201611091873";
-        mDeviceId1 = msg[3];
-        try {
-            mHandle = Integer.valueOf(msg[4]);
-        } catch (Exception e) {
-            return;
-        }
-        mOperation = msg[5];
-        if (msg[6].equals("none"))
-            mType = TYPE_NONE;
-        else if (msg[6].equals("get"))
-            mType = TYPE_GET;
-        else if (msg[6].equals("set"))
-            mType = TYPE_SET;
-        try {
-            mDataNum = Integer.valueOf(msg[7]);
-        } catch (Exception e) {
-            return;
-        }
-
-        for (int i = 0; i < mDataNum; i++) {
             try {
-                mData.add(msg[8 + i]);
+                mSyncId = Integer.valueOf(msg[1]);
             } catch (Exception e) {
                 return;
             }
-        }
+            mDeviceId0 = msg[2];
+//        mDeviceId0 = "SN0301201601010001";
+//        mDeviceId0 = "SN0303201611091873";
+            mDeviceId1 = msg[3];
+            try {
+                mHandle = Integer.valueOf(msg[4]);
+            } catch (Exception e) {
+                return;
+            }
+            mOperation = msg[5];
+            if (msg[6].equals("none"))
+                mType = TYPE_NONE;
+            else if (msg[6].equals("get"))
+                mType = TYPE_GET;
+            else if (msg[6].equals("set"))
+                mType = TYPE_SET;
+            try {
+                mDataNum = Integer.valueOf(msg[7]);
+            } catch (Exception e) {
+                return;
+            }
 
+            for (int i = 0; i < mDataNum; i++) {
+                try {
+                    mData.add(msg[8 + i]);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+        }
         MyApplication.getInstance().getSpUtils().setKeyLoginMasterDeviceSn(mDeviceId0);
         if (mOperation.equals("sn")) {
             Log.d(TAG, "set master sn: " + mDeviceId0);

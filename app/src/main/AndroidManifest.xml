@@ -105,6 +105,14 @@
             </intent-filter>
         </service>
         <service
+            android:name=".service.YmodernService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.iot.zhs.guanwuyou.service.YmodernService" />
+            </intent-filter>
+        </service>
+        <service
             android:name=".service.DownLoadService"
             android:enabled="true"
             android:exported="true">

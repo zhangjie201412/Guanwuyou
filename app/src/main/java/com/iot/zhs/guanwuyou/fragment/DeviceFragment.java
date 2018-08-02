@@ -20,21 +20,28 @@ import com.iot.zhs.guanwuyou.PileListActivity;
 import com.iot.zhs.guanwuyou.R;
 import com.iot.zhs.guanwuyou.adapter.DeviceAdapter;
 import com.iot.zhs.guanwuyou.comm.http.DeviceModel;
+import com.iot.zhs.guanwuyou.database.AlarmState;
 import com.iot.zhs.guanwuyou.database.DeviceVersion;
 import com.iot.zhs.guanwuyou.database.SlaveDevice;
 import com.iot.zhs.guanwuyou.item.DeviceItem;
+import com.iot.zhs.guanwuyou.protocol.YmodernPackage;
 import com.iot.zhs.guanwuyou.service.DownLoadService;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.NotificationDialog;
+import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
@@ -62,6 +69,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     private NotificationDialog mNotificationDialog;
 
     private ImageView loginOutIv;
+    private WaitProgressDialog mProgressDialog;
 
     public static  DeviceFragment deviceFragment;
     public static  DeviceFragment getIntance(){
@@ -74,6 +82,8 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         deviceFragment=this;
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
+        mProgressDialog = new WaitProgressDialog(getContext());
+
 
         projectNameTv=view.findViewById(R.id.tv_project_title);
         projectNameTv.setText(mSpUtils.getKeyLoginProjectName());
@@ -123,6 +133,13 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     public void onStart() {
         super.onStart();
         Log.i(TAG,"--onStart--");
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     public void doQuery(){
@@ -175,6 +192,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                 for(DeviceVersion deviceVersion:deviceVersionList){
                     if(masterDevice.masterDeviceSN.equals(deviceVersion.getSerialNumber())){
                         showTips(0,"[主机]有新版本"+deviceVersion.getVersion()+"可用，是否安装更新?",deviceVersion);
+
                         break;
                     }
                 }
@@ -196,7 +214,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         }
     }
 
-    private void showTips(int flag, String message, final DeviceVersion deviceVersion){
+    private void showTips(final int flag, String message, final DeviceVersion deviceVersion){
         mNotificationDialog = new NotificationDialog();
         mNotificationDialog.init("提醒",
                 "是",
@@ -206,13 +224,25 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                     public void onButtonClick(int id) {
                         //响应左边的button
                         if (id == 1) {
-                            /*String rsp = makeResponse("matchlist", dataList);
-                            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_WRITE);
-                            event.message = rsp;
-                            EventBus.getDefault().post(event);*/
+                          //  mProgressDialog.show();
 
-                          //  DataSupport.deleteAll(DeviceVersion.class, "serialNumber = ?", deviceVersion.getSerialNumber());
+                            YmodernPackage ymodernPackage=YmodernPackage.getInstance();
 
+                            if(flag==0){//主机
+                                ymodernPackage.setUpdateFlag(0);
+                                ymodernPackage.setFilePath(deviceVersion.getLocalURL());
+
+                                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
+                                event.message = "firmware update master\r\n";
+                                EventBus.getDefault().post(event);
+                            }else{//从机
+                                ymodernPackage.setUpdateFlag(1);
+                                ymodernPackage.setFilePath(deviceVersion.getLocalURL());
+
+                                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
+                                event.message = "firmware update slave\r\n";
+                                EventBus.getDefault().post(event);
+                            }
                             mNotificationDialog.dismiss();
                         } else if (id == 2) {
                             mNotificationDialog.dismiss();
@@ -258,4 +288,22 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                         new SelectSlaveDeviceInfo()
                 );
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Log.d(TAG, "event: " + event.type + ", message: " + event.message);
+        if (event.type == MessageEvent.EVENT_TYPE_MASTER_UPDATE_SUCCESS) {
+          if(mProgressDialog!=null&&mProgressDialog.isShowing()){
+              mProgressDialog.dismiss();
+          }
+        }
+        if(event.type==MessageEvent.EVENT_TYPE_MASTERL_UPDATE_FAIL){
+            if(mProgressDialog!=null&&mProgressDialog.isShowing()){
+                mProgressDialog.dismiss();
+            }
+        }
+    }
+
+
 }

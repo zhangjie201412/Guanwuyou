@@ -16,6 +16,7 @@ import com.iot.zhs.guanwuyou.MyApplication;
 import com.iot.zhs.guanwuyou.comm.http.ProcessProtocolInfo;
 import com.iot.zhs.guanwuyou.protocol.ProtocolPackage;
 import com.iot.zhs.guanwuyou.protocol.SerialPackage;
+import com.iot.zhs.guanwuyou.protocol.YmodernPackage;
 import com.iot.zhs.guanwuyou.utils.DowloadFileUtils;
 import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.SharedPreferenceUtils;

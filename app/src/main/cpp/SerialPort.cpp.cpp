@@ -127,7 +127,8 @@ Java_com_iot_serialport_SerialPort_open(
         jboolean isCopy;
         const char *pathUtf = env->GetStringUTFChars(path, &isCopy);
         LOGD("%s: Opening serial port %s", __func__, pathUtf);
-        fd = ::open("/dev/ttymxc2", O_RDWR/* | O_DIRECT | O_SYNC*/);
+        const char *_path=env->GetStringUTFChars(path, 0);
+        fd = ::open(_path, O_RDWR/* | O_DIRECT | O_SYNC*/);
         env->ReleaseStringUTFChars(path, pathUtf);
         if(fd < 0) {
             LOGE("%s: Failed to open %s, fd = %d, %s", __func__, pathUtf, fd, ::strerror(errno));

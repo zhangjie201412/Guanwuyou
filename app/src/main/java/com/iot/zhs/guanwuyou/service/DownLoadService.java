@@ -40,7 +40,9 @@ public class DownLoadService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        updateFileURL = intent.getStringExtra("updateFileURL");
+        if(intent.getStringExtra("updateFileURL")!=null) {
+            updateFileURL = intent.getStringExtra("updateFileURL");
+        }
         if (intent.getStringExtra("serialNumber") != null) {
             serialNumber = intent.getStringExtra("serialNumber");
         }

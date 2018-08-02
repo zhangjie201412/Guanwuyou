@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -14,6 +15,8 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -23,15 +26,19 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.comm.http.LoginUserModel;
+import com.iot.zhs.guanwuyou.protocol.YmodernPackage;
 import com.iot.zhs.guanwuyou.service.NetworkMonitorService;
+import com.iot.zhs.guanwuyou.service.YmodernService;
 import com.iot.zhs.guanwuyou.utils.Constant;
 import com.iot.zhs.guanwuyou.utils.DisplayUtil;
+import com.iot.zhs.guanwuyou.utils.MessageEvent;
 import com.iot.zhs.guanwuyou.utils.Utils;
 import com.iot.zhs.guanwuyou.view.WaitProgressDialog;
 import com.umeng.analytics.MobclickAgent;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import okhttp3.Call;
@@ -140,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "password: " + Uri.encode(md51));
         getWidthHeight();
 
-        Intent intent = new Intent("com.iot.zhs.guanwuyou.service.SerialService");
+       Intent intent = new Intent("com.iot.zhs.guanwuyou.service.SerialService");
         intent.setPackage("com.iot.zhs.guanwuyou");
         boolean bound = bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "bound = " + bound);
@@ -156,7 +163,10 @@ public class LoginActivity extends AppCompatActivity {
         Intent service = new Intent(this, NetworkMonitorService.class);
         startService(service);
 
+        Intent service1 = new Intent(this, YmodernService.class);
+        startService(service1);
 
+        //hideBottomUIMenu();
     }
 
     @Override
@@ -186,6 +196,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String username, final String password) {
+        YmodernPackage ymodernPackage=YmodernPackage.getInstance();
+        ymodernPackage.setUpdateFlag(0);
+        ymodernPackage.setFilePath("/storage/emulated/0/AndroidGZZ20/15308452348744b3987a4-07bd-4881-a5e3-7f8b0cc96a3b.bin");
+        MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
+        event.message = "firmware update master\r\n";
+        EventBus.getDefault().post(event);
+
         String encodePassword = Utils.encrypt(Utils.encrypt(password));
         Log.d(TAG, "encode password: " + encodePassword);
         mProgressDialog.show();
@@ -263,11 +280,13 @@ public class LoginActivity extends AppCompatActivity {
                             mProgressDialog.dismiss();
 
                             try {
-                                mSerialManager.setPowerUp();
-                                //   mSerialManager.sendApkVersion();
-                                mSerialManager.matchList();
-                                mSerialManager.requestCalMac();
-                                mSerialManager.requestMode();
+                                if(mSerialManager!=null) {
+                                    mSerialManager.setPowerUp();
+                                    //   mSerialManager.sendApkVersion();
+                                    mSerialManager.matchList();
+                                    mSerialManager.requestCalMac();
+                                    mSerialManager.requestMode();
+                                }
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             }
@@ -302,5 +321,31 @@ public class LoginActivity extends AppCompatActivity {
         MobclickAgent.onPause(this);
     }
 
+    /**
+     * 隐藏虚拟按键，并且全屏
+     */
+    protected void hideBottomUIMenu() {
+        //隐藏虚拟按键，并且全屏
+        /*if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {*/
+            //for new api versions.
+        //去掉虚拟按键全屏显示
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        View decorView = getWindow().getDecorView();
+            int uiOptions =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav
+                    // bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE
+            |View.SYSTEM_UI_FLAG_LOW_PROFILE
+                    |View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY ;
+            decorView.setSystemUiVisibility(uiOptions);
+       // }
+
+    }
 
 }
