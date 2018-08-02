@@ -372,12 +372,12 @@ public class FillingActivity extends BaseActivity {
         public void onResponse(String response, int id) {
             Log.d(TAG, response);
             Gson gson = new Gson();
+
             EndPourInfo info = gson.fromJson(response, EndPourInfo.class);
             String code = info.code;
-//            myApplication.setEndPourInfo(info);
-            mSpUtils.setKeyEndPourInfo(response);
 
             if (code.equals(Utils.MSG_CODE_OK)) {
+                mSpUtils.setKeyEndPourInfo(response);
                 //结束灌注后清空该桩的信息
                 DataSupport.deleteAll(AlarmState.class, "pileId = ?", mPileId);
                 //结束灌注时发送关闭蜂鸣器的指令
