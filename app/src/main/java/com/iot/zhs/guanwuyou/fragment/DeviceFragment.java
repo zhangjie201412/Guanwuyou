@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.iot.zhs.guanwuyou.MyApplication;
@@ -43,6 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
@@ -53,7 +56,7 @@ import okhttp3.MediaType;
  * Created by H151136 on 1/21/2018.
  */
 
-public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefreshLayoutDelegate,DeviceAdapter.OnItemClickListener {
+public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefreshLayoutDelegate, DeviceAdapter.OnItemClickListener {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final String TAG = "ZHS.IOT";
     private MyApplication myApplication;
@@ -61,31 +64,36 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     private BGARefreshLayout bgaRefreshLayout;
 
 
+    private String serialSN;//
     private TextView projectNameTv;
     private RecyclerView mRecyclerView;
     private DeviceAdapter mAdapter;
     private com.iot.zhs.guanwuyou.comm.http.DeviceModel info;
-    private List<DeviceVersion> deviceVersionList=new ArrayList<>();//数据库
+    private List<DeviceVersion> deviceVersionList = new ArrayList<>();//数据库
     private NotificationDialog mNotificationDialog;
 
     private ImageView loginOutIv;
     private WaitProgressDialog mProgressDialog;
 
-    public static  DeviceFragment deviceFragment;
-    public static  DeviceFragment getIntance(){
-        return  deviceFragment;
+    public static DeviceFragment deviceFragment;
+
+    public static DeviceFragment getIntance() {
+        return deviceFragment;
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_device, container, false);
-        deviceFragment=this;
+        deviceFragment = this;
+        mToast = Toast.makeText(this.getActivity(), "", Toast.LENGTH_SHORT);
+
         myApplication = MyApplication.getInstance();
         mSpUtils = myApplication.getSpUtils();
         mProgressDialog = new WaitProgressDialog(getContext());
 
 
-        projectNameTv=view.findViewById(R.id.tv_project_title);
+        projectNameTv = view.findViewById(R.id.tv_project_title);
         projectNameTv.setText(mSpUtils.getKeyLoginProjectName());
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
@@ -98,7 +106,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
 
         deviceVersionList = DataSupport.findAll(DeviceVersion.class);
 
-        loginOutIv=view.findViewById(R.id.login_out_iv);
+        loginOutIv = view.findViewById(R.id.login_out_iv);
         loginOutIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,7 +120,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                                 //响应左边的button
                                 if (id == 1) {
                                     loginOutDialog.dismiss();
-                                        DeviceFragment.this.getActivity().finish();
+                                    DeviceFragment.this.getActivity().finish();
                                 } else if (id == 2) {
                                     loginOutDialog.dismiss();
                                 }
@@ -132,7 +140,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     @Override
     public void onStart() {
         super.onStart();
-        Log.i(TAG,"--onStart--");
+        Log.i(TAG, "--onStart--");
         EventBus.getDefault().register(this);
     }
 
@@ -142,7 +150,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         EventBus.getDefault().unregister(this);
     }
 
-    public void doQuery(){
+    public void doQuery() {
         doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
     }
@@ -152,8 +160,8 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         super.onDestroyView();
     }
 
-    private void setListAdapter(){
-        if(mAdapter==null){
+    private void setListAdapter() {
+        if (mAdapter == null) {
             mAdapter = new DeviceAdapter(getContext());
             mAdapter.setSlaveDevices(info.data.slaveDevices);
             mAdapter.setMasterDevice(info.data.masterDevice);
@@ -161,7 +169,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
             mAdapter.setOnItemClickListener(this);
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);
-        }else{
+        } else {
             mAdapter.setSlaveDevices(info.data.slaveDevices);
             mAdapter.setMasterDevice(info.data.masterDevice);
             mAdapter.setDeviceVersionList(deviceVersionList);
@@ -185,27 +193,27 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     }
 
     @Override
-    public void onItemClick(int position,DeviceModel.Data.MasterDevice masterDevice, DeviceModel.Data.SlaveDevice slaveDevice) {
+    public void onItemClick(int position, DeviceModel.Data.MasterDevice masterDevice, DeviceModel.Data.SlaveDevice slaveDevice) {
         String ver;
-        if(position==0){//主机
-            if(masterDevice.isUpdate.equals("0")) {
-                for(DeviceVersion deviceVersion:deviceVersionList){
-                    if(masterDevice.masterDeviceSN.equals(deviceVersion.getSerialNumber())){
-                        showTips(0,"[主机]有新版本"+deviceVersion.getVersion()+"可用，是否安装更新?",deviceVersion);
+        if (position == 0) {//主机
+            if (masterDevice.isUpdate.equals("0")) {
+                for (DeviceVersion deviceVersion : deviceVersionList) {
+                    if (masterDevice.masterDeviceSN.equals(deviceVersion.getSerialNumber())) {
+                        showTips(0, "[主机]有新版本" + deviceVersion.getVersion() + "可用，是否安装更新?", deviceVersion);
 
                         break;
                     }
                 }
             }
 
-        }else{//从机
-            if(slaveDevice.isUpdate.equals("0")){
-                for(DeviceVersion deviceVersion:deviceVersionList){
-                    if(slaveDevice.slaveDeviceSN.equals(deviceVersion.getSerialNumber())){
-                        if(slaveDevice.deviceType==1){
-                            showTips(1,"[标定仪]有新版本"+deviceVersion.getVersion()+"可用，是否安装更新?",deviceVersion);
-                        }else{
-                            showTips(2,"[从机]有新版本"+deviceVersion.getVersion()+"可用，是否安装更新?",deviceVersion);
+        } else {//从机
+            if (slaveDevice.isUpdate.equals("0")) {
+                for (DeviceVersion deviceVersion : deviceVersionList) {
+                    if (slaveDevice.slaveDeviceSN.equals(deviceVersion.getSerialNumber())) {
+                        if (slaveDevice.deviceType == 1) {
+                            showTips(1, "[标定仪]有新版本" + deviceVersion.getVersion() + "可用，是否安装更新?", deviceVersion);
+                        } else {
+                            showTips(2, "[从机]有新版本" + deviceVersion.getVersion() + "可用，是否安装更新?", deviceVersion);
                         }
                         break;
                     }
@@ -214,7 +222,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         }
     }
 
-    private void showTips(final int flag, String message, final DeviceVersion deviceVersion){
+    private void showTips(final int flag, String message, final DeviceVersion deviceVersion) {
         mNotificationDialog = new NotificationDialog();
         mNotificationDialog.init("提醒",
                 "是",
@@ -224,24 +232,45 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
                     public void onButtonClick(int id) {
                         //响应左边的button
                         if (id == 1) {
-                          //  mProgressDialog.show();
+                            mProgressDialog.show();
+                            YmodernPackage ymodernPackage = YmodernPackage.getInstance();
 
-                            YmodernPackage ymodernPackage=YmodernPackage.getInstance();
-
-                            if(flag==0){//主机
+                            if (flag == 0) {//主机
                                 ymodernPackage.setUpdateFlag(0);
                                 ymodernPackage.setFilePath(deviceVersion.getLocalURL());
-
+                                ymodernPackage.setDeviceSN(deviceVersion.getSerialNumber());
                                 MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
                                 event.message = "firmware update master\r\n";
                                 EventBus.getDefault().post(event);
-                            }else{//从机
+                            } else {//从机
                                 ymodernPackage.setUpdateFlag(1);
                                 ymodernPackage.setFilePath(deviceVersion.getLocalURL());
+                                ymodernPackage.setDeviceSN(deviceVersion.getSerialNumber());
 
-                                MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
-                                event.message = "firmware update slave\r\n";
-                                EventBus.getDefault().post(event);
+                                String message="";
+                                if(ymodernPackage.isUart()){//切换串口
+                                    message="firmware update "+deviceVersion.getSerialNumber()+"\r\n";
+
+                                }else{
+                                    message="firmware update slave" +"\r\n";
+                                    //message="firmware update "+deviceVersion.getSerialNumber()+"\r\n";
+
+                                }
+                                final Timer timer = new Timer();
+                                final String finalMessage = message;
+                                timer.schedule(new TimerTask() {
+                                    int i = 0;
+
+                                    public void run() {
+                                        if (i++ == 5) {
+                                            timer.cancel();
+                                        }
+                                        MessageEvent event_uart = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
+                                        event_uart.message = finalMessage;
+                                        EventBus.getDefault().post(event_uart);
+                                    }
+                                }, 0,1000);// 设定指定的时间time,此处为2000毫秒
+
                             }
                             mNotificationDialog.dismiss();
                         } else if (id == 2) {
@@ -252,8 +281,6 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         mNotificationDialog.setMessage(message);
         mNotificationDialog.show(DeviceFragment.this.getActivity().getSupportFragmentManager(), "Notification");
     }
-
-
 
 
     private class SelectSlaveDeviceInfo extends StringCallback {
@@ -270,7 +297,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
             Gson gson = new Gson();
             info = gson.fromJson(response,
                     com.iot.zhs.guanwuyou.comm.http.DeviceModel.class);
-            if(info.code.equals(Utils.MSG_CODE_OK)) {
+            if (info.code.equals(Utils.MSG_CODE_OK)) {
                 setListAdapter();
             }
             bgaRefreshLayout.endRefreshing();
@@ -293,17 +320,66 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Log.d(TAG, "event: " + event.type + ", message: " + event.message);
+
+        //主机升级成功
         if (event.type == MessageEvent.EVENT_TYPE_MASTER_UPDATE_SUCCESS) {
-          if(mProgressDialog!=null&&mProgressDialog.isShowing()){
-              mProgressDialog.dismiss();
-          }
-        }
-        if(event.type==MessageEvent.EVENT_TYPE_MASTERL_UPDATE_FAIL){
-            if(mProgressDialog!=null&&mProgressDialog.isShowing()){
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
+            showToast("主机升级成功");
+            //删除数据库对应的SN号数据，同时更新adapter图标去掉
+            String deviceSN=event.message;
+            Log.d(TAG, "Ym-数据库中的删除的SN: " + deviceSN);
+            DataSupport.deleteAll(DeviceVersion.class, "serialNumber = ?", deviceSN);
+            deviceVersionList = DataSupport.findAll(DeviceVersion.class);
+            //更新界面
+            setListAdapter();
         }
+        //从机升级成功
+        if (event.type == MessageEvent.EVENT_TYPE_SLAVE_UPDATE_SUCCESS) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            showToast("从机升级成功");
+            //删除数据库对应的SN号数据，同时更新adapter图标去掉
+            String deviceSN=event.message;
+            Log.d(TAG, "Ym-数据库中的删除的SN: "+ deviceSN);
+            DataSupport.deleteAll(DeviceVersion.class, "serialNumber = ?", deviceSN);
+            deviceVersionList = DataSupport.findAll(DeviceVersion.class);
+
+            //更新界面
+            setListAdapter();
+
+        }
+        //主机升级失败
+        if (event.type == MessageEvent.EVENT_TYPE_MASTERL_UPDATE_FAIL) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            showToast("主机升级失败");
+        }
+        //从机升级失败
+        if (event.type == MessageEvent.EVENT_TYPE_SLAVE_UPDATE_FAIL) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            showToast("从机升级失败");
+        }
+        //从机SN号不匹配
+        if(event.type==MessageEvent.EVENT_TYPE_SLAVE_SN_ERR){
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            showToast("从机SN号不匹配");
+        }
+
     }
 
+    private Toast mToast;
+
+    private void showToast(String msg) {
+        mToast.setText(msg);
+        mToast.show();
+    }
 
 }

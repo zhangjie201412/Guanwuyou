@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,10 +46,14 @@ public class YmodernPackage {
     public static final String MESG_START_TO_UPDATE_MASTER = "start to update master firmware";
     public static final String MESG_START_TO_UPDATE_SLAVE = "start to update slave firmware";
     public static final String MESG_UART_SWITCH_TO_SLAVE = "uart switch to slave";
-    public static final String MESG_MASTER_UPDATE_FAIL = "master updata fail";
+    public static final String MESG_MASTER_UPDATE_FAIL = "master update fail";
+    public static final String MESG_MASTER_UPDATE_SUCCESS = "master update success";
+    public static final String MESG_SLAVE_UPDATE_FAIL = "slave update fail";
+    public static final String MESG_SLAVE_UPDATE_SUCCESS = "slave update success";
+    public static final String MESG_SLAVE_SN_ERR = "Sn is not match";
 
     public static final String MESG_ACK = "ACK";
-    public static final String MESG_C = "C";
+    public static final String MESG_C = "STARTC";
     public static final String MESG_NAK = "NAK";
     public static final String MESG_CA = "CA";
 
@@ -75,19 +81,23 @@ public class YmodernPackage {
 
     public byte m_package[] = new byte[SOH_TYPE_GROUP_SIZE];
 
-    private String fileName="";
-    private int updateFlag=-1;
-
+    private String fileName = "";
+    private String filePath;
+    private int updateFlag = -1;
     public File file;//文件
     private String mRawData;
     private int count = 0;// 文件大小/1024 取整
     private int lastPackageSize = 0;//文件大小/1024 取余，即最后一笔文件数据的大小
     private byte[] fileByte;//文件的字节数组
+    private String deviceSN;//sn号
+
     private int iIndexOfPackage = 0;//数据发送的index
     private boolean isEOTSended = false;//EOT数据是否发送
     private boolean isZeroSended = false;//zero数据是否发送
-
     private boolean isSOHSended = false;
+
+    private boolean isUart=false;
+
 
     private YmodernPackage() {
     }
@@ -105,31 +115,44 @@ public class YmodernPackage {
         return instance;
     }
 
+    public boolean isUart() {
+        return isUart;
+    }
 
     public void setUpdateFlag(int updateFlag) {
         this.updateFlag = updateFlag;
 
-        if(updateFlag==0){//主机
-            fileName="gz02Project-master.bin";
+        if (updateFlag == 0) {//主机
+            fileName = "gz02Project-master.bin";
 
-        }else if(updateFlag==1){//从机
-            fileName="gz02Project-slave.bin";
+        } else if (updateFlag == 1) {//从机
+            fileName = "gz02Project-slave.bin";
         }
     }
 
     public void setFilePath(String filePath) {
         //adb shell 目录 /storage/emulated/legacy/AndroidGZZ20
-       // filePath = "/storage/emulated/0/AndroidGZZ20/15308452348744b3987a4-07bd-4881-a5e3-7f8b0cc96a3b.bin";
+        // filePath = "/storage/emulated/0/AndroidGZZ20/15308452348744b3987a4-07bd-4881-a5e3-7f8b0cc96a3b.bin";
 
+        this.filePath=filePath;
         File oldFile = new File(filePath);
-        file=new File(oldFile.getParent()+"/"+fileName);
+        file = new File(oldFile.getParent() + "/" + fileName);
         copyFile(oldFile, file);
 
         fileByte = toByteArray(file);
     }
 
+    public void setDeviceSN(String deviceSN) {
+        this.deviceSN = deviceSN;
+    }
+
     public void setmRawData(String rawData) {
         this.mRawData = rawData.replaceAll("\r", "").replaceAll("\n", "").trim();
+       /* Log.d(TAG,"YmodernPackage---mRawData=="+mRawData);
+
+        if(mRawData.equals("")){
+            Log.d(TAG,"YmodernPackage---mRawData==空");
+        }*/
     }
 
 
@@ -146,16 +169,65 @@ public class YmodernPackage {
                     clearData();
                     break;
                 case MESG_UART_SWITCH_TO_SLAVE://主机切换串口
-                    clearData();
+                    isUart=true;
+                    final Timer timer=new Timer();
+                    timer.schedule(new TimerTask() {
+                        int i=0;
+                            public void run() {
+                                if(i++==5){
+                                    timer.cancel();
+                                }
+                                MessageEvent event_uart = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
+                                event_uart.message = "firmware update "+deviceSN+"\r\n";
+                                EventBus.getDefault().post(event_uart);
+                            }
+                        }, 0,1000);// 设定指定的时间time,此处为2000毫秒
+
+
                     break;
                 case MESG_MASTER_UPDATE_FAIL://主机升级失败
+                    Log.d(TAG, "Ym-主机升级失败");
                     //通知界面dialog销毁
-                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_MASTERL_UPDATE_FAIL);
-                    event.chars = m_package;
-                    EventBus.getDefault().post(event);
-                    break;
+                    MessageEvent m_event_fail = new MessageEvent(MessageEvent.EVENT_TYPE_MASTERL_UPDATE_FAIL);
+                    m_event_fail.message = deviceSN;
+                    EventBus.getDefault().post(m_event_fail);
 
+                    break;
+                case MESG_MASTER_UPDATE_SUCCESS://主机升级成功
+                    //通知界面dialog销毁
+                    Log.d(TAG, "Ym--主机升级成功");
+                    //对应的本地文件也删除
+                    deleteFile(filePath);
+                    MessageEvent m_event_success = new MessageEvent(MessageEvent.EVENT_TYPE_MASTER_UPDATE_SUCCESS);
+                    m_event_success.message = deviceSN;
+                    EventBus.getDefault().post(m_event_success);
+                    break;
+                case MESG_SLAVE_UPDATE_FAIL://从机升级失败
+                    //通知界面dialog销毁
+                    Log.d(TAG, "Ym--从机升级失败");
+                    MessageEvent s_event_fail = new MessageEvent(MessageEvent.EVENT_TYPE_SLAVE_UPDATE_FAIL);
+                    s_event_fail.message = deviceSN;
+                    EventBus.getDefault().post(s_event_fail);
+                    break;
+                case MESG_SLAVE_UPDATE_SUCCESS://从机升级成功
+                    //对应的本地文件也删除
+                    deleteFile(filePath);
+                    //通知界面dialog销毁
+                    Log.d(TAG, "Ym--从机升级成功");
+                    MessageEvent s_event_success = new MessageEvent(MessageEvent.EVENT_TYPE_SLAVE_UPDATE_SUCCESS);
+                    s_event_success.message = deviceSN;
+                    EventBus.getDefault().post(s_event_success);
+
+                    break;
+                case MESG_SLAVE_SN_ERR://从机SN号不匹配
+                    //通知界面dialog销毁
+                    Log.d(TAG, "Ym--从机升级失败-SN不匹配");
+                    MessageEvent s_event_err = new MessageEvent(MessageEvent.EVENT_TYPE_SLAVE_SN_ERR);
+                    s_event_err.message = deviceSN;
+                    EventBus.getDefault().post(s_event_err);
+                    break;
                 case MESG_C:
+                    Log.d(TAG,"YmodernPackage--startc");
                     if (isLastPackage()) {
                         if (!isZeroSended) {
                             constructZeroPackage();
@@ -193,6 +265,7 @@ public class YmodernPackage {
                     break;
                 case MESG_NAK:
                     constructEOTPackage();
+                    isEOTSended = true;
                     break;
                 case MESG_CA:
                     break;
@@ -244,7 +317,7 @@ public class YmodernPackage {
         lastPackageSize = (int) (fileLength % STX_PACKET_SIZE);
        /* char[] fileSizeChar = Long.toHexString(fileLength).toCharArray();//400
         byte[] fileSizeByte = new String(fileSizeChar).getBytes();*/ //先转成16进制，在转ascii
-        byte[] fileSizeByte=(fileLength+"").getBytes();
+        byte[] fileSizeByte = (fileLength + "").getBytes();
         int fileSizeLength = fileSizeByte.length;
         System.arraycopy(fileSizeByte, 0, m_package, PACKET_HEADER + fileNameLength + 1, fileSizeLength);
         m_package[PACKET_HEADER + fileNameLength + 1 + fileSizeLength] = 0x00;
@@ -268,6 +341,9 @@ public class YmodernPackage {
     //数据传递的数据帧
     public void constructRealDataPackage(int iIndex) {
         Log.d(TAG, "YmodernPackage--constructRealDataPackage");
+        Log.d(TAG, "YmodernPackage--constructRealDataPackage--iIndex=" + iIndex);
+        Log.d(TAG, "YmodernPackage--constructRealDataPackage--count=" + count);
+
         if (iIndex <= count) {
             m_package = null;
             m_package = new byte[STX_TYPE_GROUP_SIZE];
@@ -291,8 +367,11 @@ public class YmodernPackage {
         //如果文件数据的最后剩余的数据在128~1024之前，则还是使用STX的1024字节传输，但是剩余空间全部用0x1A填充
         //如果文件大小小于等于128字节或者文件数据最后剩余的数据小于128字节，则YModem会选择SOH数据帧用128字节来传输数据，如果数据不满128字节，剩余的数据用0x1A填充这是数据正的结构就变成
         if (lastPackageSize > 0 && iIndex == count + 1) {//最后一笔 128
+            Log.d(TAG, "YmodernPackage--constructRealDataPackage--最后一笔lastPackageSize=" + lastPackageSize);
 
             if (lastPackageSize <= SOH_PACKET_SIZE) {
+                Log.d(TAG, "YmodernPackage--constructRealDataPackage--最后一笔--128");
+
                 m_package = null;
                 m_package = new byte[SOH_TYPE_GROUP_SIZE];
                 m_package[0] = SOH;
@@ -305,14 +384,18 @@ public class YmodernPackage {
                 m_package[2] = (byte) (0xFF - sendIndex);
                 System.arraycopy(fileByte, count * STX_PACKET_SIZE, m_package, PACKET_HEADER, lastPackageSize);
 
-                for (int i = 0; i < SOH_PACKET_SIZE - lastPackageSize; i++) {
-                    m_package[PACKET_HEADER + lastPackageSize + i] = 0x1A;
+                if (lastPackageSize < SOH_PACKET_SIZE) {
+                    for (int i = 0; i < SOH_PACKET_SIZE - lastPackageSize; i++) {
+                        m_package[PACKET_HEADER + lastPackageSize + i] = 0x1A;
+                    }
                 }
 
                 int crc = CRC16(m_package, SOH_PACKET_SIZE);
                 m_package[PACKET_HEADER + SOH_PACKET_SIZE + 1] = (byte) crc;//lower bytes
                 m_package[PACKET_HEADER + SOH_PACKET_SIZE] = (byte) (crc >> 8);//high bytes
             } else {//1024
+                Log.d(TAG, "YmodernPackage--constructRealDataPackage--最后一笔--1024");
+
                 m_package = null;
                 m_package = new byte[STX_TYPE_GROUP_SIZE];
                 m_package[0] = STX;
@@ -422,7 +505,7 @@ public class YmodernPackage {
      * @param file
      */
     public static long getFileSize(File file) {
-        if(file==null){
+        if (file == null) {
             return 0;
         }
         if (file.exists() && file.isFile()) {
@@ -473,12 +556,18 @@ public class YmodernPackage {
 
     //文件拷贝
     //要复制的目录下的所有非子目录(文件夹)文件拷贝
-    public static boolean copyFile( File fromFile,  File toFile) {
-        if(!fromFile.exists()){
+    public static boolean copyFile(File fromFile, File toFile) {
+        if (!fromFile.exists()) {
             return false;
         }
-        if(toFile.exists()){
+        if (toFile.exists()) {
             toFile.delete();
+        }
+
+        try {
+            toFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         try {
@@ -495,6 +584,30 @@ public class YmodernPackage {
 
         } catch (Exception ex) {
             return false;
+        }
+    }
+
+    /**
+     * 删除单个文件
+     *
+     * @param filePath
+     *            要删除的文件的文件名
+     * @return 单个文件删除成功返回true，否则返回false
+     */
+    public static void deleteFile(String filePath) {
+        Log.d(TAG,"Ym-filePath--"+filePath);
+
+        if(!Utils.stringIsEmpty(filePath)) {
+            File file = new File(filePath);
+            // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+            if (file.exists() && file.isFile()) {
+               if(file.delete()){
+                   Log.d(TAG,"Ym-filePath--删除成功");
+               }else{
+                   Log.d(TAG,"Ym-filePath--删除失败");
+               }
+
+            }
         }
     }
 

@@ -12,9 +12,11 @@ public class MessageEvent {
     public static final int EVENT_TYPE_UPDATE_CAL_SLURRY = 4;
 
     public static final int EVENT_TYPE_SERIAL_UPDATE_WRITE = 5;//主机从机在线升级
-    public static final int EVENT_TYPE_MASTER_UPDATE_SUCCESS = 6;//主机从机在线升级-成功
-    public static final int EVENT_TYPE_MASTERL_UPDATE_FAIL = 7;//主机从机在线升级-失败
-
+    public static final int EVENT_TYPE_MASTER_UPDATE_SUCCESS = 6;//主机在线升级-成功
+    public static final int EVENT_TYPE_MASTERL_UPDATE_FAIL = 7;//主机在线升级-失败
+    public static final int EVENT_TYPE_SLAVE_UPDATE_SUCCESS = 8;//从机在线升级-成功
+    public static final int EVENT_TYPE_SLAVE_UPDATE_FAIL = 9;//从机在线升级-失败
+    public static final int EVENT_TYPE_SLAVE_SN_ERR = 10;//从机在线升级-失败-sn号不匹配
 
 
     public int type;

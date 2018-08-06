@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by H151136 on 1/21/2018.
@@ -41,6 +43,8 @@ public class YmodernService extends Service {
     private SerialPort mSerialPort;
     private String mRecvBuffer;
     private SerialPortMonitorThread mMonitorThread;
+    private SerialPortReadThread serialPortReadThread;
+
     private MyApplication mApplication;
     private SharedPreferenceUtils mSpUtils;
 
@@ -106,6 +110,10 @@ public class YmodernService extends Service {
         mMonitorThread.setStart();
         mMonitorThread.start();
 
+        serialPortReadThread = new SerialPortReadThread();
+        serialPortReadThread.setStart();
+        serialPortReadThread.start();
+
         EventBus.getDefault().register(this);
     }
 
@@ -114,8 +122,10 @@ public class YmodernService extends Service {
         super.onDestroy();
         mSerialPort.close();
         mMonitorThread.setStop();
+        serialPortReadThread.setStop();
         try {
             mMonitorThread.join(1000);
+            serialPortReadThread.join(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -134,8 +144,10 @@ public class YmodernService extends Service {
 
                 if (event.chars != null && event.chars.length > 0) {
                     mOutput.write(event.chars);
-                    Log.d(TAG,"YmodernPackage数据帧："+Arrays.toString(event.chars));
-                    Log.d(TAG,"YmodernPackage数据帧："+Utils.bytesToHexString(event.chars));
+                    Log.d(TAG, "YmodernPackage数据帧传输");
+
+                    // Log.d(TAG,"YmodernPackage数据帧："+Arrays.toString(event.chars));
+                   // Log.d(TAG, "YmodernPackage-16进制数据帧：" + Utils.bytesToHexString(event.chars));
 
                 }
 
@@ -153,16 +165,25 @@ public class YmodernService extends Service {
     }
 
     private void process() {
-        int endIndex = mRecvBuffer.indexOf("\n");
-        if (endIndex > 0) {
-            String cutString = mRecvBuffer.substring(0, endIndex);
-            mRecvBuffer = mRecvBuffer.substring(endIndex + 1);
+        // Log.d(TAG, "YmodernPackage---mRecvBuffer=="+mRecvBuffer);
 
+        if(mRecvBuffer!=null) {
+            int endIndex = mRecvBuffer.indexOf("\n");
+            if (endIndex > 0) {
+                String cutString = mRecvBuffer.substring(0, endIndex);
+                mRecvBuffer = mRecvBuffer.substring(endIndex + 1);
 
-            ymodernPkg = YmodernPackage.getInstance();
-            ymodernPkg.setmRawData(cutString);
-            ymodernPkg.parse();
+                if (cutString.equals("")) {
+                    //Log.d(TAG, "YmodernPackage---cutString==空");
+                }
+              //  Log.d(TAG, "YmodernPackage---cutString==" + cutString);
+                ymodernPkg = YmodernPackage.getInstance();
+                ymodernPkg.setmRawData(cutString);
+                ymodernPkg.parse();
 
+            }else if(endIndex==0){// \n开头，去掉第一位
+                mRecvBuffer = mRecvBuffer.substring(1);
+            }
         }
     }
 
@@ -182,27 +203,33 @@ public class YmodernService extends Service {
         public void run() {
             super.run();
             while (start) {
+
+                int length = 0;
                 try {
-                    int length = mInput.available();
+                    length = mInput.available();
                     if (length > 0) {
                         byte[] buffer = new byte[length];
                         mInput.read(buffer, 0, length);
                         String recv = new String(buffer);
                         mRecvBuffer += recv;
-//                        Log.d(TAG, String.format("Read %d bytes: %s", length, new String(buffer)));
-                        process();
+                        Log.d(TAG, String.format("update Read %d bytes: %s", length, new String(buffer)));
+                      //  process();
                     } else {
                         // Log.d(TAG,"休眠");
                         // Thread.sleep(100);
                     }
                 } catch (IOException e) {
-                    MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
-                    Log.d(TAG, "Serial port communicate failed");
-                    event.message = "1";
-                    EventBus.getDefault().post(event);
-
                     e.printStackTrace();
-                } /*catch (InterruptedException e) {
+                }
+
+            }
+
+            MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
+            Log.d(TAG, "Serial port communicate failed");
+            event.message = "1";
+            EventBus.getDefault().post(event);
+
+                 /*catch (InterruptedException e) {
                     MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_ERROR_UART);
                     Log.d(TAG, "Serial port communicate failed");
                     event.message = "1";
@@ -210,6 +237,28 @@ public class YmodernService extends Service {
 
                     e.printStackTrace();
                 }*/
+
+        }
+    }
+
+
+    private class SerialPortReadThread extends Thread {
+
+        private boolean start;
+
+        public void setStart() {
+            this.start = true;
+        }
+
+        public void setStop() {
+            this.start = false;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            while (start) {
+                process();
             }
         }
     }

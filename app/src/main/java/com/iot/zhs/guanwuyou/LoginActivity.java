@@ -41,6 +41,9 @@ import com.zhy.http.okhttp.callback.Callback;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.Response;
@@ -196,13 +199,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String username, final String password) {
-        YmodernPackage ymodernPackage=YmodernPackage.getInstance();
-        ymodernPackage.setUpdateFlag(0);
-        ymodernPackage.setFilePath("/storage/emulated/0/AndroidGZZ20/15308452348744b3987a4-07bd-4881-a5e3-7f8b0cc96a3b.bin");
-        MessageEvent event = new MessageEvent(MessageEvent.EVENT_TYPE_SERIAL_UPDATE_WRITE);
-        event.message = "firmware update master\r\n";
-        EventBus.getDefault().post(event);
-
         String encodePassword = Utils.encrypt(Utils.encrypt(password));
         Log.d(TAG, "encode password: " + encodePassword);
         mProgressDialog.show();
