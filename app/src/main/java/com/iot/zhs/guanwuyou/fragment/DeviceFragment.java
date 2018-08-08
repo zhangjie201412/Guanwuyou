@@ -134,6 +134,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
         doSelectSlaveDeviceInfo(mSpUtils.getKeyLoginToken(),
                 mSpUtils.getKeyLoginUserId(), mSpUtils.getKeyLoginiMasterDeviceSn());
 
+        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -141,7 +142,7 @@ public class DeviceFragment extends Fragment implements BGARefreshLayout.BGARefr
     public void onStart() {
         super.onStart();
         Log.i(TAG, "--onStart--");
-        EventBus.getDefault().register(this);
+
     }
 
     @Override

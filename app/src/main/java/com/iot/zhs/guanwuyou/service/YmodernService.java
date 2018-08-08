@@ -147,7 +147,7 @@ public class YmodernService extends Service {
                     Log.d(TAG, "YmodernPackage数据帧传输");
 
                     // Log.d(TAG,"YmodernPackage数据帧："+Arrays.toString(event.chars));
-                   // Log.d(TAG, "YmodernPackage-16进制数据帧：" + Utils.bytesToHexString(event.chars));
+                    Log.d(TAG, "YmodernPackage-16进制数据帧：" + Utils.bytesToHexString(event.chars));
 
                 }
 

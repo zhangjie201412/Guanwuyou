@@ -738,6 +738,17 @@ public class SerialPackage {
 
                 }
             });
+        } else if(mOperation.equals("idle")){
+            ProtocolPackage pkg = new ProtocolPackage(MyApplication.getInstance().getSyncId(),
+                    "0", MyApplication.getInstance().getSpUtils().getKeyLoginiMasterDeviceSn(),
+                    mDeviceId1, "idle", "none", mData.size(), mData);
+            Log.d(TAG, "-> " + pkg.toString());//>>cssp,108,0,SN0301201807180001,SN0302201807180006,idle,none,3,0,0,0,3f
+            Utils.doProcessProtocolInfo(pkg, new Utils.ResponseCallback() {
+                @Override
+                public void onResponse(String response, ProcessProtocolInfo processProtocolInfo, ProtocolPackage pkgResponse) {
+
+                }
+            });
         }
     }
 

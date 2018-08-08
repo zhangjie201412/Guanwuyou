@@ -197,7 +197,7 @@ public class YmodernPackage {
                     //通知界面dialog销毁
                     Log.d(TAG, "Ym--主机升级成功");
                     //对应的本地文件也删除
-                    deleteFile(filePath);
+                   // deleteFile(filePath);
                     MessageEvent m_event_success = new MessageEvent(MessageEvent.EVENT_TYPE_MASTER_UPDATE_SUCCESS);
                     m_event_success.message = deviceSN;
                     EventBus.getDefault().post(m_event_success);
@@ -211,7 +211,7 @@ public class YmodernPackage {
                     break;
                 case MESG_SLAVE_UPDATE_SUCCESS://从机升级成功
                     //对应的本地文件也删除
-                    deleteFile(filePath);
+                  //  deleteFile(filePath);
                     //通知界面dialog销毁
                     Log.d(TAG, "Ym--从机升级成功");
                     MessageEvent s_event_success = new MessageEvent(MessageEvent.EVENT_TYPE_SLAVE_UPDATE_SUCCESS);
